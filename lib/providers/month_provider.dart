@@ -33,6 +33,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -614,11 +615,13 @@ class MonthProvider extends ChangeNotifier {
         (value) async {
           try {
             if (monthDataModel != null) {
+              DateTime now = await NTP.now();
+
               DateTime today = DateTime.now();
-              startTime = Utils.formattedDate(
-                  "${monthDataModel?.startDate ?? DateTime.now().toUtc()}");
-              endTime = Utils.formattedDate(
-                  "${monthDataModel?.endDate ?? DateTime.now().toUtc()}");
+              startTime =
+                  Utils.formattedDate("${monthDataModel?.startDate ?? now}");
+              endTime =
+                  Utils.formattedDate("${monthDataModel?.endDate ?? now}");
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(
                       startTime!.year, startTime!.month, startTime!.day))
@@ -682,11 +685,11 @@ class MonthProvider extends ChangeNotifier {
       debugPrint("Image cache failed : $e");
     }
     notifyListeners();
-
+    DateTime now = await NTP.now();
     NotificationService.scheduleMonthlyReminder(
-        20, monthDataModel?.endDate ?? DateTime.now().toUtc());
+        20, monthDataModel?.endDate ?? now);
     NotificationService.scheduleWeekReminder(
-        30, monthDataModel?.endDate ?? DateTime.now().toUtc());
+        30, monthDataModel?.endDate ?? now);
   }
 
   Future<void> fetchWarmUp(String warmUpId) async {
@@ -1207,6 +1210,10 @@ class MonthProvider extends ChangeNotifier {
     // await pf.setString(SharedPreference.lastTimerPassed, timePassed1);
     // await pf.setString(
     //     SharedPreference.lastExitTime, DateTime.now().toString());
+    String split = monthDataModel?.weeks?[overviewCurrentWeek - 1].idList?.first
+            .toString()
+            .split(" ")[1] ??
+        "";
 
     if (timerAddress != '') {
       timePassed = timePassed1;
@@ -1219,7 +1226,8 @@ class MonthProvider extends ChangeNotifier {
           'exercise_index': selectedExIndex,
           'month_id': monthDataModel?.id,
           'week_id': weekDataModel?.id,
-          'day_id': dayDataModel?.id,
+          'day_id':
+              "${weekDataModel?.id} $split ${weekDataModel!.dayList![overviewCurrentDay - 1]}",
           'week_index': overviewCurrentWeek,
           'day_index': overviewCurrentDay,
           'is_pumpday': isPumpDay,
@@ -1432,8 +1440,7 @@ class MonthProvider extends ChangeNotifier {
     List<DayHistoryModel> decodedData;
     try {
       decodedData = List<DayHistoryModel>.from(
-        json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)),
-      );
+          json.decode(encodedTempData).map((x) => DayHistoryModel.fromJson(x)));
       decodedData.removeWhere((element) =>
           element.status == Status.empty ||
           element.status == Status.started ||
@@ -1445,7 +1452,6 @@ class MonthProvider extends ChangeNotifier {
         DateTime localTimeBDate = Utils.formattedDate("$bDate");
         return localTimeBDate.compareTo(localTimeADate);
       });
-
       DateTime now = DateTime.now();
       DateTime today = DateTime(now.year, now.month, now.day);
 
@@ -1815,14 +1821,15 @@ class MonthProvider extends ChangeNotifier {
           .getDataByDataId(tableName: DatabaseHelper.dayStatus, id: dataId);
       if (data != null) {
         dayHistoryDetails = DayHistoryModel.fromJson(data);
+        notifyListeners();
       } else {
         dayHistoryDetails = null;
       }
     } catch (e) {
       debugPrint("Error fetching single day history data: $e");
+    } finally {
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   List<CircuitModel> circuitModel = [];
@@ -1902,6 +1909,9 @@ class MonthProvider extends ChangeNotifier {
         "";
 
     try {
+      final data1 = await DatabaseHelper()
+          .fetchData(tableName: DatabaseHelper.swapExerciseHistory);
+      log('data1==========>>>>>${jsonEncode(data1)}');
       final data = await DatabaseHelper().getFilteredWithMWDData(
         tableName: DatabaseHelper.swapExerciseHistory,
         monthId: monthDataModel?.id ?? "",
@@ -1910,9 +1920,7 @@ class MonthProvider extends ChangeNotifier {
         dayId: monthDataModel!
             .weeks?[overviewCurrentWeek - 1].idList![overviewCurrentDay - 1],
       );
-      String? userIdToken = await getAuthToken();
 
-      log('data==========>>>>>${userIdToken}');
       if (data.isNotEmpty) {
         swapExerciseList = List<SwapExerciseModel>.from(
             data.map((x) => SwapExerciseModel.fromJson(x)));
@@ -3293,12 +3301,16 @@ class MonthProvider extends ChangeNotifier {
               } catch (e) {
                 debugPrint("Image cache failed : $e");
               }
+
               notifyListeners();
+
+              DateTime now1 = await NTP.now();
+
               DateTime today = DateTime.now();
-              startTime = Utils.formattedDate(
-                  "${monthDataModel?.startDate ?? DateTime.now().toUtc()}");
-              endTime = Utils.formattedDate(
-                  "${monthDataModel?.endDate ?? DateTime.now().toUtc()}");
+              startTime =
+                  Utils.formattedDate("${monthDataModel?.startDate ?? now1}");
+              endTime =
+                  Utils.formattedDate("${monthDataModel?.endDate ?? now1}");
               int dayDelta = DateTime(today.year, today.month, today.day)
                   .difference(DateTime(
                       startTime!.year, startTime!.month, startTime!.day))

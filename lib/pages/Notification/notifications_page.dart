@@ -8,6 +8,7 @@ import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 import '../../localstorage/month_prefrence.dart';
@@ -66,7 +67,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
             children: [
               Container(
                   width: ScreenUtil.horizontalScale(100),
-                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(5), vertical: ScreenUtil.verticalScale(0.2)),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil.horizontalScale(5),
+                      vertical: ScreenUtil.verticalScale(0.2)),
                   padding: EdgeInsets.all(ScreenUtil.verticalScale(2)),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -166,21 +169,26 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                     alignment: Alignment.center,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
                                             margin: EdgeInsets.only(
-                                              left: ScreenUtil.horizontalScale(4),
+                                              left:
+                                                  ScreenUtil.horizontalScale(4),
                                             ),
                                             decoration: const BoxDecoration(
                                               color: Color(0XFFd18a9b),
                                               shape: BoxShape.circle,
                                             ),
                                             child: SizedBox(
-                                              width: ScreenUtil.verticalScale(4.65),
-                                              height: ScreenUtil.verticalScale(4.65),
+                                              width: ScreenUtil.verticalScale(
+                                                  4.65),
+                                              height: ScreenUtil.verticalScale(
+                                                  4.65),
                                               child: IconButton(
-                                                padding: EdgeInsets.zero, // Removes the default padding
+                                                padding: EdgeInsets
+                                                    .zero, // Removes the default padding
                                                 icon: const Icon(
                                                   Icons.keyboard_arrow_left,
                                                   color: Colors.white,
@@ -189,7 +197,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                                   // HapticFeedBack.buttonClick();
                                                   Navigator.pop(context);
                                                 },
-                                                iconSize: ScreenUtil.verticalScale(4), // Icon size remains the same
+                                                iconSize: ScreenUtil.verticalScale(
+                                                    4), // Icon size remains the same
                                               ),
                                             ),
                                           ),
@@ -199,12 +208,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                               'Notifications',
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: ScreenUtil.verticalScale(2.5),
+                                                fontSize:
+                                                    ScreenUtil.verticalScale(
+                                                        2.5),
                                               ),
                                             ),
                                           ),
                                           SizedBox(
-                                            width: ScreenUtil.horizontalScale(10),
+                                            width:
+                                                ScreenUtil.horizontalScale(10),
                                           ),
                                         ],
                                       ),
@@ -244,11 +256,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                              topLeft:
+                                  Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Container(
-                            margin: EdgeInsets.only(top: media.height / 19, right: 20, left: 20),
+                            margin: EdgeInsets.only(
+                                top: media.height / 19, right: 20, left: 20),
                             child: Column(
                               children: notificationData.map((notification) {
                                 return Column(
@@ -272,11 +286,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                              topLeft:
+                                  Radius.circular(ScreenUtil.verticalScale(7)),
                             ),
                           ),
                           child: Container(
-                              margin: EdgeInsets.only(top: (ScreenUtil.verticalScale(80) - 300) / 2, right: 20, left: 20),
+                              margin: EdgeInsets.only(
+                                  top: (ScreenUtil.verticalScale(80) - 300) / 2,
+                                  right: 20,
+                                  left: 20),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -315,7 +333,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
       bottomNavigationBar: Wrap(
         children: [
           Container(
-            margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(10), vertical: ScreenUtil.verticalScale(2)),
+            margin: EdgeInsets.symmetric(
+                horizontal: ScreenUtil.horizontalScale(10),
+                vertical: ScreenUtil.verticalScale(2)),
             child: Column(
               children: [
                 Row(
@@ -329,19 +349,26 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Consumer<MonthProvider>(builder: (context, monthDataModel, child) {
+                    Consumer<MonthProvider>(
+                        builder: (context, monthDataModel, child) {
                       return Switch(
                         value: isSwitchOn ?? false, // Boolean value
                         onChanged: (bool value) async {
                           setState(() {
                             isSwitchOn = value; // Update state
                           });
-                          await preferences.setBool(SharedPreference.notificationSwitch, isSwitchOn ?? false);
+                          await preferences.setBool(
+                              SharedPreference.notificationSwitch,
+                              isSwitchOn ?? false);
                           if (isSwitchOn == true) {
-                            await NotificationService.scheduleMonthlyReminder(20, monthDataModel.endTime ?? DateTime.now().toUtc());
-                            await NotificationService.scheduleWeekReminder(30, monthDataModel.endTime ?? DateTime.now().toUtc());
+                            DateTime now = await NTP.now();
+                            await NotificationService.scheduleMonthlyReminder(
+                                20, monthDataModel.endTime ?? now);
+                            await NotificationService.scheduleWeekReminder(
+                                30, monthDataModel.endTime ?? now);
                           } else {
-                            await NotificationService.clearScheduledNotification();
+                            await NotificationService
+                                .clearScheduledNotification();
                           }
                         },
                         activeColor: AppColors.primaryColor,
@@ -353,7 +380,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   height: ScreenUtil.verticalScale(1),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(0)),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil.horizontalScale(0)),
                   child: ButtonWidget(
                     text: "Continue Working Out",
                     textColor: Colors.white,

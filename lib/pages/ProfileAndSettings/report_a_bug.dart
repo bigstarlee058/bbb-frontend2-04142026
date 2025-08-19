@@ -9,10 +9,13 @@ import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
@@ -29,10 +32,37 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
   final descriptionController = TextEditingController();
   DataProvider? dataProvider;
 
+  String mobileVersion = "";
+  String appVersion = "";
+
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        PackageInfo version = await getCurrentAppVersion();
+
+        appVersion = version.version;
+
+        final deviceInfo = DeviceInfoPlugin();
+        if (Platform.isAndroid) {
+          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          mobileVersion =
+              "Device: ${androidInfo.model}, Brand: ${androidInfo.brand}, Android Version: ${androidInfo.version.release}";
+        } else if (Platform.isIOS) {
+          IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+          mobileVersion =
+              "Device: ${iosInfo.utsname.machine}, System Name: ${iosInfo.systemName}, iOS Version: ${iosInfo.systemVersion}";
+        }
+      },
+    );
     super.initState();
+  }
+
+  Future<PackageInfo> getCurrentAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo;
   }
 
   @override
@@ -82,6 +112,9 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
                         titleController.text.trim(),
                         descriptionController.text.trim(),
                         image,
+                        isFromReport: true,
+                        osVersion: mobileVersion,
+                        appVersion: appVersion,
                       );
                       if (val == true) {
                         Fluttertoast.showToast(
@@ -227,42 +260,4 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
           ),
         ),
       );
-
-  void showBottomAlert(BuildContext context, String msg) {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: ScreenUtil.verticalScale(3.2),
-        left: MediaQuery.of(context).size.width * 0.1,
-        right: MediaQuery.of(context).size.width * 0.1,
-        child: SafeArea(
-          top: false,
-          bottom: Platform.isAndroid ? true : false,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Center(
-                child: Text(
-                  msg,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlayState.insert(overlayEntry);
-
-    // Remove the alert after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
-  }
 }

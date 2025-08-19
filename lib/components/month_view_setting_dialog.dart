@@ -861,10 +861,14 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                     ),
                   ),
                   onTap: () async {
-                    Navigator.of(context).pop();
                     await preferences.putString(
                         SharedPreference.monthSettingDone,
                         value.monthDataModel?.id ?? "");
+                    await Future.delayed(Duration(milliseconds: 750)).then(
+                      (v) {
+                        Navigator.of(context).pop();
+                      },
+                    );
                   },
                 );
               }),

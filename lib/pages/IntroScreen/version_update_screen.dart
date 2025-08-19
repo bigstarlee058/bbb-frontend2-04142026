@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/values/app_colors.dart';
@@ -28,9 +29,13 @@ class _VersionUpdateScreenState extends State<VersionUpdateScreen> {
   }
 
   @override
+  void dispose() {
+    preferences.setBool(SharedPreference.isUpdatePopUP, true);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    log('Platform.isIOS dataP=>>>>>${dataProvider!.newVersionModel!.ios!.forceUpdate}');
-    log('Platform.isIOS dataP=>>>>>${dataProvider!.newVersionModel!.ios!.version}');
     ScreenUtil.init(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -126,7 +131,7 @@ class _VersionUpdateScreenState extends State<VersionUpdateScreen> {
                       blurRadius: 5,
                     ),
                   ],
-                  color: Colors.red,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(15),
                   image: DecorationImage(
                     image: AssetImage("assets/icons/app_icon.jpg"),
@@ -164,8 +169,9 @@ class _VersionUpdateScreenState extends State<VersionUpdateScreen> {
                     textColor: Colors.white,
                     color: AppColors.primaryColor,
                     onPress: () async {
-                      await _launchURL(
-                          "https://apps.apple.com/us/app/booty-by-bret/id6746472250");
+                      await _launchURL(Platform.isAndroid
+                          ? "https://play.google.com/store/apps/details?id=com.bootybybret.app"
+                          : "https://apps.apple.com/us/app/booty-by-bret/id6746472250");
                     },
                     isLoading: false),
               ),

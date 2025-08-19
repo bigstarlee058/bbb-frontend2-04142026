@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -57,7 +57,13 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   }
 
   Future<void> _loadValue() async {
-    await monthProvider?.fetchExerciseHistroy();
+    String date = "";
+    try {
+      date = context.read<UserDataProvider>().user["createdAt"];
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
+
     monthProvider?.exerciseHistroy.sort((a, b) {
       if (a.date != null && b.date != null) {
         return DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!));
@@ -68,7 +74,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     DateTime today = DateTime.now();
     DateTime startDate = selectedFilterIndex == 3
         ? DateTime.parse(monthProvider!.exerciseHistroy.first.date!)
-        : today.subtract(Duration(
+        : (today.add(Duration(days: 1))).subtract(Duration(
             days: selectedFilterIndex == 0
                 ? 27
                 : selectedFilterIndex == 1
@@ -79,8 +85,14 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       DateTime itemDate = DateTime.parse(item.date ?? "${DateTime.now()}");
       return itemDate.isAfter(
               DateTime(startDate.year, startDate.month, startDate.day)) &&
-          itemDate.isBefore(today);
+          itemDate.isBefore(today.add(Duration(days: 1)));
     }).toList();
+
+    if (date.isNotEmpty) {
+      final dateOfJoining = DateTime.parse(date);
+      historyDataModel.removeWhere(
+          (element) => dateOfJoining.isAfter(DateTime.parse(element.date!)));
+    }
 
     historyDataModel.sort((a, b) =>
         DateTime.parse(a.date ?? "").compareTo(DateTime.parse(b.date ?? "")));
@@ -106,7 +118,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     }
 
     final Map<String, ExerciseHistoryDataModel> highestByDate = {};
-
     for (final item in historyDataModel) {
       final dateStr = item.date;
       final date = DateTime.parse("${dateStr ?? DateTime.now()}");
@@ -117,7 +128,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
           ? (double.tryParse(item.weight ?? '0') ?? 0) * 0.45359237
           : double.tryParse(item.weight ?? '0') ?? 0;
 
-      final load = reps * weight;
+      final rir1 = int.tryParse(item.effort ?? "0") ?? 0;
+      double rir2 = (rir1 == 100 ? 0 : rir1.toDouble());
+      final load = (reps + rir2) * weight;
 
       if (!highestByDate.containsKey(dayKey) ||
           (load) >
@@ -158,6 +171,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
 
       double oneRmSession =
           weight * ((0.025 * (reps + rir)) + 1) /*+ (reps + rir) / 30)*/;
+
       groupedData[formattedDate]!['oneRmSession'] =
           groupedData[formattedDate]!['oneRmSession']! + oneRmSession;
       groupedData.removeWhere((key, value) =>
@@ -178,6 +192,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       dateLabels.add(date);
       index++;
     });
+
     // totalWeight = chartData.fold(0, (sum, spot) => sum + spot.y.toInt());
     max1RepMaxWeight = chartData.fold(
         0, (max, spot) => spot.y > max ? spot.y.toDouble() : max);
@@ -675,8 +690,8 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
               else
                 Expanded(
                   child: Container(
-                    padding:
-                        EdgeInsets.only(top: ScreenUtil.verticalScale(1.5)),
+                    padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil.verticalScale(1.5)),
                     color: Theme.of(context).cardColor,
                     child: ListView.separated(
                       separatorBuilder: (context, index) => SizedBox(height: 7),
@@ -902,184 +917,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
         ),
       ),
     );
-
-    // return Theme(
-    //   data: Theme.of(context).copyWith(
-    //     dividerColor: Colors.transparent,
-    //     splashColor: Colors.transparent,
-    //     highlightColor: Colors.transparent,
-    //   ),
-    //   child: ExpansionTile(
-    //     tilePadding: EdgeInsets.symmetric(
-    //       horizontal: ScreenUtil.horizontalScale(5),
-    //       vertical: ScreenUtil.verticalScale(0.5),
-    //     ),
-    //     title: Row(
-    //       children: [
-    //         Expanded(
-    //           child: Text(
-    //             title,
-    //             style: TextStyle(
-    //               color: AppColors.primaryColor,
-    //               fontSize: ScreenUtil.verticalScale(2),
-    //               fontWeight: FontWeight.bold,
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //     initiallyExpanded: _expandedStates[index] ?? false,
-    //     onExpansionChanged: (bool value) {
-    //       setState(() {
-    //         _expandedStates[index] = value;
-    //       });
-    //
-    //       // if (value && index == dataProvider!.faQsModel.length - 1) {
-    //       //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       //     Future.delayed(const Duration(milliseconds: 200), () {
-    //       //       if (_scrollController.hasClients) {
-    //       //         _scrollController.animateTo(
-    //       //           _scrollController.position.maxScrollExtent,
-    //       //           duration: const Duration(milliseconds: 100),
-    //       //           curve: Curves.easeOut,
-    //       //         );
-    //       //       }
-    //       //     });
-    //       //   });
-    //       // }
-    //       if (value) {
-    //         WidgetsBinding.instance.addPostFrameCallback((_) {
-    //           // _scrollToTile(index);
-    //         });
-    //       }
-    //     },
-    //     backgroundColor: Colors.grey.withValues(alpha: 0.05),
-    //     collapsedBackgroundColor: Colors.grey.withValues(alpha: 0.05),
-    //     childrenPadding: EdgeInsets.zero,
-    //     clipBehavior: Clip.none,
-    //     iconColor: AppColors.primaryColor,
-    //     collapsedIconColor: Colors.white,
-    //     trailing: Row(
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: [
-    //         InkWell(
-    //           child: Container(
-    //             padding: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-    //             decoration: BoxDecoration(
-    //               shape: BoxShape.circle,
-    //               border: Border.all(
-    //                 color: AppColors.primaryColor,
-    //                 width: 2,
-    //               ),
-    //               color: AppColors.primaryColor,
-    //             ),
-    //             child: Icon(
-    //               _expandedStates[index] == true
-    //                   ? Icons.keyboard_arrow_up_outlined
-    //                   : Icons.keyboard_arrow_down_outlined,
-    //               color: Colors.white,
-    //               size: ScreenUtil.verticalScale(3),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //     children: [
-    //       Padding(
-    //         padding: EdgeInsets.only(
-    //             left: ScreenUtil.verticalScale(0.5),
-    //             right: ScreenUtil.verticalScale(1)),
-    //         child: Column(
-    //           children: [
-    //             ...dayGroups.map<Widget>((dayGroup) {
-    //               final String date = dayGroup["date"];
-    //               final List exercises = dayGroup["data"];
-    //               return Padding(
-    //                 padding:
-    //                     const EdgeInsets.symmetric(vertical: 0, horizontal: 16)
-    //                         .copyWith(bottom: 25),
-    //                 child: Row(
-    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                   crossAxisAlignment: CrossAxisAlignment.start,
-    //                   children: [
-    //                     SizedBox(
-    //                       width: 100,
-    //                       child: Text(
-    //                         DateFormat("MMM dd, yyyy").format(
-    //                           DateFormat("dd/MM/yyyy").parse(date),
-    //                         ),
-    //                         style: const TextStyle(
-    //                           fontSize: 14,
-    //                           fontWeight: FontWeight.normal,
-    //                           color: Colors.black,
-    //                         ),
-    //                       ),
-    //                     ),
-    //                     Align(
-    //                       alignment: Alignment.centerRight,
-    //                       child: Column(
-    //                         crossAxisAlignment: CrossAxisAlignment.end,
-    //                         children: [
-    //                           ...exercises.map<Widget>(
-    //                             (e) {
-    //                               final data = e as ExerciseHistoryDataModel;
-    //                               return Padding(
-    //                                 padding: const EdgeInsets.only(bottom: 10),
-    //                                 child: RichText(
-    //                                   text: TextSpan(
-    //                                     children: [
-    //                                       TextSpan(
-    //                                         text: '${data.reps}',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black,
-    //                                             fontWeight: FontWeight.normal),
-    //                                       ),
-    //                                       const TextSpan(
-    //                                         text: ' × ',
-    //                                         style: TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text: '${data.weight}lbs',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black,
-    //                                             fontWeight: FontWeight.bold),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text: ' @ ${data.load}%',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text:
-    //                                             ' | RIR ${data.effort == "100" ? "0" : data.effort}',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                     ],
-    //                                   ),
-    //                                 ),
-    //                               );
-    //                             },
-    //                           )
-    //                         ],
-    //                       ),
-    //                     ),
-    //                   ],
-    //                 ),
-    //               );
-    //             })
-    //           ],
-    //         ),
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }
 

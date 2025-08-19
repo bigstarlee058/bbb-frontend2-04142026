@@ -41,6 +41,7 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -102,6 +103,7 @@ class DataProvider extends ChangeNotifier {
   Future<String?> getAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
+
     return authToken;
   }
 
@@ -118,7 +120,6 @@ class DataProvider extends ChangeNotifier {
             'Content-Type': 'application/json; charset=UTF-8',
             'AUTH_TOKEN': userIdToken ?? ''
           }));
-      log('response==========>>>>>$response');
       if (response.statusCode == 200 && response.data != null) {
         newVersionModel = NewVersionModel.fromJson(response.data);
         notifyListeners();
@@ -137,6 +138,9 @@ class DataProvider extends ChangeNotifier {
   List<Map<String, dynamic>> allImageList = [];
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
+    log('url==========>>>>>$url');
+    debugPrint('url==========>>>>>$url');
+    print('url==========>>>>>$url');
     String? userIdToken = await getAuthToken();
 
     try {
@@ -272,26 +276,29 @@ class DataProvider extends ChangeNotifier {
               if (achievementsData.isEmpty) {
                 if ((ele.achievementAchievementId?.value ?? 0) <=
                     (element.currentValue ?? 0)) {
+                  DateTime now = await NTP.now();
+
                   await ApiRepo.addAchievementsList(
                       body: UpdateAchievementsRequest(
-                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsDate: now.toString(),
                     achievementsTitle:
                         ele.achievementAchievementId?.achievementIdId ?? "",
                     achievementsSubtitle: "SYNC",
                   ).toJson1());
 
                   ele.achieved = true;
-                  ele.achievedDate = DateTime.now().toUtc().toString();
+                  ele.achievedDate = now.toString();
                 }
               } else if (achievementsData.isNotEmpty &&
                   (achievementsData.any((z) =>
                           z.achievementsTitle ==
                           ele.achievementAchievementId?.achievementIdId) ==
                       false)) {
+                DateTime now = await NTP.now();
                 if ((ele.achievementAchievementId!.value)! <=
                     (element.currentValue!)) {
                   final data = UpdateAchievementsRequest(
-                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsDate: now.toString(),
                     achievementsTitle:
                         ele.achievementAchievementId?.achievementIdId ?? "",
                     achievementsSubtitle: "SYNC",
@@ -299,7 +306,7 @@ class DataProvider extends ChangeNotifier {
                   await ApiRepo.addAchievementsList(body: data.toJson1());
 
                   ele.achieved = true;
-                  ele.achievedDate = DateTime.now().toUtc().toString();
+                  ele.achievedDate = now.toString();
                 }
               } else {
                 if (achievementsData.isNotEmpty) {
@@ -557,6 +564,7 @@ class DataProvider extends ChangeNotifier {
           'AUTH_TOKEN': userIdToken ?? "",
         },
       );
+
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -843,11 +851,13 @@ class DataProvider extends ChangeNotifier {
     final String url = '${AppConstants.serverUrl}/api/workouts/current';
 
     try {
+      DateTime now = await NTP.now();
+
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',
         'split': '5',
-        'date': "${DateTime.now().toUtc()}",
+        'date': "$now",
       };
 
       String? userIdToken = await getAuthToken();
@@ -1009,8 +1019,6 @@ class DataProvider extends ChangeNotifier {
         // }
 
         final value = await DatabaseHelper().areAllTablesEmpty();
-
-        log('value==========>>>>>${value}');
 
         /*if (value) {
           log('responseData=========5=========>>>>>${DateTime.now()}');
@@ -1225,7 +1233,6 @@ class DataProvider extends ChangeNotifier {
             log('responseData=========15=========>>>>>${DateTime.now()}');
           }
         }*/
-
         if (value) {
           await fetchAndStoreDayData(monthDataModelSplit3);
           fetchAndStoreAllData(monthDataModelSplit3);
@@ -1246,6 +1253,7 @@ class DataProvider extends ChangeNotifier {
 
       /// Fetch month enrollment first
       final monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+      print('monthEnrollment==========>>>>>${jsonEncode(monthEnrollment)}');
       if (monthEnrollment.isNotEmpty) {
         for (var element in monthEnrollment) {
           final body = {
@@ -1276,7 +1284,7 @@ class DataProvider extends ChangeNotifier {
       }
 
       final streakDataModelFuture = ApiRepo.fetchStreakCount();
-
+      log('streakDataModelFuture==========>>>>>$streakDataModelFuture');
       final apiResults = await Future.wait([
         ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? ""),
         // ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? ""),
@@ -1842,7 +1850,10 @@ class DataProvider extends ChangeNotifier {
 
   bool storyLoader = false;
   Future<bool> addOwnSpotlight(
-      String title, String description, File? imageFile) async {
+      String title, String description, File? imageFile,
+      {bool isFromReport = false,
+      String? osVersion,
+      String? appVersion}) async {
     storyLoader = true;
     notifyListeners();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/addOwnSpotsligt');
@@ -1853,6 +1864,15 @@ class DataProvider extends ChangeNotifier {
       http.MultipartRequest request = http.MultipartRequest("POST", url);
       request.fields['title'] = title;
       request.fields['description'] = description;
+
+      if (isFromReport) {
+        // request.fields['app_version'] = osVersion ?? "";
+        // request.fields['device_version'] = appVersion ?? "";
+        final version = (osVersion ?? "") + (appVersion ?? "");
+        request.fields['description'] = "$description\nVersion: [$version]";
+      } else {
+        request.fields['description'] = description;
+      }
 
       if (imageFile != null) {
         final stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));

@@ -28,6 +28,7 @@ class SharedPreference {
   static const String isScreenAwake = "IS-SCREEN-AWAKE";
   static const String isDarkMode = "IS-DARK-MODE";
   static const String isKG = "IS-KG";
+  static const String isUpdatePopUP = "IS-UPDATE-POPUP";
 
   init() async {
     _preferences ??= await SharedPreferences.getInstance();

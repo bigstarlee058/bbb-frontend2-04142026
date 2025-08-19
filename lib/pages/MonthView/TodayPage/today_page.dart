@@ -39,6 +39,7 @@ import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../models/MonthResponseModel/all_exercise_model.dart';
@@ -84,7 +85,7 @@ class _TodayPageState extends State<TodayPage>
   void onWorkoutStart() async {
     final raw3 =
         await preferences.getBool(SharedPreference.isScreenAwake) ?? false;
-    if (raw3) {
+    if (!raw3) {
       await WakelockPlus.enable();
     } else {
       await WakelockPlus.disable();
@@ -207,7 +208,7 @@ class _TodayPageState extends State<TodayPage>
         }
       },
     );
-
+    await monthProvider?.fetchSingleDayHistoryLocalData();
     isInit = false;
     setState(() {});
   }
@@ -249,7 +250,7 @@ class _TodayPageState extends State<TodayPage>
             },
           );
         } catch (e) {
-          log('e=====111=====>>>>>$e');
+          log('e=====1111=====>>>>>$e');
         }
 
         try {
@@ -1076,8 +1077,8 @@ class _TodayPageState extends State<TodayPage>
                                                     ),
                                                   )
                                                 : Builder(builder: (context) {
-                                                    return (value.dayHistoryDetails ==
-                                                                    null ||
+                                                    return (/*value.dayHistoryDetails ==
+                                                                    null ||*/
                                                                 (isCurrentDaySkipped ||
                                                                     isCurrentDayCompleted)) &&
                                                             value.isCurrentMonth ==
@@ -2094,7 +2095,8 @@ class _TodayPageState extends State<TodayPage>
                                                         ],
                                                       );
                                                       // }
-
+                                                      DateTime now =
+                                                          await NTP.now();
                                                       String split = monthProvider
                                                               ?.monthDataModel
                                                               ?.weeks?[
@@ -2123,8 +2125,7 @@ class _TodayPageState extends State<TodayPage>
                                                             ?.idList![monthProvider!
                                                                 .overviewCurrentDay -
                                                             1],
-                                                        "date":
-                                                            "${DateTime.now().toUtc()}",
+                                                        "date": "$now",
                                                         "exerciseId": monthProvider
                                                             ?.allFilterExercises[
                                                                 selectExerciseSwapIndex!]
@@ -3149,6 +3150,7 @@ class _TodayPageState extends State<TodayPage>
       swapOption =
           monthProvider!.swapOptionExercises[selectSwapOptionExerciseIndex];
     }
+
     String? exerciseId = selectSwapOptionExerciseIndex == null
         ? (selectRelatedExerciseSwapIndex == null
             ? exerciseDataModel?.id ?? ""
@@ -3227,8 +3229,9 @@ class _TodayPageState extends State<TodayPage>
         "";
 
     String dataId =
-        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}"; /*-${exerciseId ?? ""}*/
+        "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseId ?? ""}";
 
+    DateTime now = await NTP.now();
     Map<String, dynamic> data = {
       "dataId": dataId,
       "split": split,
@@ -3236,7 +3239,7 @@ class _TodayPageState extends State<TodayPage>
       "weekId": monthProvider?.weekDataModel?.id,
       "dayId": monthProvider
           ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$now",
       "exerciseId": selectSwapOptionExerciseIndex == null
           ? (selectRelatedExerciseSwapIndex == null
               ? exerciseDataModel?.id ?? ""
@@ -3268,8 +3271,8 @@ class _TodayPageState extends State<TodayPage>
 
     if (matchingElement?.id != null) {
       await ApiRepo.deleteSwapExercise(dataId: dataId).then(
-        (value) {
-          ApiRepo.addSwapExercise(body: data);
+        (value) async {
+          await ApiRepo.addSwapExercise(body: data);
         },
       );
 
@@ -3278,7 +3281,7 @@ class _TodayPageState extends State<TodayPage>
           data: data,
           id: dataId);
     } else {
-      ApiRepo.addSwapExercise(body: data);
+      await ApiRepo.addSwapExercise(body: data);
       await DatabaseHelper().insertData(
           tableName: DatabaseHelper.swapExerciseHistory, data: data);
     }
@@ -3306,7 +3309,7 @@ class _TodayPageState extends State<TodayPage>
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
-
+    DateTime now = await NTP.now();
     final data = {
       "dataId": dataId,
       "exerciseId": id,
@@ -3315,7 +3318,7 @@ class _TodayPageState extends State<TodayPage>
       "dayId": monthProvider
           ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$now",
       "status": status,
       "type": type
     };
@@ -3387,7 +3390,7 @@ class _TodayPageState extends State<TodayPage>
                           "load": sets.load.toString(),
                           "type": sets.type.toString(),
                           "effort": "100",
-                          "date": "${DateTime.now().toUtc()}",
+                          "date": "$now",
                           "status": Status.empty,
                           "totalSet": "0",
                         };
@@ -3400,7 +3403,7 @@ class _TodayPageState extends State<TodayPage>
                           "load": sets.load.toString(),
                           "type": sets.type.toString(),
                           "effort": "100",
-                          "date": "${DateTime.now().toUtc()}",
+                          "date": "$now",
                           "status": Status.empty,
                           "totalSet": "0",
                           "dataId": dataId,
@@ -3448,7 +3451,7 @@ class _TodayPageState extends State<TodayPage>
                       "load": sets.load.toString(),
                       "type": sets.type.toString(),
                       "effort": "100",
-                      "date": "${DateTime.now().toUtc()}",
+                      "date": "$now",
                       "status": Status.empty,
                       "totalSet": "0",
                     };
@@ -3461,7 +3464,7 @@ class _TodayPageState extends State<TodayPage>
                       "load": sets.load.toString(),
                       "type": sets.type.toString(),
                       "effort": "100",
-                      "date": "${DateTime.now().toUtc()}",
+                      "date": "$now",
                       "status": Status.empty,
                       "totalSet": "0",
                       "dataId": dataId,
@@ -3508,7 +3511,7 @@ class _TodayPageState extends State<TodayPage>
                       "load": sets.load.toString(),
                       "type": sets.type.toString(),
                       "effort": "100",
-                      "date": "${DateTime.now().toUtc()}",
+                      "date": "$now",
                       "status": Status.empty,
                       "totalSet": "0",
                     };
@@ -3521,7 +3524,7 @@ class _TodayPageState extends State<TodayPage>
                       "load": sets.load.toString(),
                       "type": sets.type.toString(),
                       "effort": "100",
-                      "date": "${DateTime.now().toUtc()}",
+                      "date": "$now",
                       "status": Status.empty,
                       "totalSet": "0",
                       "dataId": dataId,
@@ -3546,12 +3549,11 @@ class _TodayPageState extends State<TodayPage>
       {required String status,
       required String type,
       required String status1}) async {
+    DateTime now = await NTP.now();
     await monthProvider?.fetchExerciseStatusLocalData();
     if (status1 == Status.completed) {
-      ApiRepo.addDayStatusList(body: {
-        "date": "${DateTime.now().toUtc()}",
-        "status": Status.completed
-      });
+      ApiRepo.addDayStatusList(
+          body: {"date": "$now", "status": Status.completed});
     }
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
@@ -3657,14 +3659,14 @@ class _TodayPageState extends State<TodayPage>
       "status": status1,
       "type": type,
       "endTime": (status == Status.completed || status == Status.skipped)
-          ? "${DateTime.now().toUtc()}"
+          ? "$now"
           : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
       "averageRIR": average.toString(),
       if (data!.isNotEmpty)
         "startTime": data.first.startTime == null
-            ? "${DateTime.now().toUtc()}"
+            ? "$now"
             : data.first.startTime.toString()
     };
 
@@ -3672,7 +3674,7 @@ class _TodayPageState extends State<TodayPage>
       "status": status1,
       "type": type,
       "endTime": (status == Status.completed || status == Status.skipped)
-          ? "${DateTime.now().toUtc()}"
+          ? "$now"
           : "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
@@ -3680,7 +3682,7 @@ class _TodayPageState extends State<TodayPage>
       "averageRIR": average.toString(),
       if (data.isNotEmpty)
         "startTime": data.first.startTime == null
-            ? "${DateTime.now().toUtc()}"
+            ? "$now"
             : data.first.startTime.toString()
     };
     await ApiRepo.updateDayStatus(body: apiReqBody);
@@ -3703,7 +3705,7 @@ class _TodayPageState extends State<TodayPage>
             .toString()
             .split(" ")[1] ??
         "";
-
+    DateTime now = await NTP.now();
     await unSkipped(status);
 
     String dataId =
@@ -3717,11 +3719,11 @@ class _TodayPageState extends State<TodayPage>
       "dayId": monthProvider
           ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$now",
       "status": status,
       "type": type,
-      "startTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
-      "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+      "startTime": status == Status.empty ? "" : "$now",
+      "endTime": status == Status.empty ? "" : "$now",
     };
 
     DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel
@@ -3735,9 +3737,9 @@ class _TodayPageState extends State<TodayPage>
       "startTime": status == Status.empty
           ? ""
           : matchingElement?.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$now"
               : matchingElement?.startTime.toString(),
-      "endTime": status == Status.empty ? "" : "${DateTime.now().toUtc()}",
+      "endTime": status == Status.empty ? "" : "$now",
     };
 
     final apiBody = {
@@ -3747,10 +3749,9 @@ class _TodayPageState extends State<TodayPage>
       "startTime": status == Status.empty
           ? ""
           : matchingElement?.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$now"
               : matchingElement?.startTime.toString(),
-      "endTime":
-          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "$now" : "",
       "dataId": dataId
     };
 
@@ -4469,7 +4470,7 @@ class _TodayPageState extends State<TodayPage>
             .toString()
             .split(" ")[1] ??
         "";
-
+    DateTime now = await NTP.now();
     double totalWeight = 0;
     int exCount = 0;
     double average = 0;
@@ -4527,7 +4528,7 @@ class _TodayPageState extends State<TodayPage>
       "status": status1,
       "type": type,
       "endTime": "",
-      "startTime": "${DateTime.now().toUtc()}",
+      "startTime": "$now",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),
       "averageRIR": average.toString(),
@@ -4536,7 +4537,7 @@ class _TodayPageState extends State<TodayPage>
     final apiReqBody = {
       "status": status1,
       "type": type,
-      "startTime": "${DateTime.now().toUtc()}",
+      "startTime": "$now",
       "endTime": "",
       "totalWeight": totalWeight.toString(),
       "completedExercise": exCount.toString(),

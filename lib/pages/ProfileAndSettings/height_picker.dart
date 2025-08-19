@@ -48,10 +48,7 @@ class _HeightPickerState extends State<HeightPicker> {
   @override
   void initState() {
     _cmValue = widget.initialHeight;
-    log('_cmValue==========>>>>>$_cmValue');
-    // log('_cmValue==========>>>>>${_cmDecimalValue}');
     _currentUnitSelected = widget.initialSelectedHeightUnit;
-    log('_currentUnitSelected====22======>>>>>$_currentUnitSelected');
     if (widget.initialSelectedHeightUnit == HeightUnit.inches) {
       _mainScrollController =
           FixedExtentScrollController(initialItem: _feetPart - 1);

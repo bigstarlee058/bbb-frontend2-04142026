@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
@@ -34,8 +35,10 @@ import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:ntp/ntp.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -1681,7 +1684,7 @@ class _DashboardPageState extends State<DashboardPage> {
             .toString()
             .split(" ")[1] ??
         "";
-
+    DateTime nowUT = await NTP.now();
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
 
@@ -1693,10 +1696,10 @@ class _DashboardPageState extends State<DashboardPage> {
       "dayId": monthProvider
           .weekDataModel?.idList![monthProvider.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "status": status,
       "type": type,
-      "startTime": "${DateTime.now().toUtc()}",
+      "startTime": "$nowUT",
       "endTime": "",
     };
 
@@ -1712,10 +1715,9 @@ class _DashboardPageState extends State<DashboardPage> {
       "startTime": status == Status.empty
           ? ""
           : matchingElement.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$nowUT"
               : matchingElement.startTime.toString(),
-      "endTime":
-          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "$nowUT" : "",
     };
 
     final apiBody = {
@@ -1725,10 +1727,9 @@ class _DashboardPageState extends State<DashboardPage> {
       "startTime": status == Status.empty
           ? ""
           : matchingElement.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$nowUT"
               : matchingElement.startTime.toString(),
-      "endTime":
-          (status == Status.completed) ? "${DateTime.now().toUtc()}" : "",
+      "endTime": (status == Status.completed) ? "$nowUT" : "",
       "dataId": dataId
     };
 
@@ -1754,6 +1755,8 @@ class _DashboardPageState extends State<DashboardPage> {
       required String type,
       String? title,
       bool endDate = false}) async {
+    DateTime nowUT = await NTP.now();
+
     String split = monthProvider.monthDataModel
             ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -1764,10 +1767,8 @@ class _DashboardPageState extends State<DashboardPage> {
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
 
     if (status == Status.completed) {
-      ApiRepo.addDayStatusList(body: {
-        "date": "${DateTime.now().toUtc()}",
-        "status": Status.completed
-      });
+      ApiRepo.addDayStatusList(
+          body: {"date": "$nowUT", "status": Status.completed});
     }
 
     final data = {
@@ -1778,11 +1779,11 @@ class _DashboardPageState extends State<DashboardPage> {
       "dayId": monthProvider
           .weekDataModel?.idList![monthProvider.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "status": status,
       "type": type,
-      "startTime": "${DateTime.now().toUtc()}",
-      "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
+      "startTime": "$nowUT",
+      "endTime": endDate ? "$nowUT" : "",
     };
 
     DayHistoryModel? matchingElement = monthProvider.dayHistoryModel.firstWhere(
@@ -1796,11 +1797,10 @@ class _DashboardPageState extends State<DashboardPage> {
       "startTime": status == Status.empty
           ? ""
           : matchingElement.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$nowUT"
               : matchingElement.startTime.toString(),
-      "endTime": (status == Status.completed)
-          ? "${DateTime.now().toUtc()}"
-          : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "endTime":
+          (status == Status.completed) ? "$nowUT" : (endDate ? "$nowUT" : ""),
     };
 
     final apiBody = {
@@ -1810,11 +1810,10 @@ class _DashboardPageState extends State<DashboardPage> {
       "startTime": status == Status.empty
           ? ""
           : matchingElement.startTime == null
-              ? "${DateTime.now().toUtc()}"
+              ? "$nowUT"
               : matchingElement.startTime.toString(),
-      "endTime": (status == Status.completed)
-          ? "${DateTime.now().toUtc()}"
-          : (endDate ? "${DateTime.now().toUtc()}" : ""),
+      "endTime":
+          (status == Status.completed) ? "$nowUT" : (endDate ? "$nowUT" : ""),
       "dataId": dataId
     };
 

@@ -70,6 +70,9 @@ class _ProgramPhaseScreenState extends State<ProgramPhaseScreen> {
                                       "assets/img/program-phase-1.png",
                                     )
                                   : appShimmerImage(
+                                      errorPadding: EdgeInsets.symmetric(
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(6)),
                                       color: Colors.transparent,
                                       height: ScreenUtil.verticalScale(46),
                                       networkImageUrl: value.programPhaseModel!

@@ -149,12 +149,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
             selectedHeight.text = heightStr == "0"
                 ? "0"
                 : "${heightStr[0]}'${heightStr.length > 1 ? heightStr[1] : ""}${heightStr.length > 2 ? heightStr[2] : ""}\"";
-
             final value = Utils.convertFeetInchesToCm(
                 int.parse(heightStr[0]),
-                double.parse(heightStr.length > 1
-                    ? heightStr.replaceAll(heightStr[0], "")
-                    : "0"));
+                double.parse(
+                    heightStr.length > 1 ? heightStr.substring(1) : "0"));
 
             selectedHeight1.text =
                 heightStr == "0" ? "0" : "${value.toStringAsFixed(1)} cm";

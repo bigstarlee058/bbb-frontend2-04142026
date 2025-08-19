@@ -45,6 +45,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
 
   void _handleLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
     await prefs.setBool('isLoggedIn', false);
     await prefs.clear();
     await preferences.clearPrefs();
@@ -61,6 +62,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
     );
 
     Navigator.pushNamed(context, AppRoutes.loginScreen);
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   @override

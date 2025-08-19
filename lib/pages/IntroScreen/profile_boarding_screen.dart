@@ -1000,37 +1000,3 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     ).show(context);
   }
 }
-
-void showBottomAlert(BuildContext context, String msg) {
-  OverlayState? overlayState = Overlay.of(context);
-  OverlayEntry overlayEntry = OverlayEntry(
-    builder: (context) => Positioned(
-      bottom: 20.0,
-      left: MediaQuery.of(context).size.width * 0.1,
-      right: MediaQuery.of(context).size.width * 0.1,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Center(
-            child: Text(
-              msg,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  overlayState.insert(overlayEntry); //In here I changed the code ?.
-
-  // Remove the alert after 3 seconds
-  Future.delayed(const Duration(seconds: 3), () {
-    overlayEntry.remove();
-  });
-}

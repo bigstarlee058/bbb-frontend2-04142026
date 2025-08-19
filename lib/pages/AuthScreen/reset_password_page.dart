@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
@@ -323,42 +322,4 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
     );
   }
-}
-
-void showBottomAlert(BuildContext context, String msg) {
-  OverlayState? overlayState = Overlay.of(context);
-  OverlayEntry overlayEntry = OverlayEntry(
-    builder: (context) => Positioned(
-      bottom: 20.0,
-      left: MediaQuery.of(context).size.width * 0.1,
-      right: MediaQuery.of(context).size.width * 0.1,
-      child: SafeArea(
-        top: false,
-        bottom: Platform.isAndroid ? true : false,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                msg,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  overlayState.insert(overlayEntry); //In here I changed the code ?.
-
-  // Remove the alert after 3 seconds
-  Future.delayed(const Duration(seconds: 3), () {
-    overlayEntry.remove();
-  });
 }

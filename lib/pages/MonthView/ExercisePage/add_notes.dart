@@ -13,6 +13,7 @@ import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 class AddNoteBottomSheet extends StatefulWidget {
@@ -234,9 +235,12 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
         : monthProvider!.isPumpDay && monthProvider!.isCircuit
             ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
             : monthProvider!.exerciseDetailModel!.sId.toString();
+
+    DateTime now = await NTP.now();
+
     final data = {
       "exerciseId": id.toString(),
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$now",
       "note": _noteController.text.trim(),
     };
     ApiRepo.addExerciseNotes(body: data);

@@ -1,14 +1,17 @@
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
+import 'package:bbb/components/button_widget.dart';
 import 'package:bbb/components/common_network_image.dart';
 import 'package:bbb/components/common_streak_with_notification.dart';
 import 'package:bbb/models/collections.dart';
 import 'package:bbb/models/equipment.dart';
+import 'package:bbb/pages/Tools/equipment_library_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/main_page_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
@@ -149,70 +152,36 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                   bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                 ),
               ),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.only(
-              //       topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //       bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //     ),
-              //   ),
-              //   child: Center(
-              //     child: imageurl.isNotEmpty
-              //         ? ClipRRect(
-              //             borderRadius: BorderRadius.only(
-              //               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //               bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //             ),
-              //             child: Image.network(
-              //               imageurl.startsWith('https://storage.cloud.google.com/')
-              //                   ? imageurl.replaceFirst(
-              //                       'https://storage.cloud.google.com/', 'https://storage.googleapis.com/')
-              //                   : imageurl,
-              //               width: ScreenUtil.verticalScale(11),
-              //               height: ScreenUtil.verticalScale(11),
-              //               fit: BoxFit.cover,
-              //             ),
-              //           )
-              //         : ClipRRect(
-              //             borderRadius: BorderRadius.only(
-              //               topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //               bottomLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-              //             ),
-              //             child: Image.asset(
-              //               'assets/img/warm-up-placeholder.png',
-              //               width: ScreenUtil.verticalScale(11),
-              //               height: ScreenUtil.verticalScale(11),
-              //               fit: BoxFit.cover,
-              //             ),
-              //           ),
-              //   ),
-              // ),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      title, maxLines: 3,
-                      style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: ScreenUtil.verticalScale(2),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      // maxLines: 1,
-                      // overflow: TextOverflow.ellipsis,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 3,
+                          style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontSize: ScreenUtil.verticalScale(2),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        // SizedBox(height: 3),
+                        // Text(
+                        //   'Use the code "APP10" for 10% off any order!',
+                        //   maxLines: 3,
+                        //   style: TextStyle(
+                        //     color: AppColors.primaryColor,
+                        //     fontSize: ScreenUtil.verticalScale(1.1),
+                        //     fontWeight: FontWeight.normal,
+                        //   ),
+                        // )
+                      ],
                     ),
-                    // SizedBox(height: ScreenUtil.verticalScale(1)),
-                    // Text(
-                    //   description,
-                    //   style: TextStyle(
-                    //     color: Colors.white,
-                    //     fontSize: ScreenUtil.verticalScale(1.7),
-                    //   ),
-                    //   maxLines: 2,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
                   ],
                 ),
               ),
@@ -325,26 +294,133 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                   ),
                                   Center(
                                     child: Container(
-                                      height: media.height / 5.6,
+                                      height: media.height / 5,
                                       margin: EdgeInsets.symmetric(
                                           horizontal:
-                                              ScreenUtil.horizontalScale(15),
+                                              ScreenUtil.horizontalScale(5),
                                           vertical:
-                                              ScreenUtil.verticalScale(3)),
+                                              ScreenUtil.verticalScale(2)),
                                       child: Center(
-                                        child: Text(
-                                          (collectionData?.title ?? "")
-                                                  .isNotEmpty
-                                              ? collectionData?.title ?? ""
-                                              : 'Collection Title',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.horizontalScale(6.5),
-                                            fontWeight: FontWeight.bold,
-                                            height: 1.35,
-                                          ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              (collectionData?.title ?? "")
+                                                      .isNotEmpty
+                                                  ? collectionData?.title ?? ""
+                                                  : 'Collection Title',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize:
+                                                    ScreenUtil.horizontalScale(
+                                                        6.5),
+                                                fontWeight: FontWeight.bold,
+                                                height: 1.35,
+                                              ),
+                                            ),
+                                            // Container(
+                                            //   padding: EdgeInsets.symmetric(
+                                            //       vertical: 10, horizontal: 12),
+                                            //   margin: EdgeInsets.symmetric(
+                                            //       vertical: 15),
+                                            //   decoration: BoxDecoration(
+                                            //     color: const Color(0xFFF8E6EC),
+                                            //     borderRadius:
+                                            //         BorderRadius.circular(50),
+                                            //   ),
+                                            //   child: HoldToCopy(
+                                            //     text: 'APP10',
+                                            //     child: Text(
+                                            //       'Use the code "APP10" for 10% off any order!',
+                                            //       maxLines: 3,
+                                            //       style: TextStyle(
+                                            //         color: Colors.black,
+                                            //         fontSize: ScreenUtil
+                                            //             .verticalScale(1.4),
+                                            //         fontWeight:
+                                            //             FontWeight.normal,
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: ScreenUtil
+                                                      .horizontalScale(8)),
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: ScreenUtil
+                                                                .verticalScale(
+                                                                    1.2)),
+                                                    width: double.infinity,
+                                                    child: ElevatedButton(
+                                                      onPressed: () {},
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Color(0xFFF8E6EC),
+                                                        shape:
+                                                            Utils.buttonStyle,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                          vertical: ScreenUtil
+                                                              .verticalScale(
+                                                                  1.7),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            "",
+                                                            style: TextStyle(
+                                                                fontSize: ScreenUtil
+                                                                    .verticalScale(
+                                                                        2.2)),
+                                                          ),
+                                                          HoldToCopy(
+                                                            text: 'APP10',
+                                                            child: Text(
+                                                              'Use the code "APP10" for 10% off any order!',
+                                                              maxLines: 3,
+                                                              style: TextStyle(
+                                                                fontSize: ScreenUtil
+                                                                    .verticalScale(
+                                                                        1.55),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: AppColors
+                                                                    .primaryColor,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ButtonWidget(
+                                                    text: "Shop Now",
+                                                    textColor: Colors.white,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                    onPress: () {
+                                                      _launchURL(
+                                                          "https://www.bcstrength.com/discount/APP10");
+                                                    },
+                                                    isLoading: false,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
                                     ),

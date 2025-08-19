@@ -103,7 +103,6 @@ class _WeekCalenderState extends State<WeekCalender> {
     DateTime futureDay =
         DateTime(nowUtc.year, nowUtc.month, nowUtc.day).add(Duration(days: 1));
     DateTime today = DateTime(date.year, date.month, date.day);
-
     if (today.isBefore(futureDay)) {
       if (targetDate.subtract(Duration(days: 1)).isBefore(date)) {
         if (widget.monthProvider.monthLocalDataModel.isNotEmpty) {

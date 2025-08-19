@@ -146,7 +146,6 @@ class ApiRepo extends BaseService {
     var response = await ApiService().getResponse(
         apiType: APIType.aGet,
         url: BaseService.fetchDayStatus /*, body: {"monthId": monthId}*/);
-    log('response==========>>>>>${response}');
     if (response is List) {
       return response.isEmpty
           ? []

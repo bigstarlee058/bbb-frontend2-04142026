@@ -17,7 +17,6 @@ import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
-import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
@@ -36,6 +35,7 @@ import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -304,13 +304,17 @@ class _ExercisePageState extends State<ExercisePage>
       return;
     }
     final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
-
+    log('payloadModel.weekIndex==========>>>>>${payloadModel.weekIndex}');
     monthProvider!.weekDataModel =
         monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
-    int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
-      return element == monthProvider?.todayTitleId;
-    });
 
+    log('monthProvider!.weekDataModel==========>>>>>${monthProvider!.weekDataModel}');
+    log('monthProvider?.todayTitleId==========>>>>>${jsonEncode(payloadModel)}');
+    int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
+      log('element==========>>>>>${element}');
+      return element == payloadModel.dayId;
+    });
+    log('index==========>>>>>${index}');
     final dayIndex = int.parse((monthProvider!
                 .weekDataModel!.dayList?[index ?? 0]
                 .toString()
@@ -320,6 +324,7 @@ class _ExercisePageState extends State<ExercisePage>
                 .replaceAll(" ", "") ??
             "0")) -
         1;
+    log('dayIndex==========>>>>>${dayIndex}');
     DayDataModel dayData =
         "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}"
                 .toString()
@@ -384,6 +389,8 @@ class _ExercisePageState extends State<ExercisePage>
       monthProvider!.selectedExercise =
           monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
     } else {
+      log('dayData.exercises==========>>>>>${dayData.exercises}');
+      log('payloadModel.exerciseIndex==========>>>>>${payloadModel.exerciseIndex}');
       monthProvider!.selectedExercise =
           dayData.exercises![payloadModel.exerciseIndex!];
     }
@@ -500,6 +507,7 @@ class _ExercisePageState extends State<ExercisePage>
         findIsAtLeastOnSet();
       }
     }
+    if (!mounted) return;
     setState(() => loading = false);
     videoInitialize();
   }
@@ -2090,6 +2098,8 @@ class _ExercisePageState extends State<ExercisePage>
                     ),
                   )
                 : SizedBox(),
+            if (isCurrentDayCompleted || isCurrentDaySkipped)
+              const SizedBox(height: 20),
             Container(
               height: 0.5,
               margin: EdgeInsets.symmetric(
@@ -2641,10 +2651,9 @@ class _ExercisePageState extends State<ExercisePage>
             .toString()
             .split(" ")[1] ??
         "";
-
+    DateTime nowUT = await NTP.now();
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
-    log('dataId==========>>>>>$dataId');
     final data = {
       "sets": 1,
       "reps": extra.reps,
@@ -2653,7 +2662,7 @@ class _ExercisePageState extends State<ExercisePage>
       "load": extra.load,
       "type": extra.type,
       "extraId": "EXTRA-ADDED",
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "dataId": "EXTRA-ADDED$dataId",
     };
     final apiReqBody = {
@@ -2664,7 +2673,7 @@ class _ExercisePageState extends State<ExercisePage>
       "load": "${extra.load}",
       "type": "${extra.type}",
       "extraId": "EXTRA-ADDED",
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "dataId": "EXTRA-ADDED$dataId",
     };
     ApiRepo.addExtraSet(body: apiReqBody);
@@ -2700,7 +2709,7 @@ class _ExercisePageState extends State<ExercisePage>
       required String type}) async {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
-
+    DateTime nowUT = await NTP.now();
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -2812,7 +2821,7 @@ class _ExercisePageState extends State<ExercisePage>
           final reps = double.parse(element.reps.toString());
           final effort =
               double.parse(element.effort.toString().replaceAll("+", ""));
-          final cal = weight * (reps + (effort == 100 ? 0 : effort));
+          final cal = weight * (reps /*+ (effort == 100 ? 0 : effort)*/);
           totalWeight += cal;
           totalRIR += (effort == 100 ? 0 : effort);
         }
@@ -2838,7 +2847,7 @@ class _ExercisePageState extends State<ExercisePage>
       "dayId": monthProvider
           ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "status": status,
       "type": type,
       "totalWeight": totalWeight.toString(),

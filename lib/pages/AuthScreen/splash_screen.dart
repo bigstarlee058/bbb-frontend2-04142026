@@ -1,19 +1,23 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
 import 'package:bbb/pages/IntroScreen/version_update_screen.dart';
 import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'package:bbb/pages/SubscriptionPage/woo_subscription_pay_wall.dart';
 import 'package:bbb/pages/main_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/providers/month_provider.dart';
 import 'package:bbb/providers/theme_provider.dart';
 import 'package:bbb/providers/user_data_provider.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_constants.dart';
+import 'package:bbb/values/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -39,6 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
     userData = Provider.of<UserDataProvider>(context, listen: false);
     themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
+
     // _handleLogout(context);
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) {
@@ -47,6 +52,8 @@ class _SplashScreenState extends State<SplashScreen> {
     // );
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
+        await preferences.setBool(SharedPreference.isUpdatePopUP, false);
+
         final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
         if (raw4 == null) {
           isDarkMode = false;
@@ -71,26 +78,6 @@ class _SplashScreenState extends State<SplashScreen> {
       debugPrint("dataProvider is null");
     }
   }
-
-  // void _handleLogout(BuildContext context) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('isLoggedIn', false);
-  //   await prefs.clear();
-  //   await preferences.clearPrefs();
-  //   await DatabaseHelper().clearAllTables();
-  //   await preferences.clearPrefs();
-  //   context.read<MonthProvider>().clearAllValues();
-  //   dataProvider?.achievementList = [];
-  //   Navigator.of(context).pushNamedAndRemoveUntil(
-  //     AppRoutes.onBoardingScreen,
-  //     (Route<dynamic> route) {
-  //       log("ROUTE NAME ${route.settings.name}");
-  //       return route.settings.name == AppRoutes.onBoardingScreen;
-  //     },
-  //   );
-  //
-  //   Navigator.pushNamed(context, AppRoutes.loginScreen);
-  // }
 
   Future<PackageInfo> getCurrentAppVersion() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -114,42 +101,70 @@ class _SplashScreenState extends State<SplashScreen> {
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await _initializeFetchData().then(
           (value) async {
-            dataProvider?.getAllAchievement(true);
-            dataProvider?.fetchFeaturedChalleng();
             if (monthProvider?.monthDataModel == null) {
-              if (mounted) {
-                try {
-                  await userData.fetchUserInfo(context).then(
-                    (value) async {
-                      await monthProvider?.onInit(context: context);
-                      bool isFirstTime = userData.user["createdAt"] ==
-                              userData.user["updatedAt"] ||
-                          (userData.user["detail"] == null ||
-                              !userData.user["detail"].containsKey('bodyfat'));
-                      CustomerInfo customerInfo =
-                          await Purchases.getCustomerInfo();
-                      await preferences.setBool(
-                          SharedPreference.isFirstTime, isFirstTime);
+              try {
+                await userData.fetchUserInfo(context).then((value) async {
+                  dataProvider?.getAllAchievement(true);
+                  dataProvider?.fetchFeaturedChalleng();
 
-                      bool isAppUser =
-                          userData.user["singuptype"] != "web" ? true : false;
-                      if (isAppUser) {
-                        try {
-                          Map<String, dynamic> subscriptionData =
-                              userData.user["subscription"];
-                          if (subscriptionData["subscription_type"] ==
-                                  "yearly_membership_1y_289" ||
-                              subscriptionData["subscription_type"] ==
-                                  "monthly_membership_1m_29") {
-                            DateTime now = DateTime.now().toUtc();
-                            DateTime? endDate = (subscriptionData["end_date"] ??
-                                        "")
-                                    .toString()
-                                    .isEmpty
-                                ? null
-                                : DateTime.parse(subscriptionData["end_date"]);
+                  await monthProvider?.onInit(context: context);
+                  bool isFirstTime = userData.user["createdAt"] ==
+                          userData.user["updatedAt"] ||
+                      (userData.user["detail"] == null ||
+                          !userData.user["detail"].containsKey('bodyfat'));
+                  CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
-                            if (endDate == null || (now.isAfter(endDate))) {
+                  await preferences.setBool(
+                      SharedPreference.isFirstTime, isFirstTime);
+
+                  bool isAppUser =
+                      userData.user["singuptype"] != "web" ? true : false;
+
+                  if (isAppUser) {
+                    try {
+                      Map<String, dynamic> subscriptionData =
+                          userData.user["subscription"];
+
+                      if (subscriptionData["subscription_type"] ==
+                              "yearly_membership_1y_289" ||
+                          subscriptionData["subscription_type"] ==
+                              "monthly_membership_1m_29") {
+                        DateTime now = await NTP.now();
+
+                        DateTime? endDate = (subscriptionData["end_date"] ?? "")
+                                .toString()
+                                .isEmpty
+                            ? null
+                            : DateTime.parse(subscriptionData["end_date"]);
+
+                        if (endDate == null || (now.isAfter(endDate))) {
+                          await _updateSubscriptionData(
+                            isPrice: true,
+                            type: "",
+                            endDate: "",
+                            startDate: "",
+                            status: "free_user",
+                          );
+                        }
+                      } else {
+                        final entitlements = customerInfo.entitlements.active;
+
+                        if (entitlements.isNotEmpty) {
+                          if (entitlements.values.first.productIdentifier ==
+                                  "monthly_membership_1m_29" ||
+                              entitlements.values.first.productIdentifier ==
+                                  "yearly_membership_1y_289") {
+                            DateTime now = await NTP.now();
+                            final String startDate = customerInfo
+                                        .allPurchaseDates[
+                                    subscriptionData["subscription_type"]] ??
+                                now.toString();
+
+                            final String endDate =
+                                customerInfo.allExpirationDates[
+                                    subscriptionData["subscription_type"]]!;
+
+                            if ((now.isAfter(DateTime.parse(endDate)))) {
                               await _updateSubscriptionData(
                                 isPrice: true,
                                 type: "",
@@ -157,24 +172,33 @@ class _SplashScreenState extends State<SplashScreen> {
                                 startDate: "",
                                 status: "free_user",
                               );
+                            } else {
+                              await _updateSubscriptionData(
+                                isPrice: false,
+                                type: subscriptionData["subscription_type"],
+                                endDate: endDate,
+                                startDate: startDate,
+                                status: "subscribed_user",
+                              );
                             }
                           } else {
-                            final entitlements =
-                                customerInfo.entitlements.active;
+                            final entitlement = entitlements.values.first;
 
-                            if (entitlements.values.first.productIdentifier ==
-                                    "monthly_membership_1m_29" ||
-                                entitlements.values.first.productIdentifier ==
-                                    "yearly_membership_1y_289") {
-                              final String startDate = customerInfo
-                                          .allPurchaseDates[
-                                      subscriptionData["subscription_type"]] ??
-                                  DateTime.now().toUtc().toString();
+                            if (entitlements.isNotEmpty &&
+                                entitlement.isActive) {
+                              final String planId =
+                                  entitlement.productIdentifier;
+
+                              final String startDate =
+                                  entitlement.originalPurchaseDate;
 
                               final String endDate =
-                                  customerInfo.allExpirationDates[
-                                      subscriptionData["subscription_type"]]!;
-                              DateTime now = DateTime.now().toUtc();
+                                  entitlement.expirationDate!;
+
+                              final String status = entitlement.isActive
+                                  ? "subscribed_user"
+                                  : "free_user";
+                              DateTime now = await NTP.now();
 
                               if ((now.isAfter(DateTime.parse(endDate)))) {
                                 await _updateSubscriptionData(
@@ -187,515 +211,60 @@ class _SplashScreenState extends State<SplashScreen> {
                               } else {
                                 await _updateSubscriptionData(
                                   isPrice: false,
-                                  type: subscriptionData["subscription_type"],
+                                  type: planId,
                                   endDate: endDate,
                                   startDate: startDate,
-                                  status: "subscribed_user",
+                                  status: status,
                                 );
                               }
                             } else {
-                              final entitlement = entitlements.values.first;
-                              if (entitlements.isNotEmpty &&
-                                  entitlement.isActive) {
-                                final String planId =
-                                    entitlement.productIdentifier;
-                                final String startDate =
-                                    entitlement.originalPurchaseDate;
+                              DateTime now = await NTP.now();
 
-                                final String endDate =
-                                    entitlement.expirationDate!;
+                              DateTime? endDate =
+                                  (subscriptionData["end_date"] ?? "")
+                                          .toString()
+                                          .isEmpty
+                                      ? null
+                                      : DateTime.parse(
+                                          subscriptionData["end_date"]);
 
-                                final String status = entitlement.isActive
-                                    ? "subscribed_user"
-                                    : "free_user";
-
-                                DateTime now = DateTime.now().toUtc();
-
-                                if ((now.isAfter(DateTime.parse(endDate)))) {
-                                  await _updateSubscriptionData(
-                                    isPrice: true,
-                                    type: "",
-                                    endDate: "",
-                                    startDate: "",
-                                    status: "free_user",
-                                  );
-                                } else {
-                                  await _updateSubscriptionData(
-                                    isPrice: false,
-                                    type: planId,
-                                    endDate: endDate,
-                                    startDate: startDate,
-                                    status: status,
-                                  );
-                                }
-                              } else {
-                                DateTime now = DateTime.now().toUtc();
-
-                                DateTime? endDate =
-                                    (subscriptionData["end_date"] ?? "")
-                                            .toString()
-                                            .isEmpty
-                                        ? null
-                                        : DateTime.parse(
-                                            subscriptionData["end_date"]);
-
-                                if (endDate == null || (now.isAfter(endDate))) {
-                                  await _updateSubscriptionData(
-                                    isPrice: true,
-                                    type: "",
-                                    endDate: "",
-                                    startDate: "",
-                                    status: "free_user",
-                                  );
-                                }
-                              }
-                            }
-                          }
-                        } catch (e) {
-                          debugPrint("Error fetching subscription: $e");
-                        }
-                      }
-
-                      if (isAppUser) {
-                        await userData.fetchUserInfo(context).then(
-                          (value) async {
-                            Map<String, dynamic> subscriptionData =
-                                userData.user["subscription"];
-
-                            if (subscriptionData["user_subscription_status"] !=
-                                "free_user") {
-                              if (isFirstTime) {
-                                if (mounted) {
-                                  await Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProfileBoardingScreen(
-                                        welcomeDescription: '',
-                                        welcomeImageUrl: '',
-                                      ),
-                                    ),
-                                    (route) => false,
-                                  ).then((value) async {
-                                    await preferences.setBool(
-                                        SharedPreference.isFirstTime, false);
-                                  });
-                                }
-                              } else {
-                                if (mounted) {
-                                  await Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const MainPage(
-                                        welcomeDescription: '',
-                                        welcomeImageUrl: '',
-                                      ),
-                                    ),
-                                  );
-                                }
-                                await isFromNotification();
-                              }
-                            } else {
-                              if (mounted) {
-                                await Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SubscriptionPayWall(),
-                                  ),
+                              if (endDate == null || (now.isAfter(endDate))) {
+                                await _updateSubscriptionData(
+                                  isPrice: true,
+                                  type: "",
+                                  endDate: "",
+                                  startDate: "",
+                                  status: "free_user",
                                 );
                               }
                             }
-                          },
-                        );
-                      } else if (!isAppUser) {
-                        if (isFirstTime) {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfileBoardingScreen(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: '',
-                                  ),
-                                ),
-                                (route) => false).then(
-                              (value) async {
-                                await preferences.setBool(
-                                    SharedPreference.isFirstTime, false);
-                              },
-                            );
                           }
                         } else {
-                          if (mounted) {
-                            await Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MainPage(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: ''),
-                              ),
+                          DateTime now = await NTP.now();
+                          DateTime? endDate = (subscriptionData["end_date"] ??
+                                      "")
+                                  .toString()
+                                  .isEmpty
+                              ? null
+                              : DateTime.parse(subscriptionData["end_date"]);
+
+                          if (endDate == null || (now.isAfter(endDate))) {
+                            await _updateSubscriptionData(
+                              isPrice: true,
+                              type: "",
+                              endDate: "",
+                              startDate: "",
+                              status: "free_user",
                             );
-                            await isFromNotification();
                           }
                         }
-                      } else {
-                        if (isFirstTime) {
-                          if (mounted) {
-                            await Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfileBoardingScreen(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: '',
-                                  ),
-                                ),
-                                (route) => false).then(
-                              (value) async {
-                                await preferences.setBool(
-                                    SharedPreference.isFirstTime, false);
-                              },
-                            );
-                          }
-                        } else {
-                          if (mounted) {
-                            await Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MainPage(
-                                    welcomeDescription: '',
-                                    welcomeImageUrl: ''),
-                              ),
-                            );
-                            await isFromNotification();
-                          }
-                        }
-                      }
-                    },
-                  );
-                } catch (e) {
-                  log('ERROR==========>>>>>$e');
-                }
-              }
-            }
-          },
-        ),
-      );
-    } else {
-      await Future.delayed(Duration(milliseconds: 2500));
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
-        // WidgetsBinding.instance
-        //     .addPostFrameCallback((timeStamp) => navigateAppVersion());
-      }
-    }
-  }
-
-  navigateAppVersion() async {
-    PackageInfo version = await getCurrentAppVersion();
-
-    await Future.delayed(Duration(milliseconds: 200));
-    if (Platform.isIOS) {
-      log("VERSION======== ${version.version}");
-      if (version.version !=
-          (dataProvider?.newVersionModel?.ios?.version ?? "")) {
-        if (dataProvider!.newVersionModel!.ios!.forceUpdate == true) {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        }
-      }
-    } else if (Platform.isAndroid) {
-      if (version.version !=
-          (dataProvider?.newVersionModel?.android?.version ?? "")) {
-        if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        }
-      }
-    }
-  }
-
-  isFromNotification() async {
-    int? status = preferences.getInt(SharedPreference.fromNotification);
-    if (status == 1) {
-      await Navigator.pushNamed(context, '/exercise');
-    }
-  }
-
-  // Future<void> getOffering() async {
-  //   try {
-  //     await Purchases.getOfferings();
-  //   } catch (e) {
-  //     log("Failed to fetch offerings: $e");
-  //   }
-  // }
-
-  Future<void> _updateSubscriptionData({
-    required String status,
-    required String type,
-    required String startDate,
-    required String endDate,
-    required bool isPrice,
-  }) async {
-    try {
-      final Map<String, String> queryParams = {
-        "user_subscription_status": status,
-        "subscription_type": type,
-        "purchase_date": startDate,
-        "end_date": endDate,
-        if (isPrice) "price": "",
-      };
-
-      Uri url =
-          Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
-      String? userIdToken = await getAuthToken();
-
-      final response = await http.put(
-        url,
-        body: queryParams,
-        headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""},
-      );
-
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        userData.user = jsonResponse;
-        userData.getUserDataFromJson(jsonResponse);
-      }
-    } catch (e) {
-      log("issue in month view loading => $e");
-    }
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Image.asset(
-              "assets/img/logo.png",
-              height: 60,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/*
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
-import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'package:bbb/pages/main_page.dart';
-import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/providers/theme_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/values/app_constants.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  DataProvider? dataProvider;
-  MonthProvider? monthProvider;
-  ThemeProvider? themeProvider;
-  late UserDataProvider userData;
-  bool isDarkMode = false;
-  @override
-  void initState() {
-    super.initState();
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    userData = Provider.of<UserDataProvider>(context, listen: false);
-    themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    // _handleLogout(context);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        if (Platform.isIOS) {
-          getOffering();
-        }
-      },
-    );
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
-        if (raw4 == null) {
-          isDarkMode = false;
-          await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
-        } else {
-          isDarkMode = raw4;
-        }
-        themeProvider?.toggleTheme(isDarkMode);
-      },
-    );
-    _checkLoginStatus();
-  }
-
-  Future<void> _initializeFetchData() async {
-    debugPrint("this  is initial state func");
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider =
-        Provider.of<MonthProvider>(context, listen: false);
-    if (dataProvider != null) {
-      await dataProvider?.fetchMonthWorkouts(3);
-    } else {
-      debugPrint("dataProvider is null");
-    }
-  }
-
-  // void _handleLogout(BuildContext context) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('isLoggedIn', false);
-  //   await prefs.clear();
-  //   await preferences.clearPrefs();
-  //   await DatabaseHelper().clearAllTables();
-  //   await preferences.clearPrefs();
-  //   context.read<MonthProvider>().clearAllValues();
-  //   dataProvider?.achievementList = [];
-  //   Navigator.of(context).pushNamedAndRemoveUntil(
-  //     AppRoutes.onBoardingScreen,
-  //     (Route<dynamic> route) {
-  //       log("ROUTE NAME ${route.settings.name}");
-  //       return route.settings.name == AppRoutes.onBoardingScreen;
-  //     },
-  //   );
-  //
-  //   Navigator.pushNamed(context, AppRoutes.loginScreen);
-  // }
-
-  Future<PackageInfo> getCurrentAppVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    return packageInfo;
-  }
-
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    await loginStatus(isLoggedIn);
-
-    // await dataProvider?.fetchAppVersion();
-    //
-    // PackageInfo version = await getCurrentAppVersion();
-    //
-    // if (Platform.isIOS) {
-    //   if (version.version ==
-    //       (dataProvider?.newVersionModel?.latestVersion ?? "")) {
-    //     await loginStatus(isLoggedIn);
-    //   } else {
-    //     if (mounted) {
-    //       Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(
-    //           builder: (context) => VersionUpdateScreen(),
-    //         ),
-    //       );
-    //     }
-    //   }
-    // } else {
-    //   await loginStatus(isLoggedIn);
-    // }
-  }
-
-  Future<void> loginStatus(bool isLoggedIn) async {
-    dataProvider?.getAppBGs();
-    if (isLoggedIn) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) async => await _initializeFetchData().then(
-          (value) async {
-            dataProvider?.getAllAchievement(true);
-            dataProvider?.fetchFeaturedChalleng();
-            if (monthProvider?.monthDataModel == null) {
-              if (mounted) {
-                await monthProvider?.onInit(context: context);
-                await userData.fetchUserInfo(context).then((value) async {
-                  bool isFirstTime = userData.user["createdAt"] ==
-                          userData.user["updatedAt"] ||
-                      (userData.user["detail"] == null ||
-                          !userData.user["detail"].containsKey('bodyfat'));
-
-                  await preferences.setBool(
-                      SharedPreference.isFirstTime, isFirstTime);
-
-                  bool isAppUser =
-                      userData.user["singuptype"] != "web" ? true : false;
-                  if (Platform.isIOS && isAppUser) {
-                    try {
-                      Map<String, dynamic> subscriptionData =
-                          userData.user["subscription"];
-                      DateTime now = DateTime.now().toUtc();
-                      DateTime? endDate = (subscriptionData["end_date"] ?? "")
-                              .toString()
-                              .isEmpty
-                          ? null
-                          : DateTime.parse(subscriptionData["end_date"]);
-
-                      if (endDate == null || (now.isAfter(endDate))) {
-                        await _updateSubscriptionData(
-                          type: "",
-                          endDate: "",
-                          startDate: "",
-                          status: "free_user",
-                        );
                       }
                     } catch (e) {
                       debugPrint("Error fetching subscription: $e");
                     }
                   }
-                  if (Platform.isIOS && isAppUser) {
+
+                  if (isAppUser) {
                     await userData.fetchUserInfo(context).then(
                       (value) async {
                         Map<String, dynamic> subscriptionData =
@@ -734,38 +303,19 @@ class _SplashScreenState extends State<SplashScreen> {
                             await isFromNotification();
                           }
                         } else {
-                          if (isFirstTime) {
-                            if (mounted) {
-                              await Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileBoardingScreen(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: '',
-                                    ),
-                                  ),
-                                  (route) => false).then(
-                                (value) async {
-                                  await preferences.setBool(
-                                      SharedPreference.isFirstTime, false);
-                                },
-                              );
-                            }
-                          } else {
-                            if (mounted) {
-                              await Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SubscriptionPayWall(),
-                                ),
-                              );
-                            }
+                          if (mounted) {
+                            await Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const SubscriptionPayWall(),
+                              ),
+                            );
                           }
                         }
                       },
                     );
-                  } else if (Platform.isIOS && !isAppUser) {
+                  } else if (!isAppUser) {
                     if (isFirstTime) {
                       if (mounted) {
                         await Navigator.pushAndRemoveUntil(
@@ -827,6 +377,12 @@ class _SplashScreenState extends State<SplashScreen> {
                     }
                   }
                 });
+              } catch (e) {
+                if (mounted) {
+                  _handleLogout(context,
+                      "Your session has expired. Please log in again to continue.");
+                  log('ERROR==========>>>>>$e');
+                }
               }
             }
           },
@@ -835,8 +391,36 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       await Future.delayed(Duration(milliseconds: 2500));
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
+        Navigator.pushReplacementNamed(context, '/onboarding').then(
+          (value) {
+            navigateAppVersion();
+          },
+        );
       }
+    }
+  }
+
+  navigateAppVersion() async {
+    PackageInfo version = await getCurrentAppVersion();
+    await Future.delayed(Duration(milliseconds: 200));
+
+    final bool isIOS = Platform.isIOS;
+    final String currentVersion = version.version;
+
+    final String? requiredVersion = isIOS
+        ? dataProvider?.newVersionModel?.ios?.version
+        : dataProvider?.newVersionModel?.android?.version;
+    final bool forceUpdate = isIOS
+        ? (dataProvider?.newVersionModel?.ios?.forceUpdate ?? false)
+        : (dataProvider?.newVersionModel?.android?.forceUpdate ?? false);
+
+    if (currentVersion == (requiredVersion ?? "")) return false;
+
+    if (mounted) {
+      final route = MaterialPageRoute(builder: (_) => VersionUpdateScreen());
+      forceUpdate
+          ? await Navigator.pushReplacement(context, route)
+          : await Navigator.push(context, route);
     }
   }
 
@@ -847,27 +431,19 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  String monthPrice = "";
-  String yearPrice = "";
+  void _handleLogout(BuildContext context, String msg) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
 
-  Future<void> getOffering() async {
-    try {
-      Offerings fetched = await Purchases.getOfferings();
-      setState(() {
-        for (var offeringItem in fetched.all.values) {
-          for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
-              monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
-              yearPrice = package.storeProduct.priceString;
-            }
-          }
-        }
-      });
-    } catch (e) {
-      log("Failed to fetch offerings: $e");
-    }
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
+
+    showBottomAlert(context, msg);
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   Future<void> _updateSubscriptionData({
@@ -875,22 +451,20 @@ class _SplashScreenState extends State<SplashScreen> {
     required String type,
     required String startDate,
     required String endDate,
+    required bool isPrice,
   }) async {
     try {
       final Map<String, String> queryParams = {
         "user_subscription_status": status,
         "subscription_type": type,
-        "price": type == ""
-            ? ""
-            : type == "monthly_membership_1m_29"
-                ? monthPrice
-                : yearPrice,
         "purchase_date": startDate,
         "end_date": endDate,
+        if (isPrice) "price": "",
       };
 
       Uri url =
           Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
+
       String? userIdToken = await getAuthToken();
 
       final response = await http.put(
@@ -901,8 +475,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        userData.user = jsonResponse;
-        await userData.fetchUserInfo(context);
+        userData.user = jsonResponse["result"];
+        userData.getUserDataFromJson(jsonResponse["result"]);
       }
     } catch (e) {
       log("issue in month view loading => $e");
@@ -932,464 +506,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-*/
-
-/// WEB VALIDATION
-
-/*import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
-import 'package:bbb/pages/IntroScreen/version_update_screen.dart';
-import 'package:bbb/pages/SubscriptionPage/subscription_pay_wall.dart';
-import 'package:bbb/pages/main_page.dart';
-import 'package:bbb/providers/data_provider.dart';
-import 'package:bbb/providers/month_provider.dart';
-import 'package:bbb/providers/theme_provider.dart';
-import 'package:bbb/providers/user_data_provider.dart';
-import 'package:bbb/values/app_constants.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:ntp/ntp.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../SubscriptionPage/woo_subscription_pay_wall.dart';
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  DataProvider? dataProvider;
-  MonthProvider? monthProvider;
-  ThemeProvider? themeProvider;
-  late UserDataProvider userData;
-  bool isDarkMode = false;
-  @override
-  void initState() {
-    super.initState();
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    userData = Provider.of<UserDataProvider>(context, listen: false);
-    themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    monthProvider = Provider.of<MonthProvider>(context, listen: false);
-    // _handleLogout(context);
-    WidgetsBinding.instance.addPostFrameCallback(
-          (timeStamp) {
-        if (Platform.isIOS) {
-          getOffering();
-        }
-      },
-    );
-    WidgetsBinding.instance.addPostFrameCallback(
-          (timeStamp) async {
-        final raw4 = await preferences.getBool(SharedPreference.isDarkMode);
-
-        if (raw4 == null) {
-          isDarkMode = false;
-          await preferences.setBool(SharedPreference.isDarkMode, isDarkMode);
-        } else {
-          isDarkMode = raw4;
-        }
-        themeProvider?.toggleTheme(isDarkMode);
-      },
-    );
-    _checkLoginStatus();
-  }
-
-  Future<void> _initializeFetchData() async {
-    debugPrint("this  is initial state func");
-    dataProvider = Provider.of<DataProvider>(context, listen: false);
-    dataProvider?.monthProvider =
-        Provider.of<MonthProvider>(context, listen: false);
-    if (dataProvider != null) {
-      await dataProvider?.fetchMonthWorkouts(3);
-    } else {
-      debugPrint("dataProvider is null");
-    }
-  }
-
-  // void _handleLogout(BuildContext context) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('isLoggedIn', false);
-  //   await prefs.clear();
-  //   await preferences.clearPrefs();
-  //   await DatabaseHelper().clearAllTables();
-  //   await preferences.clearPrefs();
-  //   context.read<MonthProvider>().clearAllValues();
-  //   dataProvider?.achievementList = [];
-  //   Navigator.of(context).pushNamedAndRemoveUntil(
-  //     AppRoutes.onBoardingScreen,
-  //     (Route<dynamic> route) {
-  //       log("ROUTE NAME ${route.settings.name}");
-  //       return route.settings.name == AppRoutes.onBoardingScreen;
-  //     },
-  //   );
-  //
-  //   Navigator.pushNamed(context, AppRoutes.loginScreen);
-  // }
-
-  Future<PackageInfo> getCurrentAppVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    return packageInfo;
-  }
-
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    await loginStatus(isLoggedIn);
-
-    // await dataProvider?.fetchAppVersion();
-    //
-    // PackageInfo version = await getCurrentAppVersion();
-    //
-    // if (Platform.isIOS) {
-    //   if (version.version ==
-    //       (dataProvider?.newVersionModel?.latestVersion ?? "")) {
-    //     await loginStatus(isLoggedIn);
-    //   } else {
-    //     if (mounted) {
-    //       Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(
-    //           builder: (context) => VersionUpdateScreen(),
-    //         ),
-    //       );
-    //     }
-    //   }
-    // } else {
-    //   await loginStatus(isLoggedIn);
-    // }
-  }
-
-  Future<void> loginStatus(bool isLoggedIn) async {
-    if (isLoggedIn) {
-      dataProvider?.getAppBGs();
-      WidgetsBinding.instance.addPostFrameCallback(
-            (timeStamp) async => await _initializeFetchData().then(
-              (value) async {
-            dataProvider?.getAllAchievement(true);
-            dataProvider?.fetchFeaturedChalleng();
-            if (monthProvider?.monthDataModel == null) {
-              if (mounted) {
-                await monthProvider?.onInit(context: context).then(
-                      (value) async {
-                    await userData.fetchUserInfo().then(
-                          (value) async {
-                        bool isFirstTime = userData.user["createdAt"] ==
-                            userData.user["updatedAt"] ||
-                            (userData.user["detail"] == null ||
-                                !userData.user["detail"]
-                                    .containsKey('bodyfat'));
-
-                        await preferences.setBool(
-                            SharedPreference.isFirstTime, isFirstTime);
-
-                        bool isAppUser =
-                        userData.user["singuptype"] != "web" ? true : false;
-                        if (Platform.isIOS && isAppUser) {
-                          try {
-                            Map<String, dynamic> subscriptionData =
-                            userData.user["subscription"];
-                            DateTime now = DateTime.now().toUtc();
-                            DateTime? endDate = (subscriptionData["end_date"] ??
-                                "")
-                                .toString()
-                                .isEmpty
-                                ? null
-                                : DateTime.parse(subscriptionData["end_date"]);
-
-                            if (endDate == null || (now.isAfter(endDate))) {
-                              await _updateSubscriptionData(
-                                type: "",
-                                endDate: "",
-                                startDate: "",
-                                status: "free_user",
-                              );
-                            }
-                          } catch (e) {
-                            debugPrint("Error fetching subscription: $e");
-                          }
-                        }
-
-                        if (Platform.isIOS && isAppUser) {
-                          await userData.fetchUserInfo().then(
-                                (value) async {
-                              Map<String, dynamic> subscriptionData =
-                              userData.user["subscription"];
-
-                              if (subscriptionData[
-                              "user_subscription_status"] !=
-                                  "free_user") {
-                                if (isFirstTime) {
-                                  if (mounted) {
-                                    await Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProfileBoardingScreen(
-                                              welcomeDescription: '',
-                                              welcomeImageUrl: '',
-                                            ),
-                                      ),
-                                          (route) => false,
-                                    ).then((value) async {
-                                      await preferences.setBool(
-                                          SharedPreference.isFirstTime, false);
-                                    });
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    await Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MainPage(
-                                          welcomeDescription: '',
-                                          welcomeImageUrl: '',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  await isFromNotification();
-                                }
-                              } else {
-                                if (isFirstTime) {
-                                  if (mounted) {
-                                    await Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileBoardingScreen(
-                                                welcomeDescription: '',
-                                                welcomeImageUrl: '',
-                                              ),
-                                        ),
-                                            (route) => false).then(
-                                          (value) async {
-                                        await preferences.setBool(
-                                            SharedPreference.isFirstTime,
-                                            false);
-                                      },
-                                    );
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    await Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                        const SubscriptionPayWall(),
-                                      ),
-                                    );
-                                  }
-                                }
-                              }
-                            },
-                          );
-                        } else if (Platform.isIOS && !isAppUser) {
-                          Map<String, dynamic> subscriptionData =
-                          userData.user["subscription"];
-
-                          DateTime? endDate =
-                          subscriptionData["end_date"].toString().isEmpty
-                              ? null
-                              : DateTime.parse(
-                              subscriptionData["end_date"] ?? "");
-
-                          DateTime now = await NTP.now();
-
-                          if (subscriptionData["user_subscription_status"] ==
-                              "free_user" ||
-                              (endDate != null && now.isAfter(endDate))) {
-                            if (mounted) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                  const WooSubscriptionPayWall(),
-                                ),
-                              );
-                            }
-                          } else {
-                            if (isFirstTime) {
-                              if (mounted) {
-                                await Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProfileBoardingScreen(
-                                            welcomeDescription: '',
-                                            welcomeImageUrl: '',
-                                          ),
-                                    ),
-                                        (route) => false).then(
-                                      (value) async {
-                                    await preferences.setBool(
-                                        SharedPreference.isFirstTime, false);
-                                  },
-                                );
-                              }
-                            } else {
-                              if (mounted) {
-                                await Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MainPage(
-                                        welcomeDescription: '',
-                                        welcomeImageUrl: ''),
-                                  ),
-                                );
-                                await isFromNotification();
-                              }
-                            }
-                            await isFromNotification();
-                          }
-                        } else {
-                          if (isFirstTime) {
-                            if (mounted) {
-                              await Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProfileBoardingScreen(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: '',
-                                    ),
-                                  ),
-                                      (route) => false).then(
-                                    (value) async {
-                                  await preferences.setBool(
-                                      SharedPreference.isFirstTime, false);
-                                },
-                              );
-                            }
-                          } else {
-                            if (mounted) {
-                              await Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MainPage(
-                                      welcomeDescription: '',
-                                      welcomeImageUrl: ''),
-                                ),
-                              );
-                              await isFromNotification();
-                            }
-                          }
-                        }
-                      },
-                    );
-                  },
-                );
-              }
-            }
-          },
-        ),
-      );
-    } else {
-      await dataProvider?.getAppBGs();
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
-      }
-    }
-  }
-
-  isFromNotification() async {
-    int? status = preferences.getInt(SharedPreference.fromNotification);
-    if (status == 1) {
-      await Navigator.pushNamed(context, '/exercise');
-    }
-  }
-
-  String monthPrice = "";
-  String yearPrice = "";
-
-  Future<void> getOffering() async {
-    try {
-      Offerings fetched = await Purchases.getOfferings();
-      setState(() {
-        for (var offeringItem in fetched.all.values) {
-          for (var package in offeringItem.availablePackages) {
-            if (package.storeProduct.identifier == "monthly_membership_1m_29") {
-              monthPrice = package.storeProduct.priceString;
-            } else if (package.storeProduct.identifier ==
-                "yearly_membership_1y_289") {
-              yearPrice = package.storeProduct.priceString;
-            }
-          }
-        }
-      });
-    } catch (e) {
-      log("Failed to fetch offerings: $e");
-    }
-  }
-
-  Future<void> _updateSubscriptionData({
-    required String status,
-    required String type,
-    required String startDate,
-    required String endDate,
-  }) async {
-    try {
-      final Map<String, String> queryParams = {
-        "user_subscription_status": status,
-        "subscription_type": type,
-        "price": type == ""
-            ? ""
-            : type == "monthly_membership_1m_29"
-            ? monthPrice
-            : yearPrice,
-        "purchase_date": startDate,
-        "end_date": endDate,
-      };
-
-      Uri url =
-      Uri.parse('${AppConstants.serverUrl}/api/users/update_subscription');
-      String? userIdToken = await getAuthToken();
-
-      final response = await http.put(
-        url,
-        body: queryParams,
-        headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""},
-      );
-
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        userData.user = jsonResponse;
-        await userData.fetchUserInfo();
-      }
-    } catch (e) {
-      log("issue in month view loading => $e");
-    }
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Image.asset(
-              "assets/img/logo.png",
-              height: 60,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}*/

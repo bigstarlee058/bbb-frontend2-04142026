@@ -2,14 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' as math;
 
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
+import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_constants.dart';
 import 'package:bbb/values/app_routes.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
@@ -28,7 +27,16 @@ class UserDataProvider extends ChangeNotifier {
     return authToken;
   }
 
+  // Future<String> getUserAuthToken() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String authToken = prefs.getString('getUserAuthToken') ?? "";
+  //   return authToken;
+  // }
+
   var user;
+
+  bool _isAutoLoginInProgress = false;
+  bool _hasTriedAutoLogin = false;
 
   Future<Map<String, dynamic>> fetchUserInfo(BuildContext context,
       {bool isFromLogin = false}) async {
@@ -44,30 +52,145 @@ class UserDataProvider extends ChangeNotifier {
       case 200:
         final jsonResponse = jsonDecode(response.body);
         getUserDataFromJson(jsonResponse);
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('authToken', jsonResponse["token"]);
         user = jsonResponse;
         notifyListeners();
         return jsonResponse;
-
       case 401:
-        _handleLogout(context,
-            "Your session has expired. Please log in again to continue.",
-            isFromLogin: isFromLogin);
-        throw Exception(
-            "Unauthorized - Session expired: ${response.statusCode} :::::::::: ${response.body}");
+        if (!_hasTriedAutoLogin && !_isAutoLoginInProgress) {
+          _hasTriedAutoLogin = true;
+          _isAutoLoginInProgress = true;
+          try {
+            await _handleAutoLogin(context, isFromLogin);
+          } finally {
+            _isAutoLoginInProgress = false;
+          }
+        } else {
+          _handleLogout(context,
+              "Your session has expired. Please log in again to continue.",
+              isFromLogin: isFromLogin);
+        }
 
+        return {"code": response.statusCode};
       case 503:
         _handleLogout(context, "Server is busy. Please try again in a moment.",
             isFromLogin: isFromLogin);
-        throw Exception(
-            "Service Unavailable: ${response.statusCode} :::::::::: ${response.body}");
-
+        return {"code": response.statusCode};
+      case 500:
+        _handleLogout(
+            context, "Internal server error. Please try again in a moment.",
+            isFromLogin: isFromLogin);
+        return {"code": response.statusCode};
       default:
         _handleLogout(
             context, "An unexpected error occurred. Please try again.",
             isFromLogin: isFromLogin);
-        throw Exception(
-            "Unexpected Error: ${response.statusCode} :::::::::: ${response.body}");
+        return {"code": response.statusCode};
     }
+  }
+
+  Future<void> _handleAutoLogin(BuildContext context, bool isFromLogin) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString("email");
+    String? password = prefs.getString("password");
+
+    if (email != null && password != null) {
+      await signInUser(email, password, context, isFromLogin);
+      _hasTriedAutoLogin = true;
+      await fetchUserInfo(context, isFromLogin: isFromLogin);
+    } else {
+      _handleLogout(
+          context, "Your session has expired. Please log in again to continue.",
+          isFromLogin: isFromLogin);
+    }
+  }
+
+  Future<void> signInUser(String emailAddress, String password,
+      BuildContext context, bool isFromLogin) async {
+    try {
+      final wooUrl = Uri.parse(
+          // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
+          'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
+
+      final wooResponse = await http.post(
+        wooUrl,
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: {'username': emailAddress, 'password': password},
+      );
+
+      if (wooResponse.statusCode == 200) {
+        await _handleLoginSuccess(wooResponse);
+        return;
+      }
+
+      if (wooResponse.statusCode == 403) {
+        final wooData = jsonDecode(wooResponse.body);
+        String code = wooData['code'].toString();
+
+        if (code.contains("incorrect_password")) {
+          _handleLogout(context,
+              'Login Failed. Please check your password and, if needed, click "Forgot Password" below',
+              isFromLogin: isFromLogin);
+          return;
+        }
+        if (code.contains("invalid_email")) {
+          await _tryMobileLogin(emailAddress, password, context, isFromLogin);
+          return;
+        }
+      }
+
+      _handleLogout(
+          context, "Your session has expired. Please log in again to continue.",
+          isFromLogin: isFromLogin);
+    } catch (e) {
+      _handleLogout(
+          context, "Your session has expired. Please log in again to continue.",
+          isFromLogin: isFromLogin);
+    }
+  }
+
+  Future<void> _tryMobileLogin(String email, String password,
+      BuildContext context, bool isFromLogin) async {
+    final mobileUrl =
+        Uri.parse('${AppConstants.serverUrl}/api/users/signin_mobile');
+
+    final mobileResponse = await http.post(
+      mobileUrl,
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: {'email': email, 'password': password},
+    );
+
+    if (mobileResponse.statusCode == 200) {
+      await _handleLoginSuccess(mobileResponse);
+      return;
+    }
+
+    if (mobileResponse.statusCode == 403) {
+      _handleLogout(
+          context, "Your session has expired. Please log in again to continue.",
+          isFromLogin: isFromLogin);
+      return;
+    }
+
+    _handleLogout(
+        context, "Your session has expired. Please log in again to continue.",
+        isFromLogin: isFromLogin);
+  }
+
+  Future<void> _handleLoginSuccess(http.Response response) async {
+    final data = jsonDecode(response.body);
+    await _saveLoginState(true);
+
+    final token = data['token'] ?? "";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('authToken', token);
+    // await prefs.setString('getUserAuthToken', token);
+  }
+
+  Future<void> _saveLoginState(bool isLoggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
   }
 
   // Future<Map<String, dynamic>> fetchUserInfo(context) async {
@@ -85,7 +208,6 @@ class UserDataProvider extends ChangeNotifier {
   //       ),
   //     );
   //
-  //     debugPrint('response==========>>>>>${response.data}');
   //
   //     if (response.statusCode == 200) {
   //       final jsonResponse = response.data;
@@ -109,8 +231,11 @@ class UserDataProvider extends ChangeNotifier {
   void _handleLogout(BuildContext context, String msg,
       {bool isFromLogin = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
     await prefs.setBool('isLoggedIn', false);
     await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
     await preferences.clearPrefs();
 
     if (!isFromLogin) {
@@ -126,44 +251,8 @@ class UserDataProvider extends ChangeNotifier {
     // Navigator.pushNamed(context, AppRoutes.loginScreen);
 
     showBottomAlert(context, msg);
-  }
 
-  void showBottomAlert(BuildContext context, String msg) {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: 20.0,
-        left: MediaQuery.of(context).size.width * 0.1,
-        right: MediaQuery.of(context).size.width * 0.1,
-        child: SafeArea(
-          top: false,
-          bottom: Platform.isAndroid ? true : false,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Center(
-                child: Text(
-                  msg,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlayState.insert(overlayEntry);
-
-    // Remove the alert after 3 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      overlayEntry.remove();
-    });
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   Future<void> addUserInfo(String? id, Map<String, dynamic> userDetails,

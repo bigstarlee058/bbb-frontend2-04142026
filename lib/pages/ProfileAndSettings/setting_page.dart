@@ -18,6 +18,7 @@ import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:bbb/values/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 import '../../localstorage/month_prefrence.dart';
@@ -303,6 +304,8 @@ class _SettingPageState extends State<SettingPage> {
                                               isSwitchOn =
                                                   value; // Update state
                                             });
+
+                                            DateTime now = await NTP.now();
                                             await preferences.setBool(
                                                 SharedPreference
                                                     .notificationSwitch,
@@ -312,14 +315,12 @@ class _SettingPageState extends State<SettingPage> {
                                                   .scheduleMonthlyReminder(
                                                       20,
                                                       monthDataModel.endTime ??
-                                                          DateTime.now()
-                                                              .toUtc());
+                                                          now);
                                               await NotificationService
                                                   .scheduleWeekReminder(
                                                       30,
                                                       monthDataModel.endTime ??
-                                                          DateTime.now()
-                                                              .toUtc());
+                                                          now);
                                             } else {
                                               await NotificationService
                                                   .clearScheduledNotification();
@@ -471,11 +472,12 @@ class _SettingPageState extends State<SettingPage> {
                                       builder:
                                           (context, monthDataModel, child) {
                                         return Switch(
-                                          value: isScreenAwake, // Boolean value
+                                          value:
+                                              !isScreenAwake, // Boolean value
 
                                           onChanged: (bool value) async {
                                             setState(() {
-                                              isScreenAwake = value;
+                                              isScreenAwake = !isScreenAwake;
                                             });
 
                                             await preferences.setBool(

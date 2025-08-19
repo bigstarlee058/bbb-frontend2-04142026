@@ -82,6 +82,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   void _handleLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+
     await prefs.setBool('isLoggedIn', false);
     await prefs.clear();
     await preferences.clearPrefs();
@@ -100,6 +102,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
 
     Navigator.pushNamed(context, AppRoutes.loginScreen);
+
+    // await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   Future<void> launchUrls(String urls) async {
@@ -157,44 +161,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     } catch (e) {
       throw Exception('Failed to delete account');
     }
-  }
-
-  void showBottomAlert(BuildContext context, String msg) {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: 20.0,
-        left: MediaQuery.of(context).size.width * 0.1,
-        right: MediaQuery.of(context).size.width * 0.1,
-        child: SafeArea(
-          top: false,
-          bottom: Platform.isAndroid ? true : false,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Center(
-                child: Text(
-                  msg,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlayState.insert(overlayEntry);
-
-    // Remove the alert after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   }
 
   @override

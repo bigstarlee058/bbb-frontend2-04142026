@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -12,6 +11,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:bbb/values/app_image.dart';
 import 'package:bbb/values/clip_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:number_paginator/number_paginator.dart';
@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/data_provider.dart';
+import '../../utils/utils.dart';
 
 class EquipmentLibraryPage extends StatefulWidget {
   const EquipmentLibraryPage({super.key});
@@ -125,7 +126,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                             );
                       }),
                       SizedBox(
-                        height: media.height / 2.5,
+                        height: media.height / 2.3,
                         width: media.width,
                         child: SafeArea(
                           child: Column(
@@ -156,18 +157,16 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                 ],
                               ),
                               Container(
+                                // color: Colors.red,
+                                height: media.height / 3.6,
                                 padding: EdgeInsets.symmetric(
                                   horizontal: ScreenUtil.horizontalScale(7),
                                 ),
-                                height: media.height * 0.19,
                                 child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(1),
-                                      ),
                                       SearchEquipmentField(
                                         onChanged: (query) {
                                           setState(() {
@@ -179,7 +178,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                         },
                                       ),
                                       SizedBox(
-                                        height: ScreenUtil.horizontalScale(3),
+                                        height: ScreenUtil.verticalScale(1.2),
                                       ),
                                       FilterSortButton(
                                         selectedSortBy: _selectedSortBy,
@@ -190,6 +189,49 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                                           _applyFilters(); // Apply the filters and sorting
                                         },
                                       ),
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                            vertical:
+                                                ScreenUtil.verticalScale(1.2)),
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: () {},
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color(0xFFF8E6EC),
+                                            shape: Utils.buttonStyle,
+                                            padding: EdgeInsets.symmetric(
+                                              vertical:
+                                                  ScreenUtil.verticalScale(1.7),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "",
+                                                style: TextStyle(
+                                                    fontSize: ScreenUtil
+                                                        .verticalScale(2.2)),
+                                              ),
+                                              HoldToCopy(
+                                                text: 'APP10',
+                                                child: Text(
+                                                  'Use the code "APP10" for 10% off any order!',
+                                                  maxLines: 3,
+                                                  style: TextStyle(
+                                                    fontSize: ScreenUtil
+                                                        .verticalScale(1.55),
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ]),
                               ),
                             ],
@@ -197,7 +239,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                         ),
                       ),
                       SizedBox(
-                        height: media.height / 3.19,
+                        height: media.height / 2.599,
                         width: media.width,
                         child: Align(
                           alignment: Alignment.bottomRight,
@@ -216,7 +258,7 @@ class _EquipmentLibraryPageState extends State<EquipmentLibraryPage> {
                     ],
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: media.height / 3.2),
+                    margin: EdgeInsets.only(top: media.height / 2.6),
                     child: Container(
                       constraints: BoxConstraints(
                         minHeight: (media.height -
@@ -435,7 +477,7 @@ class SearchEquipmentField extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).canvasColor,
-        borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
+        borderRadius: Utils.buttonRadius,
       ),
       child: TextField(
         onChanged: onChanged,
@@ -514,10 +556,10 @@ class _FilterSortButtonState extends State<FilterSortButton> {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF9a354e),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ScreenUtil.verticalScale(6)),
+            borderRadius: Utils.buttonRadius,
           ),
           padding: EdgeInsets.symmetric(
-            vertical: ScreenUtil.horizontalScale(3.5),
+            vertical: ScreenUtil.horizontalScale(3),
             horizontal: ScreenUtil.horizontalScale(4),
           ),
         ),
@@ -716,4 +758,28 @@ class _FilterSortButtonState extends State<FilterSortButton> {
 //     },
 //   );
 // }
+}
+
+class HoldToCopy extends StatelessWidget {
+  final String text;
+  final Widget child;
+  const HoldToCopy({super.key, required this.text, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: () async {
+        await Clipboard.setData(
+          ClipboardData(text: text),
+        );
+        HapticFeedback.lightImpact();
+
+        if (Platform.isIOS) {
+          showBottomAlert(context, '$text Copied to clipboard');
+        }
+      },
+      child: child,
+    );
+  }
 }

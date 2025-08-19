@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/haptic_feedback%20.dart';
+import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/DashBoardScreen/dashboard_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/month_view.dart';
 import 'package:bbb/pages/ProfileAndSettings/profile_settings_page.dart';
@@ -21,7 +21,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../providers/main_page_provider.dart';
 import '../providers/user_data_provider.dart';
 import 'IntroScreen/version_update_screen.dart';
@@ -59,60 +58,101 @@ class _MainPageState extends State<MainPage> {
     return packageInfo;
   }
 
-  navigateAppVersion() async {
-    PackageInfo version = await getCurrentAppVersion();
-    log("VERSION======== ${version.version}");
+  // Future<bool> navigateAppVersion() async {
+  //   PackageInfo version = await getCurrentAppVersion();
+  //
+  //   await Future.delayed(Duration(milliseconds: 200));
+  //   if (Platform.isIOS) {
+  //     if (version.version !=
+  //         (dataProvider?.newVersionModel?.ios?.version ?? "")) {
+  //       if (dataProvider!.newVersionModel!.ios!.forceUpdate == true) {
+  //         if (mounted) {
+  //           Navigator.pushReplacement(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => VersionUpdateScreen(),
+  //             ),
+  //           );
+  //         }
+  //       } else {
+  //         if (mounted) {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => VersionUpdateScreen(),
+  //             ),
+  //           );
+  //         }
+  //       }
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } else if (Platform.isAndroid) {
+  //     if (version.version !=
+  //         (dataProvider?.newVersionModel?.android?.version ?? "")) {
+  //       if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
+  //         if (mounted) {
+  //           Navigator.pushReplacement(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => VersionUpdateScreen(),
+  //             ),
+  //           );
+  //         }
+  //       } else {
+  //         if (mounted) {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => VersionUpdateScreen(),
+  //             ),
+  //           );
+  //         }
+  //       }
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
-    await Future.delayed(Duration(milliseconds: 200));
-    if (Platform.isIOS) {
-      log("VERSION======== ${version.version}");
-      if (version.version !=
-          (dataProvider?.newVersionModel?.ios?.version ?? "")) {
-        if (dataProvider!.newVersionModel!.ios!.forceUpdate == true) {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        }
-      }
-    } else if (Platform.isAndroid) {
-      log("VERSION======== ${version.version}");
-      log('dataProvider?.newVersionModel?.android?.version==========>>>>>${dataProvider?.newVersionModel?.android?.version}');
-      if (version.version !=
-          (dataProvider?.newVersionModel?.android?.version ?? "")) {
-        if (dataProvider!.newVersionModel!.android!.forceUpdate == true) {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VersionUpdateScreen(),
-              ),
-            );
-          }
-        }
-      }
+  Future<bool> navigateAppVersion() async {
+    final PackageInfo version = await getCurrentAppVersion();
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    final bool isIOS = Platform.isIOS;
+    final String currentVersion = version.version;
+
+    final String? requiredVersion = isIOS
+        ? dataProvider?.newVersionModel?.ios?.version
+        : dataProvider?.newVersionModel?.android?.version;
+    final bool forceUpdate = isIOS
+        ? (dataProvider?.newVersionModel?.ios?.forceUpdate ?? false)
+        : (dataProvider?.newVersionModel?.android?.forceUpdate ?? false);
+
+    if (currentVersion == (requiredVersion ?? "")) return false;
+
+    if (mounted) {
+      final route = MaterialPageRoute(builder: (_) => VersionUpdateScreen());
+      forceUpdate
+          ? await Navigator.pushReplacement(context, route)
+              .then((value) => showInitialDialog())
+          : await Navigator.push(context, route)
+              .then((value) => showInitialDialog());
+    }
+    return true;
+  }
+
+  void showInitialDialog() {
+    if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        _showWelcomeModal();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('hasSeenWelcome', true);
+      });
     }
   }
 
@@ -134,20 +174,19 @@ class _MainPageState extends State<MainPage> {
 
     /// UPDATE POP-UP
 
-    // WidgetsBinding.instance
-    //     .addPostFrameCallback((timeStamp) => navigateAppVersion());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      bool isUpdatePopUP =
+          await preferences.getBool(SharedPreference.isUpdatePopUP) ?? false;
 
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) async {
-        if (widget.showWelcomeModal || widget.welcomeDescription.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            _showWelcomeModal();
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('hasSeenWelcome', true);
-          });
+      if (isUpdatePopUP == false) {
+        bool versionScreenOpened = await navigateAppVersion();
+        if (!versionScreenOpened) {
+          showInitialDialog();
         }
-      },
-    );
+      } else {
+        showInitialDialog();
+      }
+    });
 
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) async => await monthProvider.updateOnInitMethods(),
