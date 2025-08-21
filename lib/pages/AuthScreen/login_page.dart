@@ -122,12 +122,23 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
 
+      if (wooResponse.statusCode == 500) {
+        internalServerError();
+        stopLoader();
+        return;
+      }
+
+      if (wooResponse.statusCode == 503) {
+        serverIsBusy();
+        stopLoader();
+        return;
+      }
+
       if (wooResponse.statusCode == 401) {
         stopLoader();
       }
       tryAgainMsg();
     } catch (e) {
-      log('e==1========>>>>>$e');
       tryAgainMsg();
     }
   }
@@ -161,6 +172,18 @@ class _LoginPageState extends State<LoginPage> {
         stopLoader();
         return;
       }
+    }
+
+    if (mobileResponse.statusCode == 500) {
+      internalServerError();
+      stopLoader();
+      return;
+    }
+
+    if (mobileResponse.statusCode == 503) {
+      serverIsBusy();
+      stopLoader();
+      return;
     }
 
     if (mobileResponse.statusCode == 401) {
@@ -897,6 +920,19 @@ class _LoginPageState extends State<LoginPage> {
     if (mounted) {
       showBottomAlert(context,
           'Something went wrong. Please check your connection and try again.');
+    }
+  }
+
+  void internalServerError() {
+    if (mounted) {
+      showBottomAlert(
+          context, 'Internal server error. Please try again in a moment.');
+    }
+  }
+
+  void serverIsBusy() {
+    if (mounted) {
+      showBottomAlert(context, 'Server is busy. Please try again in a moment.');
     }
   }
 
