@@ -226,7 +226,11 @@ class _WatchTutorialState extends State<WatchTutorial>
         }
 
         _onVideoTick();
-        setState(() {});
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
       });
 
       // _videoPlayerController.addListener(() async {

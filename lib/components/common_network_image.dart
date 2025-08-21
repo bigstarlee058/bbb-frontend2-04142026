@@ -58,6 +58,8 @@ Widget appShimmerImage(
     BorderRadiusGeometry? borderRadius,
     Widget? child,
     Color? color,
+    Color? errorColor,
+    EdgeInsets? errorPadding,
     bool? isBlur}) {
   return CachedNetworkImage(
     imageUrl: networkImageUrl.startsWith('https://storage.cloud.google.com/')
@@ -83,13 +85,16 @@ Widget appShimmerImage(
       );
     },
     errorWidget: (context, url, error) {
-      return Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor,
-          borderRadius: borderRadius ??
-              BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+      return Padding(
+        padding: errorPadding ?? EdgeInsets.zero,
+        child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: errorColor ?? AppColors.primaryColor,
+            borderRadius: borderRadius ??
+                BorderRadius.all(Radius.circular(ScreenUtil.verticalScale(5))),
+          ),
         ),
       );
     },

@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/main.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -41,8 +39,8 @@ import 'package:bbb/values/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ntp/ntp.dart';
 import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/exercise_model.dart';
 
@@ -99,12 +97,6 @@ class DataProvider extends ChangeNotifier {
   Tutorials tutorialData =
       Tutorials(id: "", title: "", description: "", photo: "", files: []);
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('authToken');
-    return authToken;
-  }
-
   NewVersionModel? newVersionModel;
 
   Future<void> fetchAppVersion() async {
@@ -116,9 +108,8 @@ class DataProvider extends ChangeNotifier {
       final response = await dio.get(url,
           options: Options(headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'AUTH_TOKEN': userIdToken ?? ''
+            'AUTH_TOKEN': userIdToken
           }));
-      log('response==========>>>>>$response');
       if (response.statusCode == 200 && response.data != null) {
         newVersionModel = NewVersionModel.fromJson(response.data);
         notifyListeners();
@@ -137,6 +128,7 @@ class DataProvider extends ChangeNotifier {
   List<Map<String, dynamic>> allImageList = [];
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
+
     String? userIdToken = await getAuthToken();
 
     try {
@@ -144,7 +136,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -258,42 +250,43 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-
         achievementList = List<AchievementModel>.from(
             data.map((x) => AchievementModel.fromJson(x)));
-
         for (var element in achievementList) {
           if (element.achievements!.isNotEmpty) {
             for (var ele in element.achievements!) {
               if (achievementsData.isEmpty) {
                 if ((ele.achievementAchievementId?.value ?? 0) <=
                     (element.currentValue ?? 0)) {
+                  DateTime now = await NTP.now();
+
                   await ApiRepo.addAchievementsList(
                       body: UpdateAchievementsRequest(
-                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsDate: now.toString(),
                     achievementsTitle:
                         ele.achievementAchievementId?.achievementIdId ?? "",
                     achievementsSubtitle: "SYNC",
                   ).toJson1());
 
                   ele.achieved = true;
-                  ele.achievedDate = DateTime.now().toUtc().toString();
+                  ele.achievedDate = now.toString();
                 }
               } else if (achievementsData.isNotEmpty &&
                   (achievementsData.any((z) =>
                           z.achievementsTitle ==
                           ele.achievementAchievementId?.achievementIdId) ==
                       false)) {
+                DateTime now = await NTP.now();
                 if ((ele.achievementAchievementId!.value)! <=
                     (element.currentValue!)) {
                   final data = UpdateAchievementsRequest(
-                    achievementsDate: DateTime.now().toUtc().toString(),
+                    achievementsDate: now.toString(),
                     achievementsTitle:
                         ele.achievementAchievementId?.achievementIdId ?? "",
                     achievementsSubtitle: "SYNC",
@@ -301,7 +294,7 @@ class DataProvider extends ChangeNotifier {
                   await ApiRepo.addAchievementsList(body: data.toJson1());
 
                   ele.achieved = true;
-                  ele.achievedDate = DateTime.now().toUtc().toString();
+                  ele.achievedDate = now.toString();
                 }
               } else {
                 if (achievementsData.isNotEmpty) {
@@ -361,7 +354,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -390,7 +383,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -415,7 +408,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -441,7 +434,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -488,7 +481,7 @@ class DataProvider extends ChangeNotifier {
     final response = await http.put(url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
         body: jsonEncode(challengeDetail));
     if (response.statusCode == 200) {
@@ -507,7 +500,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -551,14 +544,16 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
+
     try {
       final response = await http.get(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
+
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
@@ -583,7 +578,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -610,7 +605,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken
         },
       );
       if (response.statusCode == 200) {
@@ -638,7 +633,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -678,7 +673,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -712,7 +707,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -737,7 +732,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -784,7 +779,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -816,7 +811,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -843,13 +838,15 @@ class DataProvider extends ChangeNotifier {
   Future fetchMonthWorkouts(int month) async {
     final Dio dio = Dio();
     final String url = '${AppConstants.serverUrl}/api/workouts/current';
-
+    print("11================::::::::::::${DateTime.now()}");
     try {
+      DateTime now = await NTP.now();
+
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',
         'split': '5',
-        'date': "${DateTime.now().toUtc()}",
+        'date': "$now",
       };
 
       String? userIdToken = await getAuthToken();
@@ -860,13 +857,18 @@ class DataProvider extends ChangeNotifier {
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            'AUTH_TOKEN': userIdToken ?? '',
+            'AUTH_TOKEN': userIdToken,
           },
         ),
       );
+      print("22================::::::::::::${DateTime.now()}");
 
       if (response.statusCode == 200 && response.data != null) {
+        print("33================::::::::::::${DateTime.now()}");
+
         await getMonthInfoFromJson(responseData: response.data);
+        print("44================::::::::::::${DateTime.now()}");
+
         notifyListeners();
       } else {
         await getMonthInfoFromJson();
@@ -1000,7 +1002,7 @@ class DataProvider extends ChangeNotifier {
         await preferences.putString(
             "${SplitType.split5}-${monthDataModelSplit5.id}",
             jsonEncode(monthDataModelSplit5));
-        final dataList = [];
+        // final dataList = [];
 
         // for (var element in monthDataModelSplit3.weeks ?? []) {
         //   final data =
@@ -1225,10 +1227,8 @@ class DataProvider extends ChangeNotifier {
             log('responseData=========15=========>>>>>${DateTime.now()}');
           }
         }*/
-
         if (value) {
           await fetchAndStoreDayData(monthDataModelSplit3);
-
           fetchAndStoreAllData(monthDataModelSplit3);
         }
       }
@@ -1247,6 +1247,7 @@ class DataProvider extends ChangeNotifier {
 
       /// Fetch month enrollment first
       final monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+      print('monthEnrollment==========>>>>>${jsonEncode(monthEnrollment)}');
       if (monthEnrollment.isNotEmpty) {
         for (var element in monthEnrollment) {
           final body = {
@@ -1277,7 +1278,7 @@ class DataProvider extends ChangeNotifier {
       }
 
       final streakDataModelFuture = ApiRepo.fetchStreakCount();
-
+      log('streakDataModelFuture==========>>>>>$streakDataModelFuture');
       final apiResults = await Future.wait([
         ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? ""),
         // ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? ""),
@@ -1670,7 +1671,7 @@ class DataProvider extends ChangeNotifier {
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'AUTH_TOKEN': userIdToken ?? "",
+            'AUTH_TOKEN': userIdToken,
           },
         ),
       );
@@ -1726,7 +1727,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -1754,7 +1755,7 @@ class DataProvider extends ChangeNotifier {
       final response = await http.get(
         url,
         headers: <String, String>{
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -1843,7 +1844,10 @@ class DataProvider extends ChangeNotifier {
 
   bool storyLoader = false;
   Future<bool> addOwnSpotlight(
-      String title, String description, File? imageFile) async {
+      String title, String description, File? imageFile,
+      {bool isFromReport = false,
+      String? osVersion,
+      String? appVersion}) async {
     storyLoader = true;
     notifyListeners();
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/staffs/addOwnSpotsligt');
@@ -1854,6 +1858,15 @@ class DataProvider extends ChangeNotifier {
       http.MultipartRequest request = http.MultipartRequest("POST", url);
       request.fields['title'] = title;
       request.fields['description'] = description;
+
+      if (isFromReport) {
+        // request.fields['app_version'] = osVersion ?? "";
+        // request.fields['device_version'] = appVersion ?? "";
+        final version = (osVersion ?? "") + (appVersion ?? "");
+        request.fields['description'] = "$description\nVersion: [$version]";
+      } else {
+        request.fields['description'] = description;
+      }
 
       if (imageFile != null) {
         final stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
@@ -1867,7 +1880,7 @@ class DataProvider extends ChangeNotifier {
         request.files.add(multipartFile);
       }
       request.headers
-          .addAll({'AUTH_TOKEN': userIdToken!, 'Accept': 'application/json'});
+          .addAll({'AUTH_TOKEN': userIdToken, 'Accept': 'application/json'});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();

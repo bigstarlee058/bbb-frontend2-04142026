@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-StreakDataModel streakDataModelFromJson(String str) => StreakDataModel.fromJson(json.decode(str));
+StreakDataModel streakDataModelFromJson(String str) =>
+    StreakDataModel.fromJson(json.decode(str));
 
-String streakDataModelToJson(StreakDataModel data) => json.encode(data.toJson());
+String streakDataModelToJson(StreakDataModel data) =>
+    json.encode(data.toJson());
 
 class StreakDataModel {
   String? id;
@@ -21,13 +23,18 @@ class StreakDataModel {
     this.updatedAt,
   });
 
-  factory StreakDataModel.fromJson(Map<String, dynamic> json) => StreakDataModel(
+  factory StreakDataModel.fromJson(Map<String, dynamic> json) =>
+      StreakDataModel(
         id: json["_id"],
         userId: json["userId"],
         v: json["__v"],
-        count: json["count"],
-        createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-        updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+        count: json["count"].toString(),
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
+        updatedAt: json["updatedAt"] == null
+            ? null
+            : DateTime.parse(json["updatedAt"]),
       );
 
   Map<String, dynamic> toJson() => {

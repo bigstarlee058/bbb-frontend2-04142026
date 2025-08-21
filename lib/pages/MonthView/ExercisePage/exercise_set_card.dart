@@ -17,6 +17,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 import 'notes_slideout.dart';
@@ -301,7 +302,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
 
   Future<void> _saveData() async {
     // HapticFeedBack.buttonClick();
-
+    DateTime nowUT = await NTP.now();
     _handleCloseTimer();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";
@@ -365,7 +366,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
       "effort": effort.toString(),
       "index": widget.index,
       "subIndex": widget.countIndex,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "${nowUT}",
       "status": Status.completed,
       "totalSet": widget.totalRIRSet
       // "status": _restDuration == 0 ? Status.completed : Status.empty
@@ -390,7 +391,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
       "effort": effort.toString(),
       "index": "${widget.index}",
       "subIndex": "${widget.countIndex}",
-      "date": "${DateTime.now().toUtc()}",
+      "date": "${nowUT}",
       "status": Status.completed,
       "totalSet": widget.totalRIRSet.toString(),
       // "status": _restDuration == 0 ? Status.completed : Status.empty
@@ -410,7 +411,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
-      "date": "${DateTime.now().toUtc()}",
+      "date": "${nowUT}",
       "status": Status.completed,
       "totalSet": widget.totalRIRSet
       // "status": matchingElement?.status ?? (_restDuration == 0 ? Status.completed : Status.empty)
@@ -425,7 +426,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
       "load": load.toString(),
       "type": widget.extraDataModel.type.toString(),
       "effort": effort.toString(),
-      "date": "${DateTime.now().toUtc()}",
+      "date": "${nowUT}",
       "status": Status.completed,
       "totalSet": widget.totalRIRSet.toString(),
       "dataId": dataId,
@@ -538,104 +539,110 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                     isExpanded: _isExpanded,
                     canTapOnHeader: true,
                     headerBuilder: (BuildContext context, bool isExpanded) {
-                      return ColorFiltered(
-                        colorFilter: widget.available ||
-                                widget.completed ||
-                                setCompleted ||
-                                _showTimer ||
-                                timerCompleted ||
-                                _isExpanded
-                            ? ColorFilter.mode(
-                                Colors.transparent, BlendMode.saturation)
-                            : ColorFilter.mode(
-                                Colors.white.withValues(alpha: 0.55),
-                                BlendMode.saturation),
-                        child: Container(
-                          color: widget.color,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: ScreenUtil.horizontalScale(4)),
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (widget.available ||
+                      return Transform(
+                        transform: Matrix4.identity(),
+                        alignment: Alignment.center,
+                        child: ColorFiltered(
+                          colorFilter: widget.available ||
                                   widget.completed ||
-                                  setCompleted) {
-                                _showTimer = false;
-                                // await monthProvider?.setShowTimerIndex(
-                                //     -1, -1, -1);
-                                await monthProvider?.updateExpandedItem(!_isExpanded
-                                    ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
-                                    : "");
+                                  setCompleted ||
+                                  _showTimer ||
+                                  timerCompleted ||
+                                  _isExpanded
+                              ? ColorFilter.mode(
+                                  Colors.transparent, BlendMode.saturation)
+                              : ColorFilter.mode(
+                                  Colors.white.withValues(alpha: 0.55),
+                                  BlendMode.saturation),
+                          child: Container(
+                            color: widget.color,
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: ScreenUtil.horizontalScale(4)),
+                            child: GestureDetector(
+                              onTap: () async {
+                                if (widget.available ||
+                                    widget.completed ||
+                                    setCompleted) {
+                                  _showTimer = false;
+                                  // await monthProvider?.setShowTimerIndex(
+                                  //     -1, -1, -1);
+                                  await monthProvider?.updateExpandedItem(
+                                      !_isExpanded
+                                          ? "${widget.index}:${widget.countIndex}:${monthProvider!.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}"
+                                          : "");
 
-                                setState(() {
-                                  _isExpanded = !_isExpanded;
-                                });
-                              }
-                            },
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${widget.title} ${widget.subIndex + 1}",
-                                            style: GoogleFonts.plusJakartaSans(
-                                              color: AppColors.primaryColor,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
+                                  setState(() {
+                                    _isExpanded = !_isExpanded;
+                                  });
+                                }
+                              },
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${widget.title} ${widget.subIndex + 1}",
+                                              style:
+                                                  GoogleFonts.plusJakartaSans(
+                                                color: AppColors.primaryColor,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Text(
-                                        _isExpanded ? "" : '$reps reps',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          color: _isExpanded
-                                              ? Colors.transparent
-                                              : Colors.black38,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (widget.completed ||
-                                    timerCompleted ||
-                                    setCompleted)
-                                  Container(
-                                    padding: EdgeInsets.all(
-                                        ScreenUtil.verticalScale(0.5)),
-                                    margin: const EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: Colors.green, width: 3),
-                                      color: Colors.green,
+                                        const SizedBox(width: 20),
+                                        Text(
+                                          _isExpanded ? "" : '$reps reps',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            color: _isExpanded
+                                                ? Colors.transparent
+                                                : Colors.black38,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: Icon(Icons.check,
-                                        size: ScreenUtil.verticalScale(2.2),
-                                        color: Colors.white),
                                   ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                      color: AppColors.primaryColor,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(25))),
-                                  child: Icon(
-                                    _isExpanded
-                                        ? Icons.keyboard_arrow_up_outlined
-                                        : Icons.keyboard_arrow_down_outlined,
-                                    color: Colors.white,
-                                    size: 33,
+                                  if (widget.completed ||
+                                      timerCompleted ||
+                                      setCompleted)
+                                    Container(
+                                      padding: EdgeInsets.all(
+                                          ScreenUtil.verticalScale(0.5)),
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Colors.green, width: 3),
+                                        color: Colors.green,
+                                      ),
+                                      child: Icon(Icons.check,
+                                          size: ScreenUtil.verticalScale(2.2),
+                                          color: Colors.white),
+                                    ),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                        color: AppColors.primaryColor,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(25))),
+                                    child: Icon(
+                                      _isExpanded
+                                          ? Icons.keyboard_arrow_up_outlined
+                                          : Icons.keyboard_arrow_down_outlined,
+                                      color: Colors.white,
+                                      size: 33,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -730,9 +737,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                       }
                                                     },
                                                     inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .allow(RegExp(
-                                                              r'^\d*\.?\d*')),
+                                                      WeightInputFormatter(),
                                                     ],
                                                     keyboardType: /*Platform
                                                                 .isAndroid
@@ -887,7 +892,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                               child: TextFormField(
                                                 controller: _repsController,
                                                 focusNode: _nodeText2,
-                                                maxLength: 6,
+                                                maxLength: 3,
                                                 cursorColor:
                                                     AppColors.primaryColor,
                                                 keyboardType: /*Platform
@@ -904,7 +909,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                 textInputAction:
                                                     TextInputAction.done,
                                                 textAlign: TextAlign.center,
-                                                readOnly: false,
+                                                readOnly: widget.isEditable
+                                                    ? false
+                                                    : true,
                                                 decoration:
                                                     const InputDecoration(
                                                   counterText: '',
@@ -944,7 +951,11 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                   }
                                                 },
                                                 onTap: () async {
-                                                  await repsOnTap(context);
+                                                  if (_repsController.text ==
+                                                      "0") {
+                                                    _repsController.clear();
+                                                  }
+                                                  // await repsOnTap(context);
                                                 },
                                                 // inputFormatters: [
                                                 //   FilteringTextInputFormatter
@@ -1103,6 +1114,37 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
           ),
           if (_showTimer && _restDuration != 0) ...[
             TimerWithProgressBar(
+              onNextSetOpen: () {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (timeStamp) async {
+                    int lastDataMainIndex = widget.index;
+                    int lastDataSubIndex = widget.countIndex;
+                    if (lastDataSubIndex ==
+                        ((monthProvider!.selectedExercise!
+                                    .extra![lastDataMainIndex].sets! -
+                                1) +
+                            (monthProvider!.selectedExercise!
+                                        .extra![lastDataMainIndex].type ==
+                                    3
+                                ? (widget.extraSetLength)
+                                : 0))) {
+                      lastDataMainIndex += 1;
+                      if (lastDataMainIndex ==
+                              (monthProvider!
+                                  .selectedExercise!.extra!.length) &&
+                          lastDataSubIndex == (widget.setCount - 1)) {
+                      } else {
+                        lastDataSubIndex = 0;
+                      }
+                    } else {
+                      lastDataSubIndex += 1;
+                    }
+
+                    monthProvider?.updateExpandedItem(
+                        "$lastDataMainIndex:$lastDataSubIndex:${monthProvider?.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
+                  },
+                );
+              },
               makeRefresh: () {
                 widget.makeRefresh();
               },
@@ -1123,7 +1165,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
               padding: EdgeInsets.only(top: 30),
               child: TextButton(
                 onPressed: () async {
-                  log('dataId==========>>>>>$dataId');
                   ApiRepo.deleteExerciseHistory(body: {"dataId": dataId});
 
                   await DatabaseHelper().deleteSingleData(
@@ -1158,36 +1199,30 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
       );
     }
   }
+}
 
-  Future<void> repsOnTap(BuildContext context) async {
-    if (_repsController.text == "0") {
-      _repsController.clear();
+class WeightInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String text = newValue.text;
+    if (!RegExp(r'^\d*\.?\d*$').hasMatch(text)) {
+      return oldValue;
     }
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (_cardKey.currentContext != null) {
-      final box = _cardKey.currentContext!.findRenderObject() as RenderBox;
-      final position = box.localToGlobal(Offset.zero, ancestor: null);
-      final double safeAreaTop = MediaQuery.of(context).padding.top;
-      final double appBarHeight =
-          Scaffold.maybeOf(context)?.appBarMaxHeight ?? kToolbarHeight;
-      final double desiredTop = safeAreaTop + appBarHeight + 8;
-      final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-      final double offset = widget.scrollController.offset +
-          position.dy -
-          desiredTop +
-          keyboardHeight;
-      widget.scrollController.animateTo(
-        offset < 0 ? 0 : offset,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
+    if (text.contains('.')) {
+      List<String> parts = text.split('.');
+      String beforeDecimal = parts[0];
+      String afterDecimal = parts.length > 1 ? parts[1] : '';
+      if (beforeDecimal.length > 3) return oldValue;
+      if (afterDecimal.length > 2) return oldValue;
+    } else {
+      if (text.length > 3) return oldValue;
     }
-  }
-
-  Future<void> weightOnTap(BuildContext context) async {
-    if (_weightController.text == "0") {
-      _weightController.clear();
+    if (double.tryParse(text) != null && double.parse(text) > 999.99) {
+      return oldValue;
     }
-    await repsOnTap(context);
+    return newValue;
   }
 }

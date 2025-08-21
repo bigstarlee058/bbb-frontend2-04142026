@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -47,10 +48,7 @@ class _HeightPickerState extends State<HeightPicker> {
   @override
   void initState() {
     _cmValue = widget.initialHeight;
-    log('_cmValue==========>>>>>${_cmValue}');
-    // log('_cmValue==========>>>>>${_cmDecimalValue}');
     _currentUnitSelected = widget.initialSelectedHeightUnit;
-    log('_currentUnitSelected====22======>>>>>$_currentUnitSelected');
     if (widget.initialSelectedHeightUnit == HeightUnit.inches) {
       _mainScrollController =
           FixedExtentScrollController(initialItem: _feetPart - 1);
@@ -462,26 +460,30 @@ Future<void> showCupertinoHeightPicker({
     context: context,
     barrierColor: barrierColor,
     builder: (context) {
-      return Theme(
-        data: Theme.of(context)
-            .copyWith(primaryColor: Theme.of(context).cardColor),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
-            topRight: Radius.circular(ScreenUtil.verticalScale(2.5)),
-          ),
-          child: SizedBox(
-            height: modalHeight,
-            width: maxModalWidth ?? double.infinity,
-            child: ColoredBox(
-              color: Theme.of(context).cardColor,
-              child: HeightPicker(
-                key: key,
-                initialHeight: initialHeight,
-                initialSelectedHeightUnit: initialSelectedHeightUnit,
-                showSeparationText: showSeparationText,
-                canConvertUnit: canConvertUnit,
-                onHeightChanged: onHeightChanged,
+      return SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Theme(
+          data: Theme.of(context)
+              .copyWith(primaryColor: Theme.of(context).cardColor),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
+              topRight: Radius.circular(ScreenUtil.verticalScale(2.5)),
+            ),
+            child: SizedBox(
+              height: modalHeight,
+              width: maxModalWidth ?? double.infinity,
+              child: ColoredBox(
+                color: Theme.of(context).cardColor,
+                child: HeightPicker(
+                  key: key,
+                  initialHeight: initialHeight,
+                  initialSelectedHeightUnit: initialSelectedHeightUnit,
+                  showSeparationText: showSeparationText,
+                  canConvertUnit: canConvertUnit,
+                  onHeightChanged: onHeightChanged,
+                ),
               ),
             ),
           ),

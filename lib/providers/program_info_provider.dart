@@ -1,10 +1,8 @@
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/program_info_model.dart';
-import '../pages/AuthScreen/login_page.dart';
 import '../values/app_constants.dart';
 
 class ProgramInfoProvider extends ChangeNotifier {
@@ -22,8 +20,8 @@ class ProgramInfoProvider extends ChangeNotifier {
     try {
       loading = true;
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('authToken');
+      String token = await getAuthToken();
+
       String split = preferences.getString(SharedPreference.split) ?? "";
       String equipmentType =
           preferences.getString(SharedPreference.equipmentType) ?? "";
@@ -34,7 +32,7 @@ class ProgramInfoProvider extends ChangeNotifier {
             'equipmentType': equipmentType,
           },
         ), // replace with actual endpoint
-        headers: {"auth_token": "$token"},
+        headers: {"auth_token": token},
       );
 
       if (response.statusCode == 200) {

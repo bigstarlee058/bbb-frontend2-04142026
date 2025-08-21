@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
@@ -41,172 +42,183 @@ class _TutorialPageState extends State<TutorialPage> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Consumer<DataProvider>(builder: (context, value, c) {
-                          return AppImage.imageApparel(value
-                              // media,
-                              // image: dataProvider!.allImageList
-                              //     .where(
-                              //         (element) => element["key"] == "imageApparel")
-                              //     .first["image"],
-                              // // image: dataProvider!.cachedImageMap["imageApparel"],
-                              // imageKey: "imageApparel",
-                              );
-                        }),
-                        SizedBox(
-                          height: media.height / 2.5,
-                          width: media.width,
-                          child: SafeArea(
-                            child: Column(
-                              children: [
-                                AppBar(
-                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                  surfaceTintColor: Colors.transparent,
-                                  centerTitle: true,
-                                  backgroundColor: Colors.transparent,
-                                  leading: BackArrowWidget(
-                                    onPress: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-
-                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                  // Positioned(
-                                  //   left: 0,
-                                  //   child: BackArrowWidget(
-                                  //     onPress: () {
-                                  //       Navigator.pop(context);
-                                  //     },
-                                  //   ),
-                                  // leading: SizedBox(),
-                                  title: Text(
-                                    'Tutorials',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ScreenUtil.horizontalScale(5),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Column(
+                    children: [
+                      Stack(
+                        children: [
+                          Consumer<DataProvider>(builder: (context, value, c) {
+                            return AppImage.imageApparel(value
+                                // media,
+                                // image: dataProvider!.allImageList
+                                //     .where(
+                                //         (element) => element["key"] == "imageApparel")
+                                //     .first["image"],
+                                // // image: dataProvider!.cachedImageMap["imageApparel"],
+                                // imageKey: "imageApparel",
+                                );
+                          }),
+                          SizedBox(
+                            height: media.height / 2.5,
+                            width: media.width,
+                            child: SafeArea(
+                              child: Column(
+                                children: [
+                                  AppBar(
+                                    toolbarHeight:
+                                        ScreenUtil.verticalScale(5.1),
+                                    surfaceTintColor: Colors.transparent,
+                                    centerTitle: true,
+                                    backgroundColor: Colors.transparent,
+                                    leading: BackArrowWidget(
+                                      onPress: () {
+                                        Navigator.pop(context);
+                                      },
                                     ),
-                                  ),
-                                  actions: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      child: const CommonStreakWithNotification(
-                                          routeString: '/equipmentLibrary'),
-                                    )
-                                  ],
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(5),
-                                  ),
-                                  height: media.height * 0.097,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: ScreenUtil.horizontalScale(70),
-                                        child: Text(
-                                          // "Here’s a quick tutorial\njust for you",
-                                          "Browse our tutorial library (new ones added regularly).",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize:
-                                                ScreenUtil.verticalScale(2),
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
+
+                                    /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                    // Positioned(
+                                    //   left: 0,
+                                    //   child: BackArrowWidget(
+                                    //     onPress: () {
+                                    //       Navigator.pop(context);
+                                    //     },
+                                    //   ),
+                                    // leading: SizedBox(),
+                                    title: Text(
+                                      'Tutorials',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ScreenUtil.horizontalScale(5),
                                       ),
+                                    ),
+                                    actions: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 10),
+                                        child:
+                                            const CommonStreakWithNotification(
+                                                routeString:
+                                                    '/equipmentLibrary'),
+                                      )
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: media.height / 4.59,
-                          width: media.width,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
-                                height: media.height / 11,
-                                width: media.width / 6,
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: ScreenUtil.horizontalScale(5),
+                                    ),
+                                    height: media.height * 0.097,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: ScreenUtil.horizontalScale(70),
+                                          child: Text(
+                                            // "Here’s a quick tutorial\njust for you",
+                                            "Browse our tutorial library (new ones added regularly).",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  ScreenUtil.verticalScale(2),
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
+                          SizedBox(
+                            height: media.height / 4.59,
+                            width: media.width,
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: ClipPath(
+                                clipper: DiagonalClipper(),
+                                child: Container(
+                                  height: media.height / 11,
+                                  width: media.width / 6,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: media.height / 4.6),
+                    child: Container(
+                      width: media.width,
+                      constraints: BoxConstraints(
+                          minHeight: (media.height - (media.height / 4.6))),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(6),
+                          vertical: ScreenUtil.verticalScale(2)),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: media.height / 4.6),
-                  child: Container(
-                    width: media.width,
-                    constraints: BoxConstraints(
-                        minHeight: (media.height - (media.height / 4.6))),
-                    padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.horizontalScale(6),
-                        vertical: ScreenUtil.verticalScale(2)),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                      ),
+                      child: Consumer<DataProvider>(
+                        builder: (context, value, child) {
+                          return value.tutorialLoader
+                              ? Center(child: CircularProgressIndicator())
+                              : value.tutorialList.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        "Tutorials pending!\nPlease check back in later.",
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge
+                                                ?.color),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      separatorBuilder: (context, index) =>
+                                          SizedBox(
+                                              height:
+                                                  ScreenUtil.verticalScale(2)),
+                                      physics: NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: value.tutorialList.length,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                              ScreenUtil.verticalScale(2)),
+                                      itemBuilder: (context, index) =>
+                                          tutorialCard(
+                                              value.tutorialList[index]),
+                                    );
+                        },
                       ),
                     ),
-                    child: Consumer<DataProvider>(
-                      builder: (context, value, child) {
-                        return value.tutorialLoader
-                            ? Center(child: CircularProgressIndicator())
-                            : value.tutorialList.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      textAlign: TextAlign.center,
-                                      "Tutorials pending!\nPlease check back in later.",
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.color),
-                                    ),
-                                  )
-                                : ListView.separated(
-                                    separatorBuilder: (context, index) =>
-                                        SizedBox(
-                                            height:
-                                                ScreenUtil.verticalScale(2)),
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: value.tutorialList.length,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: ScreenUtil.verticalScale(2)),
-                                    itemBuilder: (context, index) =>
-                                        tutorialCard(value.tutorialList[index]),
-                                  );
-                      },
-                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

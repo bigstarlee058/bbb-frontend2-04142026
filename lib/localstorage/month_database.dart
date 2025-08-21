@@ -198,19 +198,19 @@ class DatabaseHelper {
 
   Future<bool> areAllTablesEmpty() async {
     try {
-      final Database db = await database;
       const tables = [
-        DatabaseHelper.exerciseHistory,
-        DatabaseHelper.exerciseStatus,
-        DatabaseHelper.dayStatus,
-        DatabaseHelper.circuitManager,
-        DatabaseHelper.extraSetHistory,
-        DatabaseHelper.removedExerciseHistory,
-        DatabaseHelper.exerciseNotes,
-        DatabaseHelper.extraExerciseHistory,
-        DatabaseHelper.swapExerciseHistory,
-        DatabaseHelper.achievementHistory,
+        exerciseHistory,
+        exerciseStatus,
+        dayStatus,
+        circuitManager,
+        extraSetHistory,
+        removedExerciseHistory,
+        exerciseNotes,
+        extraExerciseHistory,
+        swapExerciseHistory,
+        achievementHistory,
       ];
+      Database db = await database;
 
       for (final table in tables) {
         final result =
@@ -460,6 +460,27 @@ class DatabaseHelper {
 
     for (var element in tables) {
       await deleteAllData(element);
+    }
+  }
+
+  Future<void> getAllTables() async {
+    List<String> tables = [
+      monthHistory,
+      dayStatus,
+      exerciseHistory,
+      exerciseStatus,
+      circuitManager,
+      extraSetHistory,
+      removedExerciseHistory,
+      exerciseNotes,
+      extraExerciseHistory,
+      swapExerciseHistory,
+      achievementHistory,
+    ];
+
+    for (var element in tables) {
+      final data = await fetchData(tableName: element);
+      log('data=========================$element=========================>>>>>$data');
     }
   }
 }

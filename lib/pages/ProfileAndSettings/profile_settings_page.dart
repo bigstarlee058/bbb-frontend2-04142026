@@ -82,6 +82,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   void _handleLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+
     await prefs.setBool('isLoggedIn', false);
     await prefs.clear();
     await preferences.clearPrefs();
@@ -100,6 +102,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
 
     Navigator.pushNamed(context, AppRoutes.loginScreen);
+
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   Future<void> launchUrls(String urls) async {
@@ -129,11 +133,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     openUrl('https://bootybybret.com/pages/privacy-policy');
   }
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
   Future<void> _deleteAccount(context) async {
     Uri url = Uri.parse(
         '${AppConstants.serverUrl}/api/users/admin/${userData?.userData["id"]}');
@@ -157,40 +156,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     } catch (e) {
       throw Exception('Failed to delete account');
     }
-  }
-
-  void showBottomAlert(BuildContext context, String msg) {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: 20.0,
-        left: MediaQuery.of(context).size.width * 0.1,
-        right: MediaQuery.of(context).size.width * 0.1,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                msg,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlayState.insert(overlayEntry);
-
-    // Remove the alert after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   }
 
   @override
@@ -751,10 +716,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
                                       // await openAppSettings();
                                     } else {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      String? token =
-                                          prefs.getString('authToken');
+                                      String token = await getAuthToken();
+
                                       Uri url = Uri.parse(
                                           'https://app.bootybybret.com/?token=$token');
                                       if (await canLaunchUrl(url)) {

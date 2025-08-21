@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
-import 'package:bbb/components/app_alert_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/pages/AuthScreen/set_password_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -61,77 +62,72 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               'email': emailAddress,
             }),
           );
-
           if (response.statusCode == 200) {
-            // Assuming the API returns 200 for a successful operation
-
             showBottomAlert(
               context,
               "Please check your email inbox for the password reset email.",
             );
+            Navigator.pop(context);
+          } else if (response.statusCode == 404) {
+            final data = jsonDecode(response.body);
+            if (data["code"] == "invalid_email") {
+              var response1 = await http.post(
+                Uri.parse(
+                    '${AppConstants.serverUrl}/api/users/forgot_password'),
+                headers: <String, String>{
+                  'Content-Type': 'application/json',
+                },
+                body: jsonEncode(<String, String>{
+                  'email': emailAddress,
+                }),
+              );
 
-            // showDialog(
-            //   context: context,
-            //   builder: (BuildContext context) {
-            //     return const AppAlertDialog(
-            //       title: "Success",
-            //       description:
-            //           "Please check your email inbox for the password reset email.",
-            //     );
-            //   },
-            // );
+              if (response1.statusCode == 200) {
+                // showBottomAlert(
+                //   context,
+                //   "Please check your email inbox for the password reset email.",
+                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SetPasswordScreen(
+                      token: data["token"],
+                    ),
+                  ),
+                );
+              } else {
+                final data = jsonDecode(response1.body);
+                showBottomAlert(
+                  context,
+                  "Failed: ${data["message"]}",
+                );
+              }
+            } else {
+              final data = jsonDecode(response.body);
+              showBottomAlert(
+                context,
+                "Failed to send reset email: ${data["message"]}",
+              );
+            }
           } else {
-            // Handle error or unsuccessful operation
-
             final data = jsonDecode(response.body);
 
             showBottomAlert(
               context,
               "Failed to send reset email: ${data["message"]}",
             );
-
-            // showDialog(
-            //   context: context,
-            //   builder: (BuildContext context) {
-            //     return AppAlertDialog(
-            //       title: "Error",
-            //       description: "Failed to send reset email: ${response.body}",
-            //     );
-            //   },
-            // );
           }
         } else {
           showBottomAlert(
             context,
             "Invalid email format, Please check your email format.",
           );
-
-          // showDialog(
-          //   context: context,
-          //   builder: (BuildContext context) {
-          //     return const AppAlertDialog(
-          //       title: "Warning",
-          //       description: "Invalid email format",
-          //     );
-          //   },
-          // );
         }
       } else {
         showBottomAlert(
           context,
           "Please enter your email address to receive a password reset email.",
         );
-
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return const AppAlertDialog(
-        //       title: "Warning",
-        //       description:
-        //           "Please enter your email address to receive a password reset email.",
-        //     );
-        //   },
-        // );
       }
     } catch (e) {
       log('e==========>>>>>$e');
@@ -144,211 +140,182 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Form(
-        key: _formKey,
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Consumer<DataProvider>(builder: (context, value, c) {
-                  return AppImage.imageForgot(
-                    value,
-                    // media,
-                    // image: dataProvider!.allImageList
-                    //     .where((element) => element["key"] == "imageForgot")
-                    //     .first["image"],
-                    // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
-                    // // image: dataProvider!.cachedImageMap["imageForgot"],
-                    // imageKey: "imageForgot",
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: SafeArea(
-                            child: BackArrowWidget(onPress: () {
-                              Navigator.pop(context);
-                            }),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Form(
+          key: _formKey,
+          child: Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Consumer<DataProvider>(builder: (context, value, c) {
+                    return AppImage.imageForgot(
+                      value,
+                      // media,
+                      // image: dataProvider!.allImageList
+                      //     .where((element) => element["key"] == "imageForgot")
+                      //     .first["image"],
+                      // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                      // // image: dataProvider!.cachedImageMap["imageForgot"],
+                      // imageKey: "imageForgot",
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: SafeArea(
+                              child: BackArrowWidget(onPress: () {
+                                Navigator.pop(context);
+                              }),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                })
-              ],
-            ),
-            Positioned(
-              top: ScreenUtil.horizontalScale(50),
-              child: Container(
-                // height: 120,
-                height: 150,
-                width: media.width,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/img/bbb-logo.png'),
-                      fit: BoxFit.fitHeight,
-                      opacity: 1),
+                        ],
+                      ),
+                    );
+                  })
+                ],
+              ),
+              Positioned(
+                top: ScreenUtil.horizontalScale(50),
+                child: Container(
+                  // height: 120,
+                  height: ScreenUtil.verticalScale(15),
+                  width: media.width,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/img/bbb-logo.png'),
+                        fit: BoxFit.fitHeight,
+                        opacity: 1),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-                bottom: -0.7,
-                child: Column(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ClipPath(
-                          clipper: DiagonalClipper(),
-                          child: Container(
-                            height: media.height / 9.8,
-                            width: media.width / 6,
+              Positioned(
+                  bottom: -0.7,
+                  child: Column(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ClipPath(
+                            clipper: DiagonalClipper(),
+                            child: Container(
+                              height: media.height / 9.8,
+                              width: media.width / 6,
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: media.width,
                             decoration: BoxDecoration(
                               color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(
+                                    ScreenUtil.verticalScale(7)),
+                              ),
                             ),
-                          ),
-                        ),
-                        Container(
-                          width: media.width,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.only(
-                              topLeft:
-                                  Radius.circular(ScreenUtil.verticalScale(7)),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.verticalScale(4.4)),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(3.2),
-                                ),
-                                Text(
-                                  'Reset your password',
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil.verticalScale(3.32),
-                                    color: AppColors.primaryColor,
-                                    fontWeight: FontWeight.bold,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.verticalScale(4.4)),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(3.2),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(2),
-                                ),
-                                Text(
-                                  // 'Enter your email to receive a password reset mail',
-                                  // "Enter your email address below. We’ll send you a mail to reset password.",
-                                  "Please enter your email address to receive password reset instructions.",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil.verticalScale(1.65),
-                                    height: 1.5,
-                                    color: Color(0xff6f6f6f),
+                                  Text(
+                                    'Reset your password',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(3.32),
+                                      color: AppColors.primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(2.5),
-                                ),
-                                AppTextFormField(
-                                  hintText: 'Your Email',
-                                  keyboardType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.next,
-                                  onChanged: (value) {},
-                                  // validator: (value) {
-                                  //   return value!.isEmpty
-                                  //       ? 'Please, Enter Email Address'
-                                  //       : AppConstants.emailRegex.hasMatch(value)
-                                  //           ? null
-                                  //           : 'Invalid Email Address';
-                                  // },
-                                  controller: emailInputController,
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.only(right: 15),
-                                    child: IconButton(
-                                      onPressed: () {},
-                                      style: ButtonStyle(
-                                        minimumSize: WidgetStateProperty.all(
-                                          const Size(48, 48),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(2),
+                                  ),
+                                  Text(
+                                    // 'Enter your email to receive a password reset mail',
+                                    // "Enter your email address below. We’ll send you a mail to reset password.",
+                                    "Please enter your email address to receive password reset instructions.",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(1.65),
+                                      height: 1.5,
+                                      color: Color(0xff6f6f6f),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(2.5),
+                                  ),
+                                  AppTextFormField(
+                                    hintText: 'Your Email',
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    onChanged: (value) {},
+                                    // validator: (value) {
+                                    //   return value!.isEmpty
+                                    //       ? 'Please, Enter Email Address'
+                                    //       : AppConstants.emailRegex.hasMatch(value)
+                                    //           ? null
+                                    //           : 'Invalid Email Address';
+                                    // },
+                                    controller: emailInputController,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 15),
+                                      child: IconButton(
+                                        onPressed: () {},
+                                        style: ButtonStyle(
+                                          minimumSize: WidgetStateProperty.all(
+                                            const Size(48, 48),
+                                          ),
                                         ),
-                                      ),
-                                      icon: Icon(
-                                        Icons.email,
-                                        color: Colors.grey.shade400,
+                                        icon: Icon(
+                                          Icons.email,
+                                          color: Colors.grey.shade400,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.horizontalScale(7),
-                                ),
-                                ButtonWidget(
-                                  text: 'Send a request',
-                                  textColor: Colors.white,
-                                  color: AppColors.primaryColor,
-                                  onPress: loader
-                                      ? () {}
-                                      : () {
-                                          if (_formKey.currentState
-                                                  ?.validate() ==
-                                              true) {
-                                            resetPassword(
-                                                emailInputController.text);
-                                          }
-                                        },
-                                  isLoading: loader,
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(4),
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: ScreenUtil.horizontalScale(7),
+                                  ),
+                                  ButtonWidget(
+                                    text: 'Send a request',
+                                    textColor: Colors.white,
+                                    color: AppColors.primaryColor,
+                                    onPress: loader
+                                        ? () {}
+                                        : () {
+                                            if (_formKey.currentState
+                                                    ?.validate() ==
+                                                true) {
+                                              resetPassword(
+                                                  emailInputController.text);
+                                            }
+                                          },
+                                    isLoading: loader,
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(4),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ))
-          ],
+                        ],
+                      ),
+                    ],
+                  ))
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-void showBottomAlert(BuildContext context, String msg) {
-  OverlayState? overlayState = Overlay.of(context);
-  OverlayEntry overlayEntry = OverlayEntry(
-    builder: (context) => Positioned(
-      bottom: 20.0,
-      left: MediaQuery.of(context).size.width * 0.1,
-      right: MediaQuery.of(context).size.width * 0.1,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Center(
-            child: Text(
-              msg,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  overlayState.insert(overlayEntry); //In here I changed the code ?.
-
-  // Remove the alert after 3 seconds
-  Future.delayed(const Duration(seconds: 3), () {
-    overlayEntry.remove();
-  });
 }

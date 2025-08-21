@@ -37,100 +37,104 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackArrowWidget(onPress: () => Navigator.pop(context)),
-        toolbarHeight: ScreenUtil.verticalScale(5.1),
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
-        centerTitle: true,
-        title: Text(
-          'Submit Your Story',
-          style: TextStyle(
-            color: Theme.of(context).textTheme.bodyLarge?.color,
-            fontSize: ScreenUtil.verticalScale(2.3),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackArrowWidget(onPress: () => Navigator.pop(context)),
+          toolbarHeight: ScreenUtil.verticalScale(5.1),
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
+          title: Text(
+            'Submit Your Story',
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              fontSize: ScreenUtil.verticalScale(2.3),
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(
-          bottom: ScreenUtil.verticalScale(3.2),
-          right: ScreenUtil.horizontalScale(7),
-          left: ScreenUtil.horizontalScale(7),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Consumer<DataProvider>(builder: (context, value, child) {
-              return Column(
-                children: [
-                  ButtonWidget(
-                    text: "Submit",
-                    textColor: Colors.white,
-                    color: AppColors.primaryColor,
-                    onPress: () async {
-                      if (image == null &&
-                          titleController.text.isEmpty &&
-                          descriptionController.text.isEmpty) {
-                        showBottomAlert(context, "Please enter details");
-                      } else if (image == null) {
-                        showBottomAlert(context, "Please select image");
-                      } else if (titleController.text.isEmpty) {
-                        showBottomAlert(context, "Please enter title");
-                      } else if (descriptionController.text.isEmpty) {
-                        showBottomAlert(context, "Please enter description");
-                      } else {
-                        bool val = await value.addOwnSpotlight(
-                          titleController.text.trim(),
-                          descriptionController.text.trim(),
-                          image,
-                        );
-                        if (val == true) {
-                          Fluttertoast.showToast(
-                            msg: "Story submitted successfully!",
-                            toastLength: Toast.LENGTH_LONG,
-                            gravity: ToastGravity.TOP_RIGHT,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: AppColors.primaryColor,
-                            textColor: Colors.white,
-                            fontSize: 16.0,
-                          );
-                          Navigator.pop(context);
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.only(
+            bottom: ScreenUtil.verticalScale(3.2),
+            right: ScreenUtil.horizontalScale(7),
+            left: ScreenUtil.horizontalScale(7),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Consumer<DataProvider>(builder: (context, value, child) {
+                return Column(
+                  children: [
+                    ButtonWidget(
+                      text: "Submit",
+                      textColor: Colors.white,
+                      color: AppColors.primaryColor,
+                      onPress: () async {
+                        if (image == null &&
+                            titleController.text.isEmpty &&
+                            descriptionController.text.isEmpty) {
+                          showBottomAlert(context, "Please enter details");
+                        } else if (image == null) {
+                          showBottomAlert(context, "Please select image");
+                        } else if (titleController.text.isEmpty) {
+                          showBottomAlert(context, "Please enter title");
+                        } else if (descriptionController.text.isEmpty) {
+                          showBottomAlert(context, "Please enter description");
                         } else {
-                          Fluttertoast.showToast(
-                            msg: "Failed to add spotlight, Please try again!",
-                            toastLength: Toast.LENGTH_LONG,
-                            gravity: ToastGravity.TOP_RIGHT,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: AppColors.primaryColor,
-                            textColor: Colors.white,
-                            fontSize: 16.0,
+                          bool val = await value.addOwnSpotlight(
+                            titleController.text.trim(),
+                            descriptionController.text.trim(),
+                            image,
                           );
+                          if (val == true) {
+                            Fluttertoast.showToast(
+                              msg: "Story submitted successfully!",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.TOP_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: AppColors.primaryColor,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: "Failed to add spotlight, Please try again!",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.TOP_RIGHT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: AppColors.primaryColor,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          }
                         }
-                      }
-                    },
-                    isLoading: value.storyLoader,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    textAlign: TextAlign.center,
-                    "By submitting your photos, you grant Booty by Bret LLC the rights outlined in Section 5.5 of our Terms of Use to use and promote these images across our platforms and marketing materials.",
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                        fontStyle: FontStyle.italic,
-                        fontSize: ScreenUtil.verticalScale(1.2)),
-                  )
-                ],
-              );
-            }),
-          ],
+                      },
+                      isLoading: value.storyLoader,
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "By submitting your photos, you grant Booty by Bret LLC the rights outlined in Section 5.5 of our Terms of Use to use and promote these images across our platforms and marketing materials.",
+                      style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
+                          fontStyle: FontStyle.italic,
+                          fontSize: ScreenUtil.verticalScale(1.2)),
+                    )
+                  ],
+                );
+              }),
+            ],
+          ),
         ),
-      ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Padding(
-        padding:
-            EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-        child: form(),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+          child: form(),
+        ),
       ),
     );
   }
@@ -280,38 +284,4 @@ class _AddMemberSpotlightState extends State<AddMemberSpotlight> {
           ),
         ),
       );
-
-  void showBottomAlert(BuildContext context, String msg) {
-    OverlayState? overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        bottom: ScreenUtil.verticalScale(3.2),
-        left: MediaQuery.of(context).size.width * 0.1,
-        right: MediaQuery.of(context).size.width * 0.1,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                msg,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlayState.insert(overlayEntry);
-
-    // Remove the alert after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
-  }
 }

@@ -380,10 +380,12 @@ class _ShareAchievementNewDialogState extends State<ShareAchievementNewDialog> {
                                                             "${data.achievementAchievementId!.value}")) *
                                                         0.45359237);
                                               } else {
-                                                cValue =
-                                                    "${widget.item.currentValue}";
-                                                aValue =
-                                                    "${data.achievementAchievementId!.value}";
+                                                cValue = Utils.formatDouble(
+                                                    double.parse(
+                                                        "${widget.item.currentValue}"));
+                                                aValue = Utils.formatDouble(
+                                                    double.parse(
+                                                        "${data.achievementAchievementId!.value}"));
                                               }
                                               return Text(
                                                 data.achievedDate!.isEmpty &&

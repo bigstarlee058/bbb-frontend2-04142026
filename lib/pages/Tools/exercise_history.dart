@@ -1,9 +1,10 @@
-import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/models/SyncDataResponseModel/exercise_history_data_model.dart';
 import 'package:bbb/providers/month_provider.dart';
+import 'package:bbb/providers/user_data_provider.dart';
 import 'package:bbb/utils/utils.dart';
 import 'package:bbb/values/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -56,7 +57,13 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   }
 
   Future<void> _loadValue() async {
-    await monthProvider?.fetchExerciseHistroy();
+    String date = "";
+    try {
+      date = context.read<UserDataProvider>().user["createdAt"];
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
+
     monthProvider?.exerciseHistroy.sort((a, b) {
       if (a.date != null && b.date != null) {
         return DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!));
@@ -67,7 +74,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     DateTime today = DateTime.now();
     DateTime startDate = selectedFilterIndex == 3
         ? DateTime.parse(monthProvider!.exerciseHistroy.first.date!)
-        : today.subtract(Duration(
+        : (today.add(Duration(days: 1))).subtract(Duration(
             days: selectedFilterIndex == 0
                 ? 27
                 : selectedFilterIndex == 1
@@ -78,8 +85,14 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       DateTime itemDate = DateTime.parse(item.date ?? "${DateTime.now()}");
       return itemDate.isAfter(
               DateTime(startDate.year, startDate.month, startDate.day)) &&
-          itemDate.isBefore(today);
+          itemDate.isBefore(today.add(Duration(days: 1)));
     }).toList();
+
+    if (date.isNotEmpty) {
+      final dateOfJoining = DateTime.parse(date);
+      historyDataModel.removeWhere(
+          (element) => dateOfJoining.isAfter(DateTime.parse(element.date!)));
+    }
 
     historyDataModel.sort((a, b) =>
         DateTime.parse(a.date ?? "").compareTo(DateTime.parse(b.date ?? "")));
@@ -105,7 +118,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     }
 
     final Map<String, ExerciseHistoryDataModel> highestByDate = {};
-
     for (final item in historyDataModel) {
       final dateStr = item.date;
       final date = DateTime.parse("${dateStr ?? DateTime.now()}");
@@ -116,7 +128,9 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
           ? (double.tryParse(item.weight ?? '0') ?? 0) * 0.45359237
           : double.tryParse(item.weight ?? '0') ?? 0;
 
-      final load = reps * weight;
+      final rir1 = int.tryParse(item.effort ?? "0") ?? 0;
+      double rir2 = (rir1 == 100 ? 0 : rir1.toDouble());
+      final load = (reps + rir2) * weight;
 
       if (!highestByDate.containsKey(dayKey) ||
           (load) >
@@ -157,6 +171,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
 
       double oneRmSession =
           weight * ((0.025 * (reps + rir)) + 1) /*+ (reps + rir) / 30)*/;
+
       groupedData[formattedDate]!['oneRmSession'] =
           groupedData[formattedDate]!['oneRmSession']! + oneRmSession;
       groupedData.removeWhere((key, value) =>
@@ -177,6 +192,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       dateLabels.add(date);
       index++;
     });
+
     // totalWeight = chartData.fold(0, (sum, spot) => sum + spot.y.toInt());
     max1RepMaxWeight = chartData.fold(
         0, (max, spot) => spot.y > max ? spot.y.toDouble() : max);
@@ -286,233 +302,216 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                  child: SafeArea(
-                    child: Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil.horizontalScale(4)),
-                      decoration: const BoxDecoration(
-                          color: Color(0XFFd18a9b), shape: BoxShape.circle),
-                      child: SizedBox(
-                        width: ScreenUtil.verticalScale(4.65),
-                        height: ScreenUtil.verticalScale(4.65),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(
-                            Icons.keyboard_arrow_left,
-                            color: Colors.white,
-                            size: ScreenUtil.verticalScale(4),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+                    child: SafeArea(
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            left: ScreenUtil.horizontalScale(4)),
+                        decoration: const BoxDecoration(
+                            color: Color(0XFFd18a9b), shape: BoxShape.circle),
+                        child: SizedBox(
+                          width: ScreenUtil.verticalScale(4.65),
+                          height: ScreenUtil.verticalScale(4.65),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.keyboard_arrow_left,
+                              color: Colors.white,
+                              size: ScreenUtil.verticalScale(4),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
                         ),
                       ),
                     ),
                   ),
-                ),
-                const Expanded(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
-                      child: Text(
-                        "History",
-                        style: TextStyle(
-                          color: AppColors.primaryColor,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
+                  const Expanded(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+                        child: Text(
+                          "History",
+                          style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: ScreenUtil.horizontalScale(10)),
-              ],
+                  SizedBox(width: ScreenUtil.horizontalScale(10)),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Padding(
-            padding: commonPadding(),
-            child: Center(
-              child: Text(
-                monthProvider?.selectedExercise?.name ?? "",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).textTheme.labelLarge?.color,
-                  fontWeight: FontWeight.bold,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: commonPadding(),
+              child: Center(
+                child: Text(
+                  monthProvider?.selectedExercise?.name ?? "",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Theme.of(context).textTheme.labelLarge?.color,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          if (isLoading)
-            Expanded(
-              child: Center(
-                child: CircularProgressIndicator(color: AppColors.primaryColor),
-              ),
-            )
-          else ...[
-            if (historyDataModel.isEmpty)
+            const SizedBox(height: 8),
+            if (isLoading)
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil.horizontalScale(8)),
-                  child: Center(
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      "No data available. Once you finish & save your first exercise, this page will show your history.",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).textTheme.labelLarge?.color),
-                    ),
-                  ),
+                child: Center(
+                  child:
+                      CircularProgressIndicator(color: AppColors.primaryColor),
                 ),
               )
-            else
-              Padding(
-                padding: commonPadding(),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '1-Rep Max History',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).textTheme.labelLarge?.color,
+            else ...[
+              if (historyDataModel.isEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: ScreenUtil.horizontalScale(8)),
+                    child: Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "No data available. Once you finish & save your first exercise, this page will show your history.",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).textTheme.labelLarge?.color),
                       ),
                     ),
-                    Row(
-                      children: [
-                        FilterButton(
-                          label: "1M",
-                          isSelected: selectedFilterIndex == 0,
-                          onPressed: () => WidgetsBinding.instance
-                              .addPostFrameCallback(
-                                  (timeStamp) => _onFilterSelected(0)),
+                  ),
+                )
+              else
+                Padding(
+                  padding: commonPadding(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '1-Rep Max History',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).textTheme.labelLarge?.color,
                         ),
-                        const SizedBox(width: 6),
-                        FilterButton(
-                          label: "3M",
-                          isSelected: selectedFilterIndex == 1,
-                          onPressed: () => WidgetsBinding.instance
-                              .addPostFrameCallback(
-                                  (timeStamp) => _onFilterSelected(1)),
-                        ),
-                        const SizedBox(width: 6),
-                        FilterButton(
-                          label: "1Y",
-                          isSelected: selectedFilterIndex == 2,
-                          onPressed: () => WidgetsBinding.instance
-                              .addPostFrameCallback(
-                                  (timeStamp) => _onFilterSelected(2)),
-                        ),
-                        const SizedBox(width: 6),
-                        FilterButton(
-                          label: "All",
-                          isSelected: selectedFilterIndex == 3,
-                          onPressed: () => WidgetsBinding.instance
-                              .addPostFrameCallback(
-                                  (timeStamp) => _onFilterSelected(3)),
-                        ),
-                      ],
-                    )
-                  ],
+                      ),
+                      Row(
+                        children: [
+                          FilterButton(
+                            label: "1M",
+                            isSelected: selectedFilterIndex == 0,
+                            onPressed: () => WidgetsBinding.instance
+                                .addPostFrameCallback(
+                                    (timeStamp) => _onFilterSelected(0)),
+                          ),
+                          const SizedBox(width: 6),
+                          FilterButton(
+                            label: "3M",
+                            isSelected: selectedFilterIndex == 1,
+                            onPressed: () => WidgetsBinding.instance
+                                .addPostFrameCallback(
+                                    (timeStamp) => _onFilterSelected(1)),
+                          ),
+                          const SizedBox(width: 6),
+                          FilterButton(
+                            label: "1Y",
+                            isSelected: selectedFilterIndex == 2,
+                            onPressed: () => WidgetsBinding.instance
+                                .addPostFrameCallback(
+                                    (timeStamp) => _onFilterSelected(2)),
+                          ),
+                          const SizedBox(width: 6),
+                          FilterButton(
+                            label: "All",
+                            isSelected: selectedFilterIndex == 3,
+                            onPressed: () => WidgetsBinding.instance
+                                .addPostFrameCallback(
+                                    (timeStamp) => _onFilterSelected(3)),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            const SizedBox(height: 16),
-            historyDataModel.isEmpty
-                ? const SizedBox.shrink()
-                : Padding(
-                    padding: commonPadding(),
-                    child: Builder(
-                      builder: (context) {
-                        return maxWeight != 0
-                            ? SizedBox(
-                                height: ScreenUtil.verticalScale(18),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: LineChart(
-                                    LineChartData(
-                                      gridData: FlGridData(
-                                        show: true,
-                                        drawHorizontalLine: true,
-                                        drawVerticalLine: false,
-                                        horizontalInterval:
-                                            (maxWeight / 5).ceilToDouble(),
-                                        getDrawingHorizontalLine: (value) =>
-                                            FlLine(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .displayLarge
-                                                    ?.color,
-                                                strokeWidth: 1,
-                                                dashArray: [5, 5]),
-                                        getDrawingVerticalLine: (value) =>
-                                            FlLine(
-                                                color: Theme.of(context)
-                                                    .textTheme
-                                                    .displayLarge
-                                                    ?.color,
-                                                strokeWidth: 1,
-                                                dashArray: [5, 5]),
-                                        // getDrawingHorizontalLine: (value) {
-                                        //   return FlLine(
-                                        //       color:
-                                        //           Theme.of(context).canvasColor,
-                                        //       strokeWidth: 0.5,
-                                        //       dashArray: [5, 5]);
-                                        // },
-                                      ),
-                                      titlesData: FlTitlesData(
-                                        leftTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            reservedSize: 45,
-                                            interval: maxWeight / 3,
-                                            getTitlesWidget: (value, meta) {
-                                              return Text(
-                                                value.toStringAsFixed(0),
-                                                style: TextStyle(
-                                                  fontSize: 10,
+              const SizedBox(height: 16),
+              historyDataModel.isEmpty
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: commonPadding(),
+                      child: Builder(
+                        builder: (context) {
+                          return maxWeight != 0
+                              ? SizedBox(
+                                  height: ScreenUtil.verticalScale(18),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: LineChart(
+                                      LineChartData(
+                                        gridData: FlGridData(
+                                          show: true,
+                                          drawHorizontalLine: true,
+                                          drawVerticalLine: false,
+                                          horizontalInterval:
+                                              (maxWeight / 5).ceilToDouble(),
+                                          getDrawingHorizontalLine: (value) =>
+                                              FlLine(
                                                   color: Theme.of(context)
                                                       .textTheme
-                                                      .labelLarge
+                                                      .displayLarge
                                                       ?.color,
-                                                ),
-                                              );
-                                            },
-                                          ),
+                                                  strokeWidth: 1,
+                                                  dashArray: [5, 5]),
+                                          getDrawingVerticalLine: (value) =>
+                                              FlLine(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .displayLarge
+                                                      ?.color,
+                                                  strokeWidth: 1,
+                                                  dashArray: [5, 5]),
+                                          // getDrawingHorizontalLine: (value) {
+                                          //   return FlLine(
+                                          //       color:
+                                          //           Theme.of(context).canvasColor,
+                                          //       strokeWidth: 0.5,
+                                          //       dashArray: [5, 5]);
+                                          // },
                                         ),
-                                        bottomTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            reservedSize: 20,
-                                            interval: 1,
-                                            getTitlesWidget: (value, meta) {
-                                              int index = value.toInt();
-                                              if (index >= 0 &&
-                                                  index < dateLabels.length) {
+                                        titlesData: FlTitlesData(
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 45,
+                                              interval: maxWeight / 3,
+                                              getTitlesWidget: (value, meta) {
                                                 return Text(
-                                                  dateLabels[index],
+                                                  value.toStringAsFixed(0),
                                                   style: TextStyle(
                                                     fontSize: 10,
                                                     color: Theme.of(context)
@@ -521,99 +520,148 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                                         ?.color,
                                                   ),
                                                 );
-                                              }
-                                              return const Text('');
+                                              },
+                                            ),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 20,
+                                              interval: 1,
+                                              getTitlesWidget: (value, meta) {
+                                                int index = value.toInt();
+                                                if (index >= 0 &&
+                                                    index < dateLabels.length) {
+                                                  return Text(
+                                                    dateLabels[index],
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Theme.of(context)
+                                                          .textTheme
+                                                          .labelLarge
+                                                          ?.color,
+                                                    ),
+                                                  );
+                                                }
+                                                return const Text('');
+                                              },
+                                            ),
+                                          ),
+                                          rightTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          topTitles: const AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                        ),
+                                        borderData: FlBorderData(
+                                          show: true,
+                                          border: Border.symmetric(
+                                            horizontal: BorderSide(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .displayLarge!
+                                                  .color!,
+                                            ),
+                                            vertical: BorderSide(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .displayLarge!
+                                                  .color!,
+                                            ),
+                                          ),
+                                        ),
+                                        minY: 0,
+                                        maxY: maxWeight.toDouble(),
+                                        lineBarsData: [
+                                          LineChartBarData(
+                                            spots: chartData,
+                                            isCurved: false,
+                                            barWidth: .5,
+                                            color: AppColors.primaryColor,
+                                          ),
+                                        ],
+                                        lineTouchData: LineTouchData(
+                                          touchTooltipData:
+                                              LineTouchTooltipData(
+                                            tooltipRoundedRadius: 8,
+                                            getTooltipColor: (_) =>
+                                                Colors.black87,
+                                            tooltipMargin:
+                                                150, // Distance above the point
+                                            fitInsideHorizontally: true,
+                                            fitInsideVertically: true,
+                                            showOnTopOfTheChartBoxArea: true,
+                                            getTooltipItems: (touchedSpots) {
+                                              return touchedSpots.map(
+                                                  (LineBarSpot touchedSpot) {
+                                                final value =
+                                                    Utils.formatDouble(
+                                                        touchedSpot.y);
+
+                                                return LineTooltipItem(
+                                                  '$value ${isKg ? "kg" : "lbs"}',
+                                                  const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12,
+                                                  ),
+                                                );
+                                              }).toList();
                                             },
                                           ),
+                                          handleBuiltInTouches: true,
                                         ),
-                                        rightTitles: const AxisTitles(
-                                          sideTitles:
-                                              SideTitles(showTitles: false),
-                                        ),
-                                        topTitles: const AxisTitles(
-                                          sideTitles:
-                                              SideTitles(showTitles: false),
-                                        ),
-                                      ),
-                                      borderData: FlBorderData(
-                                        show: true,
-                                        border: Border.symmetric(
-                                          horizontal: BorderSide(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .displayLarge!
-                                                .color!,
-                                          ),
-                                          vertical: BorderSide(
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .displayLarge!
-                                                .color!,
-                                          ),
-                                        ),
-                                      ),
-                                      minY: 0,
-                                      maxY: maxWeight.toDouble(),
-                                      lineBarsData: [
-                                        LineChartBarData(
-                                          spots: chartData,
-                                          isCurved: false,
-                                          barWidth: .5,
-                                          color: AppColors.primaryColor,
-                                        ),
-                                      ],
-                                      lineTouchData: LineTouchData(
-                                        touchTooltipData: LineTouchTooltipData(
-                                          tooltipRoundedRadius: 8,
-                                          getTooltipColor: (_) =>
-                                              Colors.black87,
-                                          tooltipMargin:
-                                              150, // Distance above the point
-                                          fitInsideHorizontally: true,
-                                          fitInsideVertically: true,
-                                          showOnTopOfTheChartBoxArea: true,
-                                          getTooltipItems: (touchedSpots) {
-                                            return touchedSpots
-                                                .map((LineBarSpot touchedSpot) {
-                                              final value = Utils.formatDouble(
-                                                  touchedSpot.y);
-
-                                              return LineTooltipItem(
-                                                '$value ${isKg ? "kg" : "lbs"}',
-                                                const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              );
-                                            }).toList();
-                                          },
-                                        ),
-                                        handleBuiltInTouches: true,
                                       ),
                                     ),
                                   ),
-                                ),
-                              )
-                            : const SizedBox();
-                      },
+                                )
+                              : const SizedBox();
+                        },
+                      ),
                     ),
-                  ),
-            const SizedBox(height: 25),
-            historyDataModel.isEmpty
-                ? const SizedBox.shrink()
-                : Padding(
-                    padding: commonPadding(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Builder(builder: (context) {
-                              return Text(
-                                '${Utils.formatDouble(totalWeight)} ${isKg ? "kg" : "lbs"}',
+              const SizedBox(height: 25),
+              historyDataModel.isEmpty
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: commonPadding(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Builder(builder: (context) {
+                                return Text(
+                                  '${Utils.formatDouble(totalWeight)} ${isKg ? "kg" : "lbs"}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.color,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Total Lifted',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${Utils.formatDouble(max1RepMaxWeight)} ${isKg ? "kg" : "lbs"}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context)
@@ -622,70 +670,47 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                                       ?.color,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              );
-                            }),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Total Lifted',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${Utils.formatDouble(max1RepMaxWeight)} ${isKg ? "kg" : "lbs"}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge
-                                    ?.color,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(height: 4),
+                              const Text(
+                                '1 Rep Max',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              '1 Rep Max',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+              const SizedBox(height: 16),
+              if (historyDataModel.isEmpty || finalData.isEmpty)
+                const SizedBox.shrink()
+              else
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: ScreenUtil.verticalScale(1.5)),
+                    color: Theme.of(context).cardColor,
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) => SizedBox(height: 7),
+                      itemCount: finalData.length,
+                      padding: EdgeInsets.zero,
+                      physics: ClampingScrollPhysics(),
+                      itemBuilder: (context, monthIndex) {
+                        final monthGroup = finalData[monthIndex];
+                        final String title = monthGroup["title"];
+                        final List dayGroups = monthGroup["data"];
+                        return buildExpansionTileItem(
+                            monthGroup, title, dayGroups, monthIndex);
+                      },
                     ),
                   ),
-            const SizedBox(height: 16),
-            if (historyDataModel.isEmpty || finalData.isEmpty)
-              const SizedBox.shrink()
-            else
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(top: ScreenUtil.verticalScale(1.5)),
-                  color: Theme.of(context).cardColor,
-                  child: ListView.separated(
-                    separatorBuilder: (context, index) => SizedBox(height: 7),
-                    itemCount: finalData.length,
-                    padding: EdgeInsets.zero,
-                    physics: ClampingScrollPhysics(),
-                    itemBuilder: (context, monthIndex) {
-                      final monthGroup = finalData[monthIndex];
-                      final String title = monthGroup["title"];
-                      final List dayGroups = monthGroup["data"];
-                      return buildExpansionTileItem(
-                          monthGroup, title, dayGroups, monthIndex);
-                    },
-                  ),
                 ),
-              ),
-          ]
-        ],
+            ]
+          ],
+        ),
       ),
     );
   }
@@ -751,8 +776,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
               },
               backgroundColor: Colors.transparent,
               body: Padding(
-                padding: EdgeInsets.only(
-                    top: 15, right: ScreenUtil.verticalScale(1.25)),
+                padding: EdgeInsets.only(top: 15),
                 child: Column(
                   children: [
                     ...dayGroups.map<Widget>(
@@ -765,25 +789,25 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(
-                                width: 100,
-                                child: Text(
-                                  DateFormat("MMM dd, yyyy").format(
-                                    DateFormat("dd/MM/yyyy").parse(date),
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil.horizontalScale(3.5),
-                                    fontWeight: FontWeight.normal,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .labelLarge
-                                        ?.color,
-                                  ),
+                              Text(
+                                "${DateFormat("MMM dd,").format(
+                                  DateFormat("dd/MM/yyyy").parse(date),
+                                )}\n${DateFormat("yyyy").format(
+                                  DateFormat("dd/MM/yyyy").parse(date),
+                                )}",
+                                style: TextStyle(
+                                  fontSize: ScreenUtil.horizontalScale(3.5),
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.color,
                                 ),
                               ),
+                              SizedBox(width: ScreenUtil.horizontalScale(5)),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ...List.generate(
                                       exercises.length,
@@ -893,184 +917,6 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
         ),
       ),
     );
-
-    // return Theme(
-    //   data: Theme.of(context).copyWith(
-    //     dividerColor: Colors.transparent,
-    //     splashColor: Colors.transparent,
-    //     highlightColor: Colors.transparent,
-    //   ),
-    //   child: ExpansionTile(
-    //     tilePadding: EdgeInsets.symmetric(
-    //       horizontal: ScreenUtil.horizontalScale(5),
-    //       vertical: ScreenUtil.verticalScale(0.5),
-    //     ),
-    //     title: Row(
-    //       children: [
-    //         Expanded(
-    //           child: Text(
-    //             title,
-    //             style: TextStyle(
-    //               color: AppColors.primaryColor,
-    //               fontSize: ScreenUtil.verticalScale(2),
-    //               fontWeight: FontWeight.bold,
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //     initiallyExpanded: _expandedStates[index] ?? false,
-    //     onExpansionChanged: (bool value) {
-    //       setState(() {
-    //         _expandedStates[index] = value;
-    //       });
-    //
-    //       // if (value && index == dataProvider!.faQsModel.length - 1) {
-    //       //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       //     Future.delayed(const Duration(milliseconds: 200), () {
-    //       //       if (_scrollController.hasClients) {
-    //       //         _scrollController.animateTo(
-    //       //           _scrollController.position.maxScrollExtent,
-    //       //           duration: const Duration(milliseconds: 100),
-    //       //           curve: Curves.easeOut,
-    //       //         );
-    //       //       }
-    //       //     });
-    //       //   });
-    //       // }
-    //       if (value) {
-    //         WidgetsBinding.instance.addPostFrameCallback((_) {
-    //           // _scrollToTile(index);
-    //         });
-    //       }
-    //     },
-    //     backgroundColor: Colors.grey.withValues(alpha: 0.05),
-    //     collapsedBackgroundColor: Colors.grey.withValues(alpha: 0.05),
-    //     childrenPadding: EdgeInsets.zero,
-    //     clipBehavior: Clip.none,
-    //     iconColor: AppColors.primaryColor,
-    //     collapsedIconColor: Colors.white,
-    //     trailing: Row(
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: [
-    //         InkWell(
-    //           child: Container(
-    //             padding: EdgeInsets.all(ScreenUtil.verticalScale(0.3)),
-    //             decoration: BoxDecoration(
-    //               shape: BoxShape.circle,
-    //               border: Border.all(
-    //                 color: AppColors.primaryColor,
-    //                 width: 2,
-    //               ),
-    //               color: AppColors.primaryColor,
-    //             ),
-    //             child: Icon(
-    //               _expandedStates[index] == true
-    //                   ? Icons.keyboard_arrow_up_outlined
-    //                   : Icons.keyboard_arrow_down_outlined,
-    //               color: Colors.white,
-    //               size: ScreenUtil.verticalScale(3),
-    //             ),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //     children: [
-    //       Padding(
-    //         padding: EdgeInsets.only(
-    //             left: ScreenUtil.verticalScale(0.5),
-    //             right: ScreenUtil.verticalScale(1)),
-    //         child: Column(
-    //           children: [
-    //             ...dayGroups.map<Widget>((dayGroup) {
-    //               final String date = dayGroup["date"];
-    //               final List exercises = dayGroup["data"];
-    //               return Padding(
-    //                 padding:
-    //                     const EdgeInsets.symmetric(vertical: 0, horizontal: 16)
-    //                         .copyWith(bottom: 25),
-    //                 child: Row(
-    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                   crossAxisAlignment: CrossAxisAlignment.start,
-    //                   children: [
-    //                     SizedBox(
-    //                       width: 100,
-    //                       child: Text(
-    //                         DateFormat("MMM dd, yyyy").format(
-    //                           DateFormat("dd/MM/yyyy").parse(date),
-    //                         ),
-    //                         style: const TextStyle(
-    //                           fontSize: 14,
-    //                           fontWeight: FontWeight.normal,
-    //                           color: Colors.black,
-    //                         ),
-    //                       ),
-    //                     ),
-    //                     Align(
-    //                       alignment: Alignment.centerRight,
-    //                       child: Column(
-    //                         crossAxisAlignment: CrossAxisAlignment.end,
-    //                         children: [
-    //                           ...exercises.map<Widget>(
-    //                             (e) {
-    //                               final data = e as ExerciseHistoryDataModel;
-    //                               return Padding(
-    //                                 padding: const EdgeInsets.only(bottom: 10),
-    //                                 child: RichText(
-    //                                   text: TextSpan(
-    //                                     children: [
-    //                                       TextSpan(
-    //                                         text: '${data.reps}',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black,
-    //                                             fontWeight: FontWeight.normal),
-    //                                       ),
-    //                                       const TextSpan(
-    //                                         text: ' × ',
-    //                                         style: TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text: '${data.weight}lbs',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black,
-    //                                             fontWeight: FontWeight.bold),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text: ' @ ${data.load}%',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                       TextSpan(
-    //                                         text:
-    //                                             ' | RIR ${data.effort == "100" ? "0" : data.effort}',
-    //                                         style: const TextStyle(
-    //                                             fontSize: 14,
-    //                                             color: Colors.black),
-    //                                       ),
-    //                                     ],
-    //                                   ),
-    //                                 ),
-    //                               );
-    //                             },
-    //                           )
-    //                         ],
-    //                       ),
-    //                     ),
-    //                   ],
-    //                 ),
-    //               );
-    //             })
-    //           ],
-    //         ),
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }
 

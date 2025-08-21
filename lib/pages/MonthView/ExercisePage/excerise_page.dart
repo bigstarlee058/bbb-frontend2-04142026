@@ -17,7 +17,6 @@ import 'package:bbb/middleware/notification_service.dart';
 import 'package:bbb/models/MonthResponseModel/circuit_model.dart';
 import 'package:bbb/models/MonthResponseModel/exercise_history_model.dart';
 import 'package:bbb/models/MonthResponseModel/extra_set_model.dart';
-import 'package:bbb/models/MonthResponseModel/history_data_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/models/MonthResponseModel/payload_model.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/add_notes.dart';
@@ -36,6 +35,7 @@ import 'package:flutter_animated_progress_bar/flutter_animated_progress_bar.dart
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -304,13 +304,17 @@ class _ExercisePageState extends State<ExercisePage>
       return;
     }
     final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
-
+    log('payloadModel.weekIndex==========>>>>>${payloadModel.weekIndex}');
     monthProvider!.weekDataModel =
         monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
-    int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
-      return element == monthProvider?.todayTitleId;
-    });
 
+    log('monthProvider!.weekDataModel==========>>>>>${monthProvider!.weekDataModel}');
+    log('monthProvider?.todayTitleId==========>>>>>${jsonEncode(payloadModel)}');
+    int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
+      log('element==========>>>>>${element}');
+      return element == payloadModel.dayId;
+    });
+    log('index==========>>>>>${index}');
     final dayIndex = int.parse((monthProvider!
                 .weekDataModel!.dayList?[index ?? 0]
                 .toString()
@@ -320,6 +324,7 @@ class _ExercisePageState extends State<ExercisePage>
                 .replaceAll(" ", "") ??
             "0")) -
         1;
+    log('dayIndex==========>>>>>${dayIndex}');
     DayDataModel dayData =
         "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}"
                 .toString()
@@ -384,6 +389,8 @@ class _ExercisePageState extends State<ExercisePage>
       monthProvider!.selectedExercise =
           monthProvider!.pumpDayModel!.exercises![payloadModel.exerciseIndex!];
     } else {
+      log('dayData.exercises==========>>>>>${dayData.exercises}');
+      log('payloadModel.exerciseIndex==========>>>>>${payloadModel.exerciseIndex}');
       monthProvider!.selectedExercise =
           dayData.exercises![payloadModel.exerciseIndex!];
     }
@@ -500,6 +507,7 @@ class _ExercisePageState extends State<ExercisePage>
         findIsAtLeastOnSet();
       }
     }
+    if (!mounted) return;
     setState(() => loading = false);
     videoInitialize();
   }
@@ -923,220 +931,225 @@ class _ExercisePageState extends State<ExercisePage>
     backOffIndex = 0;
     workingIndex = 0;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: loading &&
-              ((isExercise == 1
-                      ? (monthProvider
-                                  ?.exerciseDetailModel?.files?.isNotEmpty ??
-                              false) &&
-                          !videoNotInitialized &&
-                          videoSize != null
-                      : (monthProvider?.warmUpModel?.files?.isNotEmpty ??
-                              false) &&
-                          !videoNotInitialized &&
-                          videoSize != null) ==
-                  false)
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
-              ),
-            )
-          : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) ||
-                  (isExercise == 0 && monthProvider?.warmUpModel == null)
-              ? Column(
-                  children: [
-                    backButton(media, context),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "No data found!",
-                          style: TextStyle(fontSize: 17),
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: loading &&
+                ((isExercise == 1
+                        ? (monthProvider
+                                    ?.exerciseDetailModel?.files?.isNotEmpty ??
+                                false) &&
+                            !videoNotInitialized &&
+                            videoSize != null
+                        : (monthProvider?.warmUpModel?.files?.isNotEmpty ??
+                                false) &&
+                            !videoNotInitialized &&
+                            videoSize != null) ==
+                    false)
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primaryColor,
+                ),
+              )
+            : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) ||
+                    (isExercise == 0 && monthProvider?.warmUpModel == null)
+                ? Column(
+                    children: [
+                      backButton(media, context),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "No data found!",
+                            style: TextStyle(fontSize: 17),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                )
-              : SingleChildScrollView(
-                  controller: scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        fit: StackFit.loose,
-                        children: [
-                          Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showControlsOnTap();
-                                },
-                                child: Stack(
-                                  children: [
-                                    /// VIDEO SECTION
-
-                                    videoSection(media),
-
-                                    /// BACK BUTTON
-
-                                    backButton(media, context),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          /// PLAY PAUSE REWIND CONTROL
-
-                          playPauseControl(media),
-
-                          /// VIDEO PROGRESS
-
-                          videoProgress(media, context),
-
-                          // SafeArea(
-                          //   child: Align(
-                          //     alignment: Alignment.centerRight,
-                          //     child: Padding(
-                          //       padding: const EdgeInsets.only(right: 10),
-                          //       child: PopupMenuButton<String>(
-                          //         padding: EdgeInsets.only(right: 0),
-                          //         menuPadding:
-                          //             EdgeInsets.symmetric(vertical: 5),
-                          //         position: PopupMenuPosition.under,
-                          //         color: Theme.of(context).cardColor,
-                          //         icon: const Icon(
-                          //           Icons.more_vert,
-                          //           color: Colors.white70,
-                          //         ),
-                          //         onSelected: (value) {
-                          //           if (value == 'speed') {
-                          //             _showSpeedOptions();
-                          //           } else if (value == 'download') {
-                          //             _downloadVideo();
-                          //           }
-                          //         },
-                          //         itemBuilder: (_) => [
-                          //           PopupMenuItem(
-                          //               value: 'speed',
-                          //               child: Row(
-                          //                 children: [
-                          //                   Icon(
-                          //                     Icons.slow_motion_video,
-                          //                     color: Theme.of(context)
-                          //                         .textTheme
-                          //                         .bodyLarge
-                          //                         ?.color,
-                          //                   ),
-                          //                   SizedBox(width: 5),
-                          //                   Text(
-                          //                     'Playback Speed',
-                          //                     style: TextStyle(
-                          //                       color: Theme.of(context)
-                          //                           .textTheme
-                          //                           .bodyLarge
-                          //                           ?.color,
-                          //                     ),
-                          //                   ),
-                          //                 ],
-                          //               )),
-                          //           PopupMenuItem(
-                          //             value: 'download',
-                          //             child: Row(
-                          //               children: [
-                          //                 Icon(
-                          //                   Icons.download,
-                          //                   color: Theme.of(context)
-                          //                       .textTheme
-                          //                       .bodyLarge
-                          //                       ?.color,
-                          //                 ),
-                          //                 SizedBox(width: 5),
-                          //                 Text(
-                          //                   'Download',
-                          //                   style: TextStyle(
-                          //                     color: Theme.of(context)
-                          //                         .textTheme
-                          //                         .bodyLarge
-                          //                         ?.color,
-                          //                   ),
-                          //                 ),
-                          //               ],
-                          //             ),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-
-                      /// MAIN CONTENT
-
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: ((isExercise == 1
-                                        ? (monthProvider?.exerciseDetailModel?.files
-                                                    ?.isNotEmpty ??
-                                                false) &&
-                                            !videoNotInitialized &&
-                                            videoSize != null
-                                        : (monthProvider?.warmUpModel?.files
-                                                    ?.isNotEmpty ??
-                                                false) &&
-                                            !videoNotInitialized &&
-                                            videoSize != null)
-                                    ? videoSize!.height
-                                    : videoNotAvailable
-                                        ? (isExercise == 1
-                                                    ? monthProvider
-                                                            ?.exerciseDetailModel
-                                                            ?.videoThumbnail ??
-                                                        ""
-                                                    : monthProvider?.warmUpModel
-                                                            ?.videoThumbnail ??
-                                                        "")
-                                                .isEmpty
-                                            ? media.width +
-                                                media.height * 0.0605
-                                            : media.height * 0.83
-                                        : media.height * 0.83) -
-                                media.height * 0.121),
-                        child: Stack(
+                    ],
+                  )
+                : SingleChildScrollView(
+                    controller: scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Stack(
                           clipBehavior: Clip.none,
+                          fit: StackFit.loose,
                           children: [
-                            mainContent(media),
-                            Positioned(
-                              top: -((media.height / 3.995)),
-                              right: 0,
-                              child: SizedBox(
-                                height: media.height / 3.99,
-                                width: media.width,
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: ClipPath(
-                                    clipper: DiagonalClipper(),
-                                    child: Container(
-                                      height: media.height / 11,
-                                      width: media.width / 6,
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showControlsOnTap();
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      /// VIDEO SECTION
+
+                                      videoSection(media),
+
+                                      /// BACK BUTTON
+
+                                      backButton(media, context),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            /// PLAY PAUSE REWIND CONTROL
+
+                            playPauseControl(media),
+
+                            /// VIDEO PROGRESS
+
+                            videoProgress(media, context),
+
+                            // SafeArea(
+                            //   child: Align(
+                            //     alignment: Alignment.centerRight,
+                            //     child: Padding(
+                            //       padding: const EdgeInsets.only(right: 10),
+                            //       child: PopupMenuButton<String>(
+                            //         padding: EdgeInsets.only(right: 0),
+                            //         menuPadding:
+                            //             EdgeInsets.symmetric(vertical: 5),
+                            //         position: PopupMenuPosition.under,
+                            //         color: Theme.of(context).cardColor,
+                            //         icon: const Icon(
+                            //           Icons.more_vert,
+                            //           color: Colors.white70,
+                            //         ),
+                            //         onSelected: (value) {
+                            //           if (value == 'speed') {
+                            //             _showSpeedOptions();
+                            //           } else if (value == 'download') {
+                            //             _downloadVideo();
+                            //           }
+                            //         },
+                            //         itemBuilder: (_) => [
+                            //           PopupMenuItem(
+                            //               value: 'speed',
+                            //               child: Row(
+                            //                 children: [
+                            //                   Icon(
+                            //                     Icons.slow_motion_video,
+                            //                     color: Theme.of(context)
+                            //                         .textTheme
+                            //                         .bodyLarge
+                            //                         ?.color,
+                            //                   ),
+                            //                   SizedBox(width: 5),
+                            //                   Text(
+                            //                     'Playback Speed',
+                            //                     style: TextStyle(
+                            //                       color: Theme.of(context)
+                            //                           .textTheme
+                            //                           .bodyLarge
+                            //                           ?.color,
+                            //                     ),
+                            //                   ),
+                            //                 ],
+                            //               )),
+                            //           PopupMenuItem(
+                            //             value: 'download',
+                            //             child: Row(
+                            //               children: [
+                            //                 Icon(
+                            //                   Icons.download,
+                            //                   color: Theme.of(context)
+                            //                       .textTheme
+                            //                       .bodyLarge
+                            //                       ?.color,
+                            //                 ),
+                            //                 SizedBox(width: 5),
+                            //                 Text(
+                            //                   'Download',
+                            //                   style: TextStyle(
+                            //                     color: Theme.of(context)
+                            //                         .textTheme
+                            //                         .bodyLarge
+                            //                         ?.color,
+                            //                   ),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+
+                        /// MAIN CONTENT
+
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: ((isExercise == 1
+                                          ? (monthProvider?.exerciseDetailModel
+                                                      ?.files?.isNotEmpty ??
+                                                  false) &&
+                                              !videoNotInitialized &&
+                                              videoSize != null
+                                          : (monthProvider?.warmUpModel?.files
+                                                      ?.isNotEmpty ??
+                                                  false) &&
+                                              !videoNotInitialized &&
+                                              videoSize != null)
+                                      ? videoSize!.height
+                                      : videoNotAvailable
+                                          ? (isExercise == 1
+                                                      ? monthProvider
+                                                              ?.exerciseDetailModel
+                                                              ?.videoThumbnail ??
+                                                          ""
+                                                      : monthProvider
+                                                              ?.warmUpModel
+                                                              ?.videoThumbnail ??
+                                                          "")
+                                                  .isEmpty
+                                              ? media.width +
+                                                  media.height * 0.0605
+                                              : media.height * 0.83
+                                          : media.height * 0.83) -
+                                  media.height * 0.121),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              mainContent(media),
+                              Positioned(
+                                top: -((media.height / 3.995)),
+                                right: 0,
+                                child: SizedBox(
+                                  height: media.height / 3.99,
+                                  width: media.width,
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: ClipPath(
+                                      clipper: DiagonalClipper(),
+                                      child: Container(
+                                        height: media.height / 11,
+                                        width: media.width / 6,
+                                        decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -2085,6 +2098,8 @@ class _ExercisePageState extends State<ExercisePage>
                     ),
                   )
                 : SizedBox(),
+            if (isCurrentDayCompleted || isCurrentDaySkipped)
+              const SizedBox(height: 20),
             Container(
               height: 0.5,
               margin: EdgeInsets.symmetric(
@@ -2636,10 +2651,9 @@ class _ExercisePageState extends State<ExercisePage>
             .toString()
             .split(" ")[1] ??
         "";
-
+    DateTime nowUT = await NTP.now();
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
-    log('dataId==========>>>>>$dataId');
     final data = {
       "sets": 1,
       "reps": extra.reps,
@@ -2648,7 +2662,7 @@ class _ExercisePageState extends State<ExercisePage>
       "load": extra.load,
       "type": extra.type,
       "extraId": "EXTRA-ADDED",
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "dataId": "EXTRA-ADDED$dataId",
     };
     final apiReqBody = {
@@ -2659,7 +2673,7 @@ class _ExercisePageState extends State<ExercisePage>
       "load": "${extra.load}",
       "type": "${extra.type}",
       "extraId": "EXTRA-ADDED",
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "dataId": "EXTRA-ADDED$dataId",
     };
     ApiRepo.addExtraSet(body: apiReqBody);
@@ -2695,7 +2709,7 @@ class _ExercisePageState extends State<ExercisePage>
       required String type}) async {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
-
+    DateTime nowUT = await NTP.now();
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -2807,7 +2821,7 @@ class _ExercisePageState extends State<ExercisePage>
           final reps = double.parse(element.reps.toString());
           final effort =
               double.parse(element.effort.toString().replaceAll("+", ""));
-          final cal = weight * (reps + (effort == 100 ? 0 : effort));
+          final cal = weight * (reps /*+ (effort == 100 ? 0 : effort)*/);
           totalWeight += cal;
           totalRIR += (effort == 100 ? 0 : effort);
         }
@@ -2833,7 +2847,7 @@ class _ExercisePageState extends State<ExercisePage>
       "dayId": monthProvider
           ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
       "split": split,
-      "date": "${DateTime.now().toUtc()}",
+      "date": "$nowUT",
       "status": status,
       "type": type,
       "totalWeight": totalWeight.toString(),

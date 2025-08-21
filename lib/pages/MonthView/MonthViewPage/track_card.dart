@@ -16,6 +16,7 @@ import 'package:flutter/material.dart' hide ExpansionPanel, ExpansionPanelList;
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:mobkit_dashed_border/mobkit_dashed_border.dart';
+import 'package:ntp/ntp.dart';
 import 'package:provider/provider.dart';
 
 class WeeklyTrackCard extends StatefulWidget {
@@ -1749,15 +1750,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               .toString()
               .split(" ")[1] ??
           "";
-
+      DateTime nowUT = await NTP.now();
       String dataId =
           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
       if (status == Status.completed) {
-        ApiRepo.addDayStatusList(body: {
-          "date": "${DateTime.now().toUtc()}",
-          "status": Status.completed
-        });
+        ApiRepo.addDayStatusList(
+            body: {"date": "${nowUT}", "status": Status.completed});
       }
 
       final data = {
@@ -1768,11 +1767,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "dayId": monthProvider
             ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
         "split": split,
-        "date": "${DateTime.now().toUtc()}",
+        "date": "${nowUT}",
         "status": status,
         "type": type,
-        "startTime": "${DateTime.now().toUtc()}",
-        "endTime": endDate ? "${DateTime.now().toUtc()}" : "",
+        "startTime": "${nowUT}",
+        "endTime": endDate ? "${nowUT}" : "",
       };
 
       DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel
@@ -1786,11 +1785,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "startTime": status == Status.empty
             ? ""
             : matchingElement?.startTime == null
-                ? "${DateTime.now().toUtc()}"
+                ? "${nowUT}"
                 : matchingElement?.startTime.toString(),
         "endTime": (status == Status.completed)
-            ? "${DateTime.now().toUtc()}"
-            : (endDate ? "${DateTime.now().toUtc()}" : ""),
+            ? "${nowUT}"
+            : (endDate ? "${nowUT}" : ""),
       };
 
       final apiBody = {
@@ -1800,11 +1799,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "startTime": status == Status.empty
             ? ""
             : matchingElement?.startTime == null
-                ? "${DateTime.now().toUtc()}"
+                ? "${nowUT}"
                 : matchingElement?.startTime.toString(),
         "endTime": (status == Status.completed)
-            ? "${DateTime.now().toUtc()}"
-            : (endDate ? "${DateTime.now().toUtc()}" : ""),
+            ? "${nowUT}"
+            : (endDate ? "${nowUT}" : ""),
         "dataId": dataId
       };
 

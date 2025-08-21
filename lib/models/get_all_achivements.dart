@@ -3,6 +3,7 @@
 //     final achievementModel = achievementModelFromJson(jsonString);
 
 import 'dart:convert';
+import 'dart:developer';
 
 List<AchievementModel> achievementModelFromJson(String str) =>
     List<AchievementModel>.from(
@@ -16,7 +17,7 @@ class AchievementModel {
   String? title;
   String? thumbnail;
   String? description;
-  int? currentValue;
+  double? currentValue;
   List<Achievement>? achievements;
 
   AchievementModel({
@@ -28,18 +29,19 @@ class AchievementModel {
     this.description,
   });
 
-  factory AchievementModel.fromJson(Map<String, dynamic> json) =>
-      AchievementModel(
-        id: json["id"],
-        title: json["title"],
-        currentValue: json["currentValue"],
-        description: json["description"],
-        thumbnail: json["thumbnail"],
-        achievements: json["achievements"] == null
-            ? []
-            : List<Achievement>.from(
-                json["achievements"]!.map((x) => Achievement.fromJson(x))),
-      );
+  factory AchievementModel.fromJson(Map<String, dynamic> json) {
+    return AchievementModel(
+      id: json["id"],
+      title: json["title"],
+      currentValue: double.parse("${json["currentValue"]}"),
+      description: json["description"],
+      thumbnail: json["thumbnail"],
+      achievements: json["achievements"] == null
+          ? []
+          : List<Achievement>.from(
+              json["achievements"]!.map((x) => Achievement.fromJson(x))),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

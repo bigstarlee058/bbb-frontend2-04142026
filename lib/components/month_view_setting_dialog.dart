@@ -9,6 +9,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../pages/MonthView/MonthViewPage/sections/choose_equipment_popup.dart';
 
@@ -37,6 +38,11 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
         : equipment == "B"
             ? 1
             : 2;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async => await preferences.putString(
+          SharedPreference.monthSettingDone,
+          widget.monthProvider.monthDataModel?.id ?? ""),
+    );
     super.initState();
   }
 
@@ -860,11 +866,13 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                           color: Colors.white),
                     ),
                   ),
-                  onTap: () async {
+                  onTap: () {
                     Navigator.of(context).pop();
-                    await preferences.putString(
-                        SharedPreference.monthSettingDone,
-                        value.monthDataModel?.id ?? "");
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (timeStamp) async => await preferences.putString(
+                          SharedPreference.monthSettingDone,
+                          widget.monthProvider.monthDataModel?.id ?? ""),
+                    );
                   },
                 );
               }),

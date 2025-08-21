@@ -11,6 +11,8 @@ class ButtonWidget extends StatefulWidget {
     required this.onPress,
     required this.isLoading,
     this.icon,
+    this.fontSize,
+    this.smallText,
   });
 
   final String text;
@@ -19,6 +21,8 @@ class ButtonWidget extends StatefulWidget {
   final Function()? onPress;
   final bool isLoading;
   final Widget? icon;
+  final double? fontSize;
+  final Widget? smallText;
 
   @override
   State<ButtonWidget> createState() => _ButtonWidgetState();
@@ -56,11 +60,13 @@ class _ButtonWidgetState extends State<ButtonWidget> {
                   Text(
                     widget.text,
                     style: TextStyle(
-                      fontSize: ScreenUtil.verticalScale(2.2),
+                      fontSize:
+                          widget.fontSize ?? ScreenUtil.verticalScale(2.2),
                       fontWeight: FontWeight.bold,
                       color: widget.textColor,
                     ),
                   ),
+                  widget.smallText ?? SizedBox(),
                   widget.icon ?? SizedBox()
                 ],
               ),

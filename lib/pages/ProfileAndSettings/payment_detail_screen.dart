@@ -28,11 +28,11 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
   bool isLoading = false;
 
   String monthPackage = Platform.isIOS
-      ? "monthly_membership_1m_29"
-      : "monthly_membership_1m_29:monthly-membership-1m-29";
+      ? "monthly_membership_1m_29_auto"
+      : "monthly_membership_1m_29:monthly-membership-1m-29-auto";
   String yearPackage = Platform.isIOS
-      ? "yearly_membership_1y_289"
-      : "yearly_membership_1y_289:yearly-membership-1y-289";
+      ? "yearly_membership_1y_289_auto"
+      : "yearly_membership_1y_289:yearly-membership-1y-289-auto";
 
   @override
   void initState() {
@@ -68,108 +68,113 @@ class _PaymentDetailScreenState extends State<PaymentDetailScreen> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
 
-    return Scaffold(
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Image.asset(
-            'assets/img/back 1.png',
-            height: MediaQuery.of(context).size.height / 1.8,
-            width: double.infinity,
-            fit: BoxFit.fitWidth,
-          ),
-          // Utils.appImage(
-          //   isImage: true,
-          //   MediaQuery.of(context).size,
-          //   imageKey: '',
-          //   child: Column(
-          //     children: [
-          //       Align(
-          //         alignment: Alignment.topLeft,
-          //         child: SafeArea(
-          //           child: BackArrowWidget(onPress: () {
-          //             Navigator.pop(context);
-          //           }),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          Positioned(
-            child: SafeArea(
-              child: BackArrowWidget(
-                onPress: () {
-                  Navigator.pop(context);
-                },
+    return SafeArea(
+      top: false,
+      bottom: Platform.isAndroid ? true : false,
+      child: Scaffold(
+        body: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Image.asset(
+              'assets/img/back.jpg',
+              height: MediaQuery.of(context).size.height,
+              width: double.infinity,
+              fit: BoxFit.fill,
+            ),
+            // Utils.appImage(
+            //   isImage: true,
+            //   MediaQuery.of(context).size,
+            //   imageKey: '',
+            //   child: Column(
+            //     children: [
+            //       Align(
+            //         alignment: Alignment.topLeft,
+            //         child: SafeArea(
+            //           child: BackArrowWidget(onPress: () {
+            //             Navigator.pop(context);
+            //           }),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            Positioned(
+              child: SafeArea(
+                child: BackArrowWidget(
+                  onPress: () {
+                    Navigator.pop(context);
+                  },
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: MediaQuery.of(context).size.height / 5,
-            child: Image.asset(
-              'assets/img/logo1.png',
-              height: 80,
+            Positioned(
+              left: 0,
+              right: 0,
+              top: MediaQuery.of(context).size.height / 5,
+              child: Image.asset(
+                'assets/img/logo1.png',
+                height: 80,
+              ),
             ),
-          ),
-          Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.2),
-            padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
-                .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            Container(
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height / 2.2),
+              padding: EdgeInsets.all(ScreenUtil.horizontalScale(5))
+                  .copyWith(bottom: ScreenUtil.verticalScale(3.2)),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: offering == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Subscription Details for get the full Booty by Bret Monthly Programming",
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.labelLarge?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: ScreenUtil.verticalScale(2.4),
+                          ),
+                        ),
+                        SizedBox(height: ScreenUtil.verticalScale(1.5)),
+                        _feature("Up to 5 workouts per week"),
+                        _feature("Comprehensive Exercise Library"),
+                        _feature("Community Support Group"),
+                        SizedBox(height: ScreenUtil.verticalScale(1.8)),
+                        if (monthPrice.isNotEmpty)
+                          Column(
+                            children: [
+                              _planOption(
+                                title: "Monthly",
+                                price: monthPrice,
+                                selected: monthPackage
+                                    .contains(selectedPackage ?? ""),
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        if (yearPrice.isNotEmpty)
+                          Column(
+                            children: [
+                              SizedBox(height: ScreenUtil.verticalScale(1.5)),
+                              _planOption(
+                                title: "Annual",
+                                price: yearPrice,
+                                selected:
+                                    yearPackage.contains(selectedPackage ?? ""),
+                                onTap: () {},
+                                badge: "20% OFF",
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
             ),
-            child: offering == null
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Subscription Details for get the full Booty by Bret Monthly Programming",
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.labelLarge?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: ScreenUtil.verticalScale(2.4),
-                        ),
-                      ),
-                      SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                      _feature("Up to 5 workouts per week"),
-                      _feature("Comprehensive Exercise Library"),
-                      _feature("Community Support Group"),
-                      SizedBox(height: ScreenUtil.verticalScale(1.8)),
-                      if (monthPrice.isNotEmpty)
-                        Column(
-                          children: [
-                            _planOption(
-                              title: "Monthly",
-                              price: monthPrice,
-                              selected:
-                                  monthPackage.contains(selectedPackage ?? ""),
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      if (yearPrice.isNotEmpty)
-                        Column(
-                          children: [
-                            SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                            _planOption(
-                              title: "Annual",
-                              price: yearPrice,
-                              selected:
-                                  yearPackage.contains(selectedPackage ?? ""),
-                              onTap: () {},
-                              badge: "20% OFF",
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

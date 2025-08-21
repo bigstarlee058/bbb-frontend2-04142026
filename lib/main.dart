@@ -17,7 +17,6 @@ import 'package:bbb/pages/DashBoardScreen/meet_our_staff.dart';
 import 'package:bbb/pages/DashBoardScreen/program_phase_screen.dart';
 import 'package:bbb/pages/IntroScreen/on_boarding_page.dart';
 import 'package:bbb/pages/MonthView/DayCompletedPage/day_completed_page.dart';
-import 'package:bbb/pages/MonthView/DayOverviewPage/day_overview.dart';
 import 'package:bbb/pages/MonthView/ExercisePage/excerise_page.dart';
 import 'package:bbb/pages/MonthView/TodayPage/today_page.dart';
 import 'package:bbb/pages/Notification/notifications_page.dart';
@@ -281,8 +280,6 @@ class _MyAppState extends State<MyApp> {
                     const ResetPasswordScreen(image: ''),
                 // AppRoutes.emailVerificationScreen: (context) =>
                 //     const EmailVerificationScreen(),
-                AppRoutes.dayOverviewScreen: (context) =>
-                    const DayOverviewPage(),
                 AppRoutes.todayScreen: (context) => const TodayPage(),
                 AppRoutes.dayCompletedScreen: (context) =>
                     const DayCompletedPage(dayTitle: ""),

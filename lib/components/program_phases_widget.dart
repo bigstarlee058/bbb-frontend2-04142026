@@ -74,6 +74,9 @@ class ProgramPhasesWidget extends StatelessWidget {
                                   ? Image.asset(
                                       "assets/img/program-phase-1.png")
                                   : appShimmerImage(
+                                      errorPadding: EdgeInsets.symmetric(
+                                          horizontal:
+                                              ScreenUtil.horizontalScale(6)),
                                       height: media.width / 4,
                                       width: media.width,
                                       networkImageUrl: value.programPhaseModel!
