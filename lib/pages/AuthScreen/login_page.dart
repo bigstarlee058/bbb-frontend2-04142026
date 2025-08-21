@@ -6,6 +6,7 @@ import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
+import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/pages/AuthScreen/reset_password_page.dart';
 import 'package:bbb/pages/IntroScreen/profile_boarding_screen.dart';
@@ -176,7 +177,6 @@ class _LoginPageState extends State<LoginPage> {
     final token = data['token'] ?? "";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
-    // await prefs.setString('getUserAuthToken', token);
 
     var userDataResponse;
     try {
@@ -452,93 +452,67 @@ class _LoginPageState extends State<LoginPage> {
           await preferences.setBool(SharedPreference.isFirstTime, isFirstTime);
           CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
-          dataProvider?.getAllAchievement(true);
-          if (monthProvider?.monthDataModel == null) {
-            if (mounted) {
-              try {
-                await monthProvider?.onInit(context: context).then(
-                  (value) async {
-                    if (isAppUser) {
-                      try {
-                        Map<String, dynamic> subscriptionData =
-                            userData.user["subscription"];
+          String token = await getAuthToken();
 
-                        if (subscriptionData["subscription_type"] ==
-                                "yearly_membership_1y_289" ||
-                            subscriptionData["subscription_type"] ==
-                                "monthly_membership_1m_29") {
-                          DateTime now = await NTP.now();
+          if (token.isEmpty) {
+            stopLoader();
+            _handleLogout(context,
+                "Your session has expired. Please log in again to continue.");
+            return;
+          } else {
+            dataProvider?.getAllAchievement(true);
+            if (monthProvider?.monthDataModel == null) {
+              if (mounted) {
+                try {
+                  await monthProvider?.onInit(context: context).then(
+                    (value) async {
+                      if (isAppUser) {
+                        try {
+                          Map<String, dynamic> subscriptionData =
+                              userData.user["subscription"];
 
-                          DateTime? endDate = (subscriptionData["end_date"] ??
-                                      "")
-                                  .toString()
-                                  .isEmpty
-                              ? null
-                              : DateTime.parse(subscriptionData["end_date"]);
-                          if (endDate == null || (now.isAfter(endDate))) {
-                            await _updateSubscriptionData(
-                              isPrice: true,
-                              type: "",
-                              endDate: "",
-                              startDate: "",
-                              status: "free_user",
-                            );
-                          }
-                        } else {
-                          final entitlements = customerInfo.entitlements.active;
+                          if (subscriptionData["subscription_type"] ==
+                                  "yearly_membership_1y_289" ||
+                              subscriptionData["subscription_type"] ==
+                                  "monthly_membership_1m_29") {
+                            DateTime now = await NTP.now();
 
-                          if (entitlements.isNotEmpty) {
-                            if (entitlements.values.first.productIdentifier ==
-                                    "monthly_membership_1m_29" ||
-                                entitlements.values.first.productIdentifier ==
-                                    "yearly_membership_1y_289") {
-                              DateTime now = await NTP.now();
+                            DateTime? endDate = (subscriptionData["end_date"] ??
+                                        "")
+                                    .toString()
+                                    .isEmpty
+                                ? null
+                                : DateTime.parse(subscriptionData["end_date"]);
+                            if (endDate == null || (now.isAfter(endDate))) {
+                              await _updateSubscriptionData(
+                                isPrice: true,
+                                type: "",
+                                endDate: "",
+                                startDate: "",
+                                status: "free_user",
+                              );
+                            }
+                          } else {
+                            final entitlements =
+                                customerInfo.entitlements.active;
 
-                              final String startDate = customerInfo
-                                          .allPurchaseDates[
-                                      subscriptionData["subscription_type"]] ??
-                                  now.toString();
+                            if (entitlements.isNotEmpty) {
+                              if (entitlements.values.first.productIdentifier ==
+                                      "monthly_membership_1m_29" ||
+                                  entitlements.values.first.productIdentifier ==
+                                      "yearly_membership_1y_289") {
+                                DateTime now = await NTP.now();
 
-                              final String endDate =
-                                  customerInfo.allExpirationDates[
-                                      subscriptionData["subscription_type"]]!;
-
-                              if ((now.isAfter(DateTime.parse(endDate)))) {
-                                await _updateSubscriptionData(
-                                  isPrice: true,
-                                  type: "",
-                                  endDate: "",
-                                  startDate: "",
-                                  status: "free_user",
-                                );
-                              } else {
-                                await _updateSubscriptionData(
-                                  isPrice: false,
-                                  type: subscriptionData["subscription_type"],
-                                  endDate: endDate,
-                                  startDate: startDate,
-                                  status: "subscribed_user",
-                                );
-                              }
-                            } else {
-                              final entitlements =
-                                  customerInfo.entitlements.active;
-                              if (entitlements.isNotEmpty &&
-                                  entitlements.values.first.isActive) {
-                                final entitlement = entitlements.values.first;
-                                final String planId =
-                                    entitlement.productIdentifier;
                                 final String startDate =
-                                    entitlement.originalPurchaseDate;
+                                    customerInfo.allPurchaseDates[
+                                            subscriptionData[
+                                                "subscription_type"]] ??
+                                        now.toString();
 
                                 final String endDate =
-                                    entitlement.expirationDate!;
+                                    customerInfo.allExpirationDates[
+                                        subscriptionData["subscription_type"]]!;
 
-                                final String status = entitlement.isActive
-                                    ? "subscribed_user"
-                                    : "free_user";
-
-                                DateTime now = await NTP.now();
                                 if ((now.isAfter(DateTime.parse(endDate)))) {
                                   await _updateSubscriptionData(
                                     isPrice: true,
@@ -550,252 +524,307 @@ class _LoginPageState extends State<LoginPage> {
                                 } else {
                                   await _updateSubscriptionData(
                                     isPrice: false,
-                                    type: planId,
+                                    type: subscriptionData["subscription_type"],
                                     endDate: endDate,
                                     startDate: startDate,
-                                    status: status,
+                                    status: "subscribed_user",
                                   );
                                 }
                               } else {
-                                DateTime now = await NTP.now();
-                                DateTime? endDate =
-                                    (subscriptionData["end_date"] ?? "")
-                                            .toString()
-                                            .isEmpty
-                                        ? null
-                                        : DateTime.parse(
-                                            subscriptionData["end_date"]);
+                                final entitlements =
+                                    customerInfo.entitlements.active;
+                                if (entitlements.isNotEmpty &&
+                                    entitlements.values.first.isActive) {
+                                  final entitlement = entitlements.values.first;
+                                  final String planId =
+                                      entitlement.productIdentifier;
+                                  final String startDate =
+                                      entitlement.originalPurchaseDate;
 
-                                if (endDate == null || (now.isAfter(endDate))) {
-                                  await _updateSubscriptionData(
-                                    isPrice: true,
-                                    type: "",
-                                    endDate: "",
-                                    startDate: "",
-                                    status: "free_user",
-                                  );
+                                  final String endDate =
+                                      entitlement.expirationDate!;
+
+                                  final String status = entitlement.isActive
+                                      ? "subscribed_user"
+                                      : "free_user";
+
+                                  DateTime now = await NTP.now();
+                                  if ((now.isAfter(DateTime.parse(endDate)))) {
+                                    await _updateSubscriptionData(
+                                      isPrice: true,
+                                      type: "",
+                                      endDate: "",
+                                      startDate: "",
+                                      status: "free_user",
+                                    );
+                                  } else {
+                                    await _updateSubscriptionData(
+                                      isPrice: false,
+                                      type: planId,
+                                      endDate: endDate,
+                                      startDate: startDate,
+                                      status: status,
+                                    );
+                                  }
+                                } else {
+                                  DateTime now = await NTP.now();
+                                  DateTime? endDate =
+                                      (subscriptionData["end_date"] ?? "")
+                                              .toString()
+                                              .isEmpty
+                                          ? null
+                                          : DateTime.parse(
+                                              subscriptionData["end_date"]);
+
+                                  if (endDate == null ||
+                                      (now.isAfter(endDate))) {
+                                    await _updateSubscriptionData(
+                                      isPrice: true,
+                                      type: "",
+                                      endDate: "",
+                                      startDate: "",
+                                      status: "free_user",
+                                    );
+                                  }
                                 }
                               }
-                            }
-                          } else {
-                            DateTime now = await NTP.now();
-                            DateTime? endDate = (subscriptionData["end_date"] ??
-                                        "")
-                                    .toString()
-                                    .isEmpty
-                                ? null
-                                : DateTime.parse(subscriptionData["end_date"]);
+                            } else {
+                              DateTime now = await NTP.now();
+                              DateTime? endDate =
+                                  (subscriptionData["end_date"] ?? "")
+                                          .toString()
+                                          .isEmpty
+                                      ? null
+                                      : DateTime.parse(
+                                          subscriptionData["end_date"]);
 
-                            if (endDate == null || (now.isAfter(endDate))) {
-                              await _updateSubscriptionData(
-                                isPrice: true,
-                                type: "",
-                                endDate: "",
-                                startDate: "",
-                                status: "free_user",
-                              );
+                              if (endDate == null || (now.isAfter(endDate))) {
+                                await _updateSubscriptionData(
+                                  isPrice: true,
+                                  type: "",
+                                  endDate: "",
+                                  startDate: "",
+                                  status: "free_user",
+                                );
+                              }
                             }
                           }
+                        } catch (e) {
+                          debugPrint("Error fetching subscription: $e");
                         }
-                      } catch (e) {
-                        debugPrint("Error fetching subscription: $e");
                       }
-                    }
 
-                    // if (Platform.isIOS && isAppUser) {
-                    //   try {
-                    //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-                    //     if (customerInfo.entitlements.active.isNotEmpty) {
-                    //       customerInfo.entitlements.active.forEach((key, entitlement) async {
-                    //         final latestPurchaseDate = customerInfo.allPurchaseDates;
-                    //         final identifier = entitlement.productIdentifier;
-                    //
-                    //         await _updateSubscriptionData(
-                    //           type: identifier,
-                    //           endDate: entitlement.expirationDate ?? "",
-                    //           startDate: latestPurchaseDate[identifier] ?? "",
-                    //           status: "subscribed_user",
-                    //         );
-                    //       });
-                    //     } else {
-                    //       await _updateSubscriptionData(
-                    //         type: "",
-                    //         endDate: "",
-                    //         startDate: "",
-                    //         status: "free_user",
-                    //       );
-                    //     }
-                    //   } catch (e) {
-                    //     debugPrint("Error fetching subscription: $e");
-                    //   }
-                    // }
+                      // if (Platform.isIOS && isAppUser) {
+                      //   try {
+                      //     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+                      //     if (customerInfo.entitlements.active.isNotEmpty) {
+                      //       customerInfo.entitlements.active.forEach((key, entitlement) async {
+                      //         final latestPurchaseDate = customerInfo.allPurchaseDates;
+                      //         final identifier = entitlement.productIdentifier;
+                      //
+                      //         await _updateSubscriptionData(
+                      //           type: identifier,
+                      //           endDate: entitlement.expirationDate ?? "",
+                      //           startDate: latestPurchaseDate[identifier] ?? "",
+                      //           status: "subscribed_user",
+                      //         );
+                      //       });
+                      //     } else {
+                      //       await _updateSubscriptionData(
+                      //         type: "",
+                      //         endDate: "",
+                      //         startDate: "",
+                      //         status: "free_user",
+                      //       );
+                      //     }
+                      //   } catch (e) {
+                      //     debugPrint("Error fetching subscription: $e");
+                      //   }
+                      // }
 
-                    if (/*Platform.isIOS && */ isAppUser) {
-                      await userData
-                          .fetchUserInfo(context, isFromLogin: true)
-                          .then(
-                        (value) async {
-                          Map<String, dynamic> subscriptionData =
-                              userData.user["subscription"];
+                      if (isAppUser) {
+                        await userData
+                            .fetchUserInfo(context, isFromLogin: true)
+                            .then(
+                          (value) async {
+                            Map<String, dynamic> subscriptionData =
+                                userData.user["subscription"];
 
-                          if (subscriptionData["user_subscription_status"] ==
-                              "free_user") {
-                            if (mounted) {
-                              await Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        SubscriptionPayWall()),
-                              );
-                            }
-                          } else {
-                            if (isFirstTime) {
+                            if (subscriptionData["user_subscription_status"] ==
+                                "free_user") {
                               if (mounted) {
-                                await Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
+                                await Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
                                       builder: (context) =>
-                                          ProfileBoardingScreen(
-                                        welcomeDescription: '',
-                                        welcomeImageUrl: '',
-                                      ),
-                                    ),
-                                    (route) => false).then(
-                                  (value) async {
-                                    await preferences.setBool(
-                                        SharedPreference.isFirstTime, false);
-                                  },
+                                          SubscriptionPayWall()),
                                 );
                               }
                             } else {
-                              if (mounted) {
-                                await Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => MainPage(
-                                              showWelcomeModal: !hasSeenWelcome,
-                                              welcomeDescription: "",
-                                              welcomeImageUrl: dataProvider
-                                                      ?.screenBackgroundModel
-                                                      ?.vimeoId ??
-                                                  "",
-                                            )),
-                                    (route) => false);
+                              if (isFirstTime) {
+                                if (mounted) {
+                                  await Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileBoardingScreen(
+                                          welcomeDescription: '',
+                                          welcomeImageUrl: '',
+                                        ),
+                                      ),
+                                      (route) => false).then(
+                                    (value) async {
+                                      await preferences.setBool(
+                                          SharedPreference.isFirstTime, false);
+                                    },
+                                  );
+                                }
+                              } else {
+                                if (mounted) {
+                                  await Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MainPage(
+                                                showWelcomeModal:
+                                                    !hasSeenWelcome,
+                                                welcomeDescription: "",
+                                                welcomeImageUrl: dataProvider
+                                                        ?.screenBackgroundModel
+                                                        ?.vimeoId ??
+                                                    "",
+                                              )),
+                                      (route) => false);
+                                }
                               }
                             }
+                          },
+                        );
+                      } else if (!isAppUser) {
+                        // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
+                        //     ? null
+                        //     : DateTime.parse(subscriptionData["end_date"] ?? "");
+                        //
+                        // DateTime now = await NTP.now();
+                        //
+                        // if (subscriptionData["user_subscription_status"] == "free_user" ||
+                        //     (endDate != null && now.isAfter(endDate))) {
+                        //   if (mounted) {
+                        //     Navigator.pushReplacement(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) => const WooSubscriptionPayWall(),
+                        //       ),
+                        //     );
+                        //   }
+                        // } else {
+                        //   if (mounted) {
+                        //     await Navigator.pushAndRemoveUntil(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //             builder: (context) => MainPage(
+                        //                 showWelcomeModal: !hasSeenWelcome,
+                        //                 welcomeDescription:
+                        //                     descriptionData['description'] ?? "",
+                        //                 welcomeImageUrl: descriptionData['vimeoId'])),
+                        //         (route) => false);
+                        //   }
+                        // }
+                        stopLoader();
+                        if (isFirstTime) {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfileBoardingScreen(
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
+                                  ),
+                                ),
+                                (route) => false).then(
+                              (value) async {
+                                await preferences.setBool(
+                                    SharedPreference.isFirstTime, false);
+                              },
+                            );
                           }
-                        },
-                      );
-                    } else if (/*Platform.isIOS && */ !isAppUser) {
-                      // DateTime? endDate = subscriptionData["end_date"].toString().isEmpty
-                      //     ? null
-                      //     : DateTime.parse(subscriptionData["end_date"] ?? "");
-                      //
-                      // DateTime now = await NTP.now();
-                      //
-                      // if (subscriptionData["user_subscription_status"] == "free_user" ||
-                      //     (endDate != null && now.isAfter(endDate))) {
-                      //   if (mounted) {
-                      //     Navigator.pushReplacement(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const WooSubscriptionPayWall(),
-                      //       ),
-                      //     );
-                      //   }
-                      // } else {
-                      //   if (mounted) {
-                      //     await Navigator.pushAndRemoveUntil(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //             builder: (context) => MainPage(
-                      //                 showWelcomeModal: !hasSeenWelcome,
-                      //                 welcomeDescription:
-                      //                     descriptionData['description'] ?? "",
-                      //                 welcomeImageUrl: descriptionData['vimeoId'])),
-                      //         (route) => false);
-                      //   }
-                      // }
-                      stopLoader();
-                      if (isFirstTime) {
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfileBoardingScreen(
-                                  welcomeDescription: '',
-                                  welcomeImageUrl: '',
-                                ),
-                              ),
-                              (route) => false).then(
-                            (value) async {
-                              await preferences.setBool(
-                                  SharedPreference.isFirstTime, false);
-                            },
-                          );
+                        } else {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainPage(
+                                          showWelcomeModal: !hasSeenWelcome,
+                                          welcomeDescription: "",
+                                          welcomeImageUrl: dataProvider
+                                                  ?.screenBackgroundModel
+                                                  ?.vimeoId ??
+                                              "",
+                                        )),
+                                (route) => false);
+                          }
                         }
                       } else {
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
+                        if (isFirstTime) {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfileBoardingScreen(
+                                    welcomeDescription: '',
+                                    welcomeImageUrl: '',
+                                  ),
+                                ),
+                                (route) => false).then(
+                              (value) async {
+                                await preferences.setBool(
+                                    SharedPreference.isFirstTime, false);
+                              },
+                            );
+                          }
+                        } else {
+                          if (mounted) {
+                            await Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
                                   builder: (context) => MainPage(
-                                        showWelcomeModal: !hasSeenWelcome,
-                                        welcomeDescription: "",
-                                        welcomeImageUrl: dataProvider
-                                                ?.screenBackgroundModel
-                                                ?.vimeoId ??
-                                            "",
-                                      )),
-                              (route) => false);
-                        }
-                      }
-                    } else {
-                      if (isFirstTime) {
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfileBoardingScreen(
-                                  welcomeDescription: '',
-                                  welcomeImageUrl: '',
+                                    showWelcomeModal: !hasSeenWelcome,
+                                    welcomeDescription: "",
+                                    welcomeImageUrl: dataProvider
+                                            ?.screenBackgroundModel?.vimeoId ??
+                                        "",
+                                  ),
                                 ),
-                              ),
-                              (route) => false).then(
-                            (value) async {
-                              await preferences.setBool(
-                                  SharedPreference.isFirstTime, false);
-                            },
-                          );
+                                (route) => false);
+                          }
                         }
-                      } else {
-                        if (mounted) {
-                          await Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MainPage(
-                                  showWelcomeModal: !hasSeenWelcome,
-                                  welcomeDescription: "",
-                                  welcomeImageUrl: dataProvider
-                                          ?.screenBackgroundModel?.vimeoId ??
-                                      "",
-                                ),
-                              ),
-                              (route) => false);
-                        }
+                        stopLoader();
                       }
-                      stopLoader();
-                    }
-                  },
-                );
-              } catch (e) {
-                log('ERROR==========>>>>>$e');
+                    },
+                  );
+                } catch (e) {
+                  log('ERROR==========>>>>>$e');
+                }
               }
             }
           }
         },
       ),
     );
+  }
+
+  void _handleLogout(BuildContext context, String msg) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcome') ?? false;
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.clear();
+    await preferences.clearPrefs();
+    await DatabaseHelper().clearAllTables();
+    await preferences.clearPrefs();
+
+    // Navigator.pushNamed(context, AppRoutes.loginScreen);
+
+    showBottomAlert(context, msg);
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   String monthPrice = "";
@@ -829,6 +858,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
+        print('jsonResponse==========>>>>>$jsonResponse');
         userData.user = jsonResponse["result"];
         userData.getUserDataFromJson(jsonResponse["result"]);
         // await userData.fetchUserInfo(context);
@@ -836,11 +866,6 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       log("issue in month view loading => $e");
     }
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
   }
 
   String previousMasked = "";

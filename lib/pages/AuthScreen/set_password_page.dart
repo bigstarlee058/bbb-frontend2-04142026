@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:bbb/components/app_text_form_field.dart';
 import 'package:bbb/components/back_arrow_widget.dart';
 import 'package:bbb/components/button_widget.dart';
-import 'package:bbb/pages/AuthScreen/set_password_page.dart';
 import 'package:bbb/providers/data_provider.dart';
 import 'package:bbb/utils/screen_util.dart';
 import 'package:bbb/utils/utils.dart';
@@ -17,116 +16,77 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  final String image;
-
-  const ResetPasswordScreen({super.key, required this.image});
+class SetPasswordScreen extends StatefulWidget {
+  final String token;
+  const SetPasswordScreen({super.key, required this.token});
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  State<SetPasswordScreen> createState() => _SetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  TextEditingController emailInputController = TextEditingController();
+class _SetPasswordScreenState extends State<SetPasswordScreen> {
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController cPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   DataProvider? dataProvider;
 
   @override
   void initState() {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
-
     super.initState();
   }
 
   @override
   void dispose() {
+    passwordController.dispose();
+    cPasswordController.dispose();
     super.dispose();
   }
 
   bool loader = false;
 
-  resetPassword(String emailAddress) async {
+  resetPassword(String password, String cPassword) async {
     try {
-      if (emailAddress.isNotEmpty) {
-        loader = true;
-        setState(() {});
-        if (AppConstants.emailRegex.hasMatch(emailAddress)) {
+      if (password.isNotEmpty && cPassword.isNotEmpty) {
+        if (password.trim() == cPassword.trim()) {
+          loader = true;
+          setState(() {});
+          Uri url =
+              Uri.parse('${AppConstants.serverUrl}/api/users/reset_password');
+
           var response = await http.post(
-            Uri.parse(
-                // 'https://bbbdev1.wpenginepowered.com/wp-json/custom/v1/send-password-reset'),
-                'https://app.bootybybret.com/wp-json/custom/v1/send-password-reset'),
+            url,
             headers: <String, String>{
               'Content-Type': 'application/json',
             },
             body: jsonEncode(<String, String>{
-              'email': emailAddress,
+              'password': password.trim(),
+              'confirmPassword': cPassword.trim(),
+              'token': widget.token
             }),
           );
-          if (response.statusCode == 200) {
-            showBottomAlert(
-              context,
-              "Please check your email inbox for the password reset email.",
-            );
-            Navigator.pop(context);
-          } else if (response.statusCode == 404) {
-            final data = jsonDecode(response.body);
-            if (data["code"] == "invalid_email") {
-              var response1 = await http.post(
-                Uri.parse(
-                    '${AppConstants.serverUrl}/api/users/forgot_password'),
-                headers: <String, String>{
-                  'Content-Type': 'application/json',
-                },
-                body: jsonEncode(<String, String>{
-                  'email': emailAddress,
-                }),
-              );
 
-              if (response1.statusCode == 200) {
-                // showBottomAlert(
-                //   context,
-                //   "Please check your email inbox for the password reset email.",
-                // );
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SetPasswordScreen(
-                      token: data["token"],
-                    ),
-                  ),
-                );
-              } else {
-                final data = jsonDecode(response1.body);
-                showBottomAlert(
-                  context,
-                  "Failed: ${data["message"]}",
-                );
-              }
-            } else {
-              final data = jsonDecode(response.body);
-              showBottomAlert(
-                context,
-                "Failed to send reset email: ${data["message"]}",
-              );
-            }
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            String msg = data['message'].toString();
+            showBottomAlert(context, msg);
+            Navigator.pop(context);
+            Navigator.pop(context);
           } else {
             final data = jsonDecode(response.body);
-
             showBottomAlert(
-              context,
-              "Failed to send reset email: ${data["message"]}",
-            );
+                context, "Reset password failed : ${data["message"]}");
           }
         } else {
           showBottomAlert(
             context,
-            "Invalid email format, Please check your email format.",
+            "Password and confirm password do not match.",
           );
         }
       } else {
         showBottomAlert(
           context,
-          "Please enter your email address to receive a password reset email.",
+          "Please enter password and confirm password.",
         );
       }
     } catch (e) {
@@ -229,7 +189,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     height: ScreenUtil.verticalScale(3.2),
                                   ),
                                   Text(
-                                    'Reset your password',
+                                    'Set your password',
                                     style: TextStyle(
                                       fontSize: ScreenUtil.verticalScale(3.32),
                                       color: AppColors.primaryColor,
@@ -237,26 +197,37 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: ScreenUtil.verticalScale(2),
-                                  ),
-                                  Text(
-                                    // 'Enter your email to receive a password reset mail',
-                                    // "Enter your email address below. We’ll send you a mail to reset password.",
-                                    "Please enter your email address to receive password reset instructions.",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(1.65),
-                                      height: 1.5,
-                                      color: Color(0xff6f6f6f),
-                                    ),
-                                  ),
-                                  SizedBox(
                                     height: ScreenUtil.verticalScale(2.5),
                                   ),
                                   AppTextFormField(
-                                    hintText: 'Your Email',
-                                    keyboardType: TextInputType.emailAddress,
+                                    hintText: 'Password',
+                                    keyboardType: TextInputType.text,
                                     textInputAction: TextInputAction.next,
+                                    onChanged: (value) {},
+                                    controller: passwordController,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 15),
+                                      child: IconButton(
+                                        onPressed: () {},
+                                        style: ButtonStyle(
+                                          minimumSize: WidgetStateProperty.all(
+                                            const Size(48, 48),
+                                          ),
+                                        ),
+                                        icon: Icon(
+                                          Icons.email,
+                                          color: Colors.grey.shade400,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(2),
+                                  ),
+                                  AppTextFormField(
+                                    hintText: 'Confirm Password',
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.done,
                                     onChanged: (value) {},
                                     // validator: (value) {
                                     //   return value!.isEmpty
@@ -265,7 +236,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     //           ? null
                                     //           : 'Invalid Email Address';
                                     // },
-                                    controller: emailInputController,
+                                    controller: cPasswordController,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.only(right: 15),
                                       child: IconButton(
@@ -286,7 +257,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     height: ScreenUtil.horizontalScale(7),
                                   ),
                                   ButtonWidget(
-                                    text: 'Send a request',
+                                    text: 'Set Password',
                                     textColor: Colors.white,
                                     color: AppColors.primaryColor,
                                     onPress: loader
@@ -296,7 +267,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                                     ?.validate() ==
                                                 true) {
                                               resetPassword(
-                                                  emailInputController.text);
+                                                passwordController.text,
+                                                cPasswordController.text,
+                                              );
                                             }
                                           },
                                     isLoading: loader,

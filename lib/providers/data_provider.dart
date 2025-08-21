@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
-import 'package:bbb/main.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
@@ -43,7 +41,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ntp/ntp.dart';
 import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/exercise_model.dart';
 
@@ -100,13 +97,6 @@ class DataProvider extends ChangeNotifier {
   Tutorials tutorialData =
       Tutorials(id: "", title: "", description: "", photo: "", files: []);
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('authToken');
-
-    return authToken;
-  }
-
   NewVersionModel? newVersionModel;
 
   Future<void> fetchAppVersion() async {
@@ -118,7 +108,7 @@ class DataProvider extends ChangeNotifier {
       final response = await dio.get(url,
           options: Options(headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'AUTH_TOKEN': userIdToken ?? ''
+            'AUTH_TOKEN': userIdToken
           }));
       if (response.statusCode == 200 && response.data != null) {
         newVersionModel = NewVersionModel.fromJson(response.data);
@@ -138,9 +128,7 @@ class DataProvider extends ChangeNotifier {
   List<Map<String, dynamic>> allImageList = [];
   Future<void> getAppBGs() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
-    log('url==========>>>>>$url');
-    debugPrint('url==========>>>>>$url');
-    print('url==========>>>>>$url');
+
     String? userIdToken = await getAuthToken();
 
     try {
@@ -148,7 +136,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -262,7 +250,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -366,7 +354,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -395,7 +383,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -420,7 +408,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -446,7 +434,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -493,7 +481,7 @@ class DataProvider extends ChangeNotifier {
     final response = await http.put(url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
         body: jsonEncode(challengeDetail));
     if (response.statusCode == 200) {
@@ -512,7 +500,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -556,12 +544,13 @@ class DataProvider extends ChangeNotifier {
     Uri url =
         Uri.parse('${AppConstants.serverUrl}/api/challenges/get-featured');
     String? userIdToken = await getAuthToken();
+
     try {
       final response = await http.get(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -589,7 +578,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -616,7 +605,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken
         },
       );
       if (response.statusCode == 200) {
@@ -644,7 +633,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -684,7 +673,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -718,7 +707,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -743,7 +732,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -790,7 +779,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -822,7 +811,7 @@ class DataProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'AUTH_TOKEN': userIdToken ?? "",
+        'AUTH_TOKEN': userIdToken,
       },
     );
 
@@ -849,7 +838,7 @@ class DataProvider extends ChangeNotifier {
   Future fetchMonthWorkouts(int month) async {
     final Dio dio = Dio();
     final String url = '${AppConstants.serverUrl}/api/workouts/current';
-
+    print("11================::::::::::::${DateTime.now()}");
     try {
       DateTime now = await NTP.now();
 
@@ -868,13 +857,18 @@ class DataProvider extends ChangeNotifier {
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            'AUTH_TOKEN': userIdToken ?? '',
+            'AUTH_TOKEN': userIdToken,
           },
         ),
       );
+      print("22================::::::::::::${DateTime.now()}");
 
       if (response.statusCode == 200 && response.data != null) {
+        print("33================::::::::::::${DateTime.now()}");
+
         await getMonthInfoFromJson(responseData: response.data);
+        print("44================::::::::::::${DateTime.now()}");
+
         notifyListeners();
       } else {
         await getMonthInfoFromJson();
@@ -1677,7 +1671,7 @@ class DataProvider extends ChangeNotifier {
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
-            'AUTH_TOKEN': userIdToken ?? "",
+            'AUTH_TOKEN': userIdToken,
           },
         ),
       );
@@ -1733,7 +1727,7 @@ class DataProvider extends ChangeNotifier {
         url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
       if (response.statusCode == 200) {
@@ -1761,7 +1755,7 @@ class DataProvider extends ChangeNotifier {
       final response = await http.get(
         url,
         headers: <String, String>{
-          'AUTH_TOKEN': userIdToken ?? "",
+          'AUTH_TOKEN': userIdToken,
         },
       );
 
@@ -1886,7 +1880,7 @@ class DataProvider extends ChangeNotifier {
         request.files.add(multipartFile);
       }
       request.headers
-          .addAll({'AUTH_TOKEN': userIdToken!, 'Accept': 'application/json'});
+          .addAll({'AUTH_TOKEN': userIdToken, 'Accept': 'application/json'});
       http.StreamedResponse response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();

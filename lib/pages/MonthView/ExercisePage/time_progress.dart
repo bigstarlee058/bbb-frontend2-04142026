@@ -15,6 +15,7 @@ class TimerWithProgressBar extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onComplete;
   final VoidCallback makeRefresh;
+  final VoidCallback onNextSetOpen;
   final String currentTime;
   final String dataId;
   final String index;
@@ -33,6 +34,7 @@ class TimerWithProgressBar extends StatefulWidget {
     required this.subIndex,
     required this.index,
     required this.makeRefresh,
+    required this.onNextSetOpen,
   });
 
   @override
@@ -209,6 +211,17 @@ class _TimerWithProgressBarState extends State<TimerWithProgressBar>
     WidgetsBinding.instance.removeObserver(this);
     timerTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant TimerWithProgressBar oldWidget) {
+    if (currentTime >= widget.initialDuration) {
+      currentTime = 0;
+      setState(() {});
+      widget.onClose();
+      widget.onNextSetOpen();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override

@@ -78,11 +78,6 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     }
   }
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
   Future<void> _updateSubscriptionData({
     required String status,
     required String type,
@@ -544,11 +539,6 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     } catch (e) {
       log("Failed to fetch offerings: $e");
     }
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
   }
 
   Future<void> _updateSubscriptionData({

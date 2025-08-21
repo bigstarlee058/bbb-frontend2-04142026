@@ -19,11 +19,6 @@ enum APIType { aPost, aGet, aDelete, aPut }
 class ApiService extends BaseService {
   Dio dio = Dio();
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
   Future<dynamic> getResponse(
       {required APIType apiType,
       required String url,
@@ -186,7 +181,6 @@ class ApiService extends BaseService {
     final token = data['token'] ?? "";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
-    // await prefs.setString('getUserAuthToken', token);
 
     if (email != null && password != null) {
       await prefs.setString("email", email);

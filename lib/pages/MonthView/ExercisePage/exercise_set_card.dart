@@ -1114,6 +1114,37 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
           ),
           if (_showTimer && _restDuration != 0) ...[
             TimerWithProgressBar(
+              onNextSetOpen: () {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (timeStamp) async {
+                    int lastDataMainIndex = widget.index;
+                    int lastDataSubIndex = widget.countIndex;
+                    if (lastDataSubIndex ==
+                        ((monthProvider!.selectedExercise!
+                                    .extra![lastDataMainIndex].sets! -
+                                1) +
+                            (monthProvider!.selectedExercise!
+                                        .extra![lastDataMainIndex].type ==
+                                    3
+                                ? (widget.extraSetLength)
+                                : 0))) {
+                      lastDataMainIndex += 1;
+                      if (lastDataMainIndex ==
+                              (monthProvider!
+                                  .selectedExercise!.extra!.length) &&
+                          lastDataSubIndex == (widget.setCount - 1)) {
+                      } else {
+                        lastDataSubIndex = 0;
+                      }
+                    } else {
+                      lastDataSubIndex += 1;
+                    }
+
+                    monthProvider?.updateExpandedItem(
+                        "$lastDataMainIndex:$lastDataSubIndex:${monthProvider?.selectedExIndex}:${monthProvider?.overviewCurrentWeek}:${monthProvider?.overviewCurrentDay}");
+                  },
+                );
+              },
               makeRefresh: () {
                 widget.makeRefresh();
               },

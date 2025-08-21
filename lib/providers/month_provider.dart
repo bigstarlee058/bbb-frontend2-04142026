@@ -1042,12 +1042,6 @@ class MonthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('authToken');
-    return authToken;
-  }
-
   Future<void> fetchCurrentExercise(String id) async {
     try {
       final userIdToken = await getAuthToken();
@@ -1911,7 +1905,6 @@ class MonthProvider extends ChangeNotifier {
     try {
       final data1 = await DatabaseHelper()
           .fetchData(tableName: DatabaseHelper.swapExerciseHistory);
-      log('data1==========>>>>>${jsonEncode(data1)}');
       final data = await DatabaseHelper().getFilteredWithMWDData(
         tableName: DatabaseHelper.swapExerciseHistory,
         monthId: monthDataModel?.id ?? "",

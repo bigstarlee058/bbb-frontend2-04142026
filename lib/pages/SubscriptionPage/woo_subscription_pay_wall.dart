@@ -31,11 +31,6 @@ class WooSubscriptionPayWall extends StatefulWidget {
 }
 
 class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
-  }
-
   DataProvider? dataProvider;
   @override
   void initState() {
@@ -133,9 +128,7 @@ class _WooSubscriptionPayWallState extends State<WooSubscriptionPayWall> {
                       textColor: Colors.white,
                       isLoading: false,
                       onPress: () async {
-                        SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        String? token = prefs.getString('authToken');
+                        String token = await getAuthToken();
 
                         Uri url = Uri.parse(
                             'https://app.bootybybret.com/?token=$token');

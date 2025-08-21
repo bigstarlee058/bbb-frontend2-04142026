@@ -97,17 +97,34 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> loginStatus(bool isLoggedIn) async {
     dataProvider?.getAppBGs();
+
     if (isLoggedIn) {
+      print("1================::::::::::::${DateTime.now()}");
+
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await _initializeFetchData().then(
           (value) async {
+            print("2================::::::::::::${DateTime.now()}");
+
             if (monthProvider?.monthDataModel == null) {
               try {
                 await userData.fetchUserInfo(context).then((value) async {
-                  dataProvider?.getAllAchievement(true);
-                  dataProvider?.fetchFeaturedChalleng();
+                  print("3================::::::::::::${DateTime.now()}");
 
+                  String token = await getAuthToken();
+
+                  if (token.isEmpty) {
+                    _handleLogout(context,
+                        "Your session has expired. Please log in again to continue.");
+                    return;
+                  }
+                  print("4================::::::::::::${DateTime.now()}");
+                  dataProvider?.getAllAchievement(true);
+                  print("5================::::::::::::${DateTime.now()}");
+                  dataProvider?.fetchFeaturedChalleng();
+                  print("6================::::::::::::${DateTime.now()}");
                   await monthProvider?.onInit(context: context);
+                  print("7================::::::::::::${DateTime.now()}");
                   bool isFirstTime = userData.user["createdAt"] ==
                           userData.user["updatedAt"] ||
                       (userData.user["detail"] == null ||
@@ -376,6 +393,8 @@ class _SplashScreenState extends State<SplashScreen> {
                       }
                     }
                   }
+
+                  print("8================::::::::::::${DateTime.now()}");
                 });
               } catch (e) {
                 if (mounted) {
@@ -470,7 +489,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final response = await http.put(
         url,
         body: queryParams,
-        headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""},
+        headers: <String, String>{'AUTH_TOKEN': userIdToken},
       );
 
       if (response.statusCode == 200) {
@@ -481,11 +500,6 @@ class _SplashScreenState extends State<SplashScreen> {
     } catch (e) {
       log("issue in month view loading => $e");
     }
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
   }
 
   @override

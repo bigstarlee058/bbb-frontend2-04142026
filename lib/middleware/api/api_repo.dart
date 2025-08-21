@@ -114,6 +114,7 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExerciseStatus,
         body: {"monthId": monthId});
     if (response is List) {
+      log('response==========>>>>>${response}');
       return response.isEmpty
           ? []
           : response

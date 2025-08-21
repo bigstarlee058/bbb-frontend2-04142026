@@ -103,7 +103,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
     Navigator.pushNamed(context, AppRoutes.loginScreen);
 
-    // await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
+    await prefs.setBool('hasSeenWelcome', hasSeenWelcome);
   }
 
   Future<void> launchUrls(String urls) async {
@@ -131,11 +131,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   toPrivacyPolicyPage() async {
     openUrl('https://bootybybret.com/pages/privacy-policy');
-  }
-
-  Future<String?> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('authToken');
   }
 
   Future<void> _deleteAccount(context) async {
@@ -721,10 +716,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
                                       // await openAppSettings();
                                     } else {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      String? token =
-                                          prefs.getString('authToken');
+                                      String token = await getAuthToken();
+
                                       Uri url = Uri.parse(
                                           'https://app.bootybybret.com/?token=$token');
                                       if (await canLaunchUrl(url)) {

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
@@ -111,7 +112,6 @@ class _MonthViewState extends State<MonthView> {
       (timeStamp) async {
         String monthId =
             preferences.getString(SharedPreference.monthSettingDone) ?? "";
-
         monthProvider?.monthLocalDataModel.sort((a, b) =>
             DateTime.parse(b.monthStartDate ?? "${DateTime.now()}").compareTo(
                 DateTime.parse(a.monthStartDate ?? "${DateTime.now()}")));

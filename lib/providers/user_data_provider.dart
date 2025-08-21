@@ -21,18 +21,6 @@ class UserDataProvider extends ChangeNotifier {
   bool previousPage = false;
   var userData;
 
-  Future<String> getAuthToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String authToken = prefs.getString('authToken') ?? "";
-    return authToken;
-  }
-
-  // Future<String> getUserAuthToken() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String authToken = prefs.getString('getUserAuthToken') ?? "";
-  //   return authToken;
-  // }
-
   var user;
 
   bool _isAutoLoginInProgress = false;
@@ -42,7 +30,8 @@ class UserDataProvider extends ChangeNotifier {
       {bool isFromLogin = false}) async {
     final String url = '${AppConstants.serverUrl}/api/users/get_user';
 
-    String token = await getAuthToken();
+    // String token = await getAuthToken();
+    String token = await getUserAuthToken();
     final response = await http.get(
       Uri.parse(url),
       headers: {'AUTH_TOKEN': token},
@@ -52,8 +41,8 @@ class UserDataProvider extends ChangeNotifier {
       case 200:
         final jsonResponse = jsonDecode(response.body);
         getUserDataFromJson(jsonResponse);
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('authToken', jsonResponse["token"]);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('getUserProfileToken', jsonResponse["token"]);
         user = jsonResponse;
         notifyListeners();
         return jsonResponse;
@@ -185,7 +174,6 @@ class UserDataProvider extends ChangeNotifier {
     final token = data['token'] ?? "";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
-    // await prefs.setString('getUserAuthToken', token);
   }
 
   Future<void> _saveLoginState(bool isLoggedIn) async {
