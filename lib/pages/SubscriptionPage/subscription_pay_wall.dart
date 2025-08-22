@@ -734,200 +734,205 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
 
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Image.asset(
-              'assets/img/back 1.png',
-              height: MediaQuery.of(context).size.height / 1.8,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            Utils.appImage(
-              image: '',
-              isImage: true,
-              MediaQuery.of(context).size,
-              imageKey: '',
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: SafeArea(
-                      child: BackArrowWidget(onPress: () {
-                        _handleLogout(context);
-                      }),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          body: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Image.asset(
+                'assets/img/back 1.png',
+                height: MediaQuery.of(context).size.height / 1.8,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+              Utils.appImage(
+                image: '',
+                isImage: true,
+                MediaQuery.of(context).size,
+                imageKey: '',
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: SafeArea(
+                        child: BackArrowWidget(onPress: () {
+                          _handleLogout(context);
+                        }),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: MediaQuery.of(context).size.height / 5,
-              child: Image.asset(
-                'assets/img/logo1.png',
-                height: 80,
+              Positioned(
+                left: 0,
+                right: 0,
+                top: MediaQuery.of(context).size.height / 5,
+                child: Image.asset(
+                  'assets/img/logo1.png',
+                  height: 80,
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height / 2.4),
-              padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(
-                  bottom:
-                      ScreenUtil.verticalScale(Platform.isAndroid ? 2 : 3.2)),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: offering == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          // "Subscribe now to access the full Booty by Bret Monthly Programming",
-                          "New Users: Subscribe Now",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color:
-                                Theme.of(context).textTheme.labelLarge?.color,
-                            fontSize: ScreenUtil.verticalScale(2.7),
-                          ),
-                        ),
-                        SizedBox(height: ScreenUtil.verticalScale(1.1)),
-                        // Text(
-                        //   "Please note: if you're an existing subscriber through our website, do not purchase again here, go to app.bootybybret.com to reset your password or contact support for help.",
-                        //   style: TextStyle(
-                        //     fontWeight: FontWeight.bold,
-                        //     color: AppColors.primaryColor,
-                        //     fontSize: ScreenUtil.verticalScale(1.3),
-                        //   ),
-                        // ),
-
-                        Container(
-                          padding: EdgeInsets.all(
-                            ScreenUtil.verticalScale(1.2),
-                          ),
-                          decoration: BoxDecoration(
-                            // border: Border.all(
-                            //   color: const Color(0xFF8B2D40),
-                            //   width: 1.5,
-                            // ),
-                            borderRadius: BorderRadius.circular(12),
-                            color: const Color(0xFFF8E6EC),
-                            // color: AppColors.secondColor,
-                          ),
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Please note: if you're an existing subscriber through our website, do not purchase again here, go to ",
-                                  style: TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: ScreenUtil.verticalScale(1.3),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: "app.bootybybret.com",
-                                  style: TextStyle(
-                                    color: AppColors
-                                        .blueColor, // Make it look like a link
-                                    fontSize: ScreenUtil.verticalScale(1.3),
-                                    decoration: TextDecoration.none,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () async {
-                                      const url = "https://app.bootybybret.com";
-                                      if (await canLaunchUrl(Uri.parse(url))) {
-                                        await launchUrl(Uri.parse(url));
-                                      } else {
-                                        throw "Could not launch $url";
-                                      }
-                                    },
-                                ),
-                                TextSpan(
-                                  text:
-                                      " to reset your password or contact support for help.",
-                                  style: TextStyle(
-                                    color: AppColors.blackColor,
-                                    fontSize: ScreenUtil.verticalScale(1.3),
-                                  ),
-                                ),
-                              ],
+              Container(
+                margin: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height / 2.4),
+                padding: EdgeInsets.all(ScreenUtil.horizontalScale(5)).copyWith(
+                    bottom: ScreenUtil.verticalScale(
+                        Platform.isAndroid ? 1.5 : 3.2)),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: offering == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            // "Subscribe now to access the full Booty by Bret Monthly Programming",
+                            "New Users: Subscribe Now",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  Theme.of(context).textTheme.labelLarge?.color,
+                              fontSize: ScreenUtil.verticalScale(2.7),
                             ),
                           ),
-                        ),
-                        SizedBox(height: ScreenUtil.verticalScale(1.3)),
-                        _feature("Up to 5 workouts per week"),
-                        _feature("Comprehensive Exercise Library"),
-                        _feature("Community Support Group"),
-                        SizedBox(height: ScreenUtil.verticalScale(1.8)),
-                        if (monthPrice.isNotEmpty)
-                          Column(
-                            children: [
-                              _planOption(
-                                title: "Monthly",
-                                price: monthPrice,
-                                selected:
-                                    selectedPackage?.storeProduct.identifier ==
-                                        monthPackage,
-                                onTap: () {
-                                  selectedPackage = offering!.monthly;
-                                  setState(() {});
-                                  // setState(() {
-                                  //   selectedPackage = offering!
-                                  //       .current?.availablePackages
-                                  //       .firstWhere((p) {
-                                  //     return p.storeProduct.identifier ==
-                                  //         monthPackage;
-                                  //   });
-                                  // });
-                                },
+                          SizedBox(height: ScreenUtil.verticalScale(1.1)),
+                          // Text(
+                          //   "Please note: if you're an existing subscriber through our website, do not purchase again here, go to app.bootybybret.com to reset your password or contact support for help.",
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.bold,
+                          //     color: AppColors.primaryColor,
+                          //     fontSize: ScreenUtil.verticalScale(1.3),
+                          //   ),
+                          // ),
+
+                          Container(
+                            padding: EdgeInsets.all(
+                              ScreenUtil.verticalScale(1.2),
+                            ),
+                            decoration: BoxDecoration(
+                              // border: Border.all(
+                              //   color: const Color(0xFF8B2D40),
+                              //   width: 1.5,
+                              // ),
+                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xFFF8E6EC),
+                              // color: AppColors.secondColor,
+                            ),
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text:
+                                        "Please note: if you're an existing subscriber through our website, do not purchase again here, go to ",
+                                    style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: ScreenUtil.verticalScale(1.3),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: "app.bootybybret.com",
+                                    style: TextStyle(
+                                      color: AppColors
+                                          .blueColor, // Make it look like a link
+                                      fontSize: ScreenUtil.verticalScale(1.3),
+                                      decoration: TextDecoration.none,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        const url =
+                                            "https://app.bootybybret.com";
+                                        if (await canLaunchUrl(
+                                            Uri.parse(url))) {
+                                          await launchUrl(Uri.parse(url));
+                                        } else {
+                                          throw "Could not launch $url";
+                                        }
+                                      },
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        " to reset your password or contact support for help.",
+                                    style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: ScreenUtil.verticalScale(1.3),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: ScreenUtil.verticalScale(1)),
-                            ],
+                            ),
                           ),
-                        if (yearPrice.isNotEmpty)
-                          _planOption(
-                            title: "Annual",
-                            price: yearPrice,
-                            selected:
-                                selectedPackage?.storeProduct.identifier ==
-                                    yearPackage,
-                            onTap: () {
-                              selectedPackage = offering!.annual;
-                              setState(() {});
-                              // setState(() {
-                              //   selectedPackage = offering!
-                              //       .current?.availablePackages
-                              //       .firstWhere((p) {
-                              //     return p.storeProduct.identifier == yearPackage;
-                              //   });
-                              // });
-                            },
-                            badge: "20% OFF",
+                          SizedBox(height: ScreenUtil.verticalScale(1.3)),
+                          _feature("Up to 5 workouts per week"),
+                          _feature("Comprehensive Exercise Library"),
+                          _feature("Community Support Group"),
+                          SizedBox(height: ScreenUtil.verticalScale(1.8)),
+                          if (monthPrice.isNotEmpty)
+                            Column(
+                              children: [
+                                _planOption(
+                                  title: "Monthly",
+                                  price: monthPrice,
+                                  selected: selectedPackage
+                                          ?.storeProduct.identifier ==
+                                      monthPackage,
+                                  onTap: () {
+                                    selectedPackage = offering!.monthly;
+                                    setState(() {});
+                                    // setState(() {
+                                    //   selectedPackage = offering!
+                                    //       .current?.availablePackages
+                                    //       .firstWhere((p) {
+                                    //     return p.storeProduct.identifier ==
+                                    //         monthPackage;
+                                    //   });
+                                    // });
+                                  },
+                                ),
+                                SizedBox(height: ScreenUtil.verticalScale(1)),
+                              ],
+                            ),
+                          if (yearPrice.isNotEmpty)
+                            _planOption(
+                              title: "Annual",
+                              price: yearPrice,
+                              selected:
+                                  selectedPackage?.storeProduct.identifier ==
+                                      yearPackage,
+                              onTap: () {
+                                selectedPackage = offering!.annual;
+                                setState(() {});
+                                // setState(() {
+                                //   selectedPackage = offering!
+                                //       .current?.availablePackages
+                                //       .firstWhere((p) {
+                                //     return p.storeProduct.identifier == yearPackage;
+                                //   });
+                                // });
+                              },
+                              badge: "20% OFF",
+                            ),
+                          Spacer(),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ButtonWidget(
+                              color: AppColors.primaryColor,
+                              text: "Continue",
+                              textColor: Colors.white,
+                              isLoading: isLoading,
+                              onPress: isLoading ? () {} : _purchasePackage,
+                            ),
                           ),
-                        Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ButtonWidget(
-                            color: AppColors.primaryColor,
-                            text: "Continue",
-                            textColor: Colors.white,
-                            isLoading: isLoading,
-                            onPress: isLoading ? () {} : _purchasePackage,
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ],
+                        ],
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

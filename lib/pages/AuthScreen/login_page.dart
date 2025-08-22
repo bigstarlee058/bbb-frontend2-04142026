@@ -84,6 +84,9 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  http.Response? wooResponse;
+  http.Response? mobileResponse;
+
   void signInUser(String emailAddress, String password) async {
     if (emailAddress.isEmpty || password.isEmpty) {
       showBottomAlert(context, 'Please fill out the inputs');
@@ -96,78 +99,176 @@ class _LoginPageState extends State<LoginPage> {
           // 'https://bbbdev1.wpenginepowered.com/wp-json/jwt-auth/v1/token');
           'https://app.bootybybret.com/wp-json/jwt-auth/v1/token');
 
-      final wooResponse = await http.post(
+      wooResponse = await http.post(
         wooUrl,
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'username': emailAddress, 'password': password},
       );
 
-      if (wooResponse.statusCode == 200) {
-        await _handleLoginSuccess(wooResponse);
-        return;
+      switch (wooResponse?.statusCode) {
+        case ApiStatus.ok:
+          await _handleLoginSuccess(wooResponse!);
+          return;
+        case ApiStatus.forbidden:
+          final wooData = jsonDecode(wooResponse!.body);
+          final code = wooData['code'].toString();
+          if (code.contains("incorrect_password")) {
+            stopLoader();
+            loginFailedMsg();
+          } else if (code.contains("invalid_email") ||
+              code.contains("invalid_username")) {
+            await _tryMobileLogin(emailAddress, password);
+            return;
+          }
+          break;
+        case ApiStatus.unauthorized:
+          sessionExpiredMsg();
+          break;
+        case ApiStatus.serverError:
+          internalServerError();
+          break;
+        case ApiStatus.serverBusy:
+          serverIsBusy();
+          break;
+        default:
+          tryAgainMsg();
       }
 
-      if (wooResponse.statusCode == 403) {
-        final wooData = jsonDecode(wooResponse.body);
-        String code = wooData['code'].toString();
-
-        if (code.contains("incorrect_password")) {
-          loginFailedMsg();
-          stopLoader();
-          return;
-        }
-        if (code.contains("invalid_email")) {
-          await _tryMobileLogin(emailAddress, password);
-          return;
-        }
-      }
-
-      if (wooResponse.statusCode == 401) {
+      // if (wooResponse.statusCode == 200) {
+      //   await _handleLoginSuccess(wooResponse);
+      //   return;
+      // }
+      // if (wooResponse.statusCode == 403) {
+      //   final wooData = jsonDecode(wooResponse.body);
+      //   String code = wooData['code'].toString();
+      //   if (code.contains("incorrect_password")) {
+      //     loginFailedMsg();
+      //     stopLoader();
+      //     return;
+      //   }
+      //   if (code.contains("invalid_email")) {
+      //     await _tryMobileLogin(emailAddress, password);
+      //     return;
+      //   }
+      // }
+      // if (wooResponse.statusCode == 500) {
+      //   internalServerError();
+      //   stopLoader();
+      //   return;
+      // }
+      // if (wooResponse.statusCode == 503) {
+      //   serverIsBusy();
+      //   stopLoader();
+      //   return;
+      // }
+      // if (wooResponse.statusCode == 401) {
+      //   stopLoader();
+      //   sessionExpiredMsg();
+      //   return;
+      // }
+      // stopLoader();
+      // tryAgainMsg();
+    } catch (e, s) {
+      log('Login error: $e\n$s');
+      tryAgainMsg();
+    } finally {
+      if (wooResponse != null &&
+          wooResponse?.statusCode != ApiStatus.ok &&
+          wooResponse?.statusCode != ApiStatus.forbidden) {
         stopLoader();
       }
-      tryAgainMsg();
-    } catch (e) {
-      log('e==1========>>>>>$e');
-      tryAgainMsg();
     }
   }
 
   Future<void> _tryMobileLogin(String email, String password) async {
     final mobileUrl =
         Uri.parse('${AppConstants.serverUrl}/api/users/signin_mobile');
+    try {
+      mobileResponse = await http.post(
+        mobileUrl,
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: {'email': email, 'password': password},
+      );
 
-    final mobileResponse = await http.post(
-      mobileUrl,
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: {'email': email, 'password': password},
-    );
-    log('mobileResponse==========>>>>>$mobileResponse');
-    if (mobileResponse.statusCode == 200) {
-      await _handleLoginSuccess(mobileResponse);
-      return;
-    }
-
-    if (mobileResponse.statusCode == 403) {
-      final mobileData = jsonDecode(mobileResponse.body);
-      String code = mobileData['code'].toString();
-
-      if (code.contains("invalid_password")) {
-        loginFailedMsg();
-        stopLoader();
-        return;
+      switch (mobileResponse?.statusCode) {
+        case ApiStatus.ok:
+          await _handleLoginSuccess(mobileResponse!);
+          return;
+        case ApiStatus.forbidden:
+          final mobileData = jsonDecode(mobileResponse!.body);
+          final code = mobileData['code'].toString();
+          if (code.contains("invalid_password")) {
+            loginFailedMsg();
+          } else if (code.contains("invalid_email")) {
+            userNotFoundMsg();
+          }
+          break;
+        case ApiStatus.unauthorized:
+          sessionExpiredMsg();
+          break;
+        case ApiStatus.serverError:
+          internalServerError();
+          break;
+        case ApiStatus.serverBusy:
+          serverIsBusy();
+          break;
+        default:
+          loginFailedMsg1();
       }
-      if (code.contains("invalid_email")) {
-        userNotFoundMsg();
+    } catch (e, s) {
+      log('Mobile login error: $e\n$s');
+      tryAgainMsg();
+    } finally {
+      if (mobileResponse != null &&
+          mobileResponse?.statusCode != ApiStatus.ok) {
         stopLoader();
-        return;
       }
     }
+    // if (mobileResponse.statusCode == 200) {
+    //   await _handleLoginSuccess(mobileResponse);
+    //   return;
+    // }
+    //
+    // if (mobileResponse.statusCode == 403) {
+    //   final mobileData = jsonDecode(mobileResponse.body);
+    //   String code = mobileData['code'].toString();
+    //
+    //   if (code.contains("invalid_password")) {
+    //     loginFailedMsg();
+    //     stopLoader();
+    //     return;
+    //   }
+    //   if (code.contains("invalid_email")) {
+    //     userNotFoundMsg();
+    //     stopLoader();
+    //     return;
+    //   }
+    // }
+    //
+    // if (mobileResponse.statusCode == 500) {
+    //   internalServerError();
+    //   stopLoader();
+    //   return;
+    // }
+    //
+    // if (mobileResponse.statusCode == 503) {
+    //   serverIsBusy();
+    //   stopLoader();
+    //   return;
+    // }
+    //
+    // if (mobileResponse.statusCode == 401) {
+    //   stopLoader();
+    // }
 
-    if (mobileResponse.statusCode == 401) {
-      stopLoader();
-    }
+    // if (mobileResponse.statusCode == 401) {
+    //   sessionExpiredMsg();
+    //   stopLoader();
+    //   return;
+    // }
+    // stopLoader();
 
-    loginFailedMsg1();
+    // loginFailedMsg1();
   }
 
   Future<void> _handleLoginSuccess(http.Response response) async {
@@ -456,8 +557,7 @@ class _LoginPageState extends State<LoginPage> {
 
           if (token.isEmpty) {
             stopLoader();
-            _handleLogout(context,
-                "Your session has expired. Please log in again to continue.");
+            _handleLogout(context, sessionExpired);
             return;
           } else {
             dataProvider?.getAllAchievement(true);
@@ -729,6 +829,7 @@ class _LoginPageState extends State<LoginPage> {
                         //         (route) => false);
                         //   }
                         // }
+
                         stopLoader();
                         if (isFirstTime) {
                           if (mounted) {
@@ -764,6 +865,7 @@ class _LoginPageState extends State<LoginPage> {
                           }
                         }
                       } else {
+                        stopLoader();
                         if (isFirstTime) {
                           if (mounted) {
                             await Navigator.pushAndRemoveUntil(
@@ -797,7 +899,6 @@ class _LoginPageState extends State<LoginPage> {
                                 (route) => false);
                           }
                         }
-                        stopLoader();
                       }
                     },
                   );
@@ -853,12 +954,11 @@ class _LoginPageState extends State<LoginPage> {
       final response = await http.put(
         url,
         body: queryParams,
-        headers: <String, String>{'AUTH_TOKEN': userIdToken ?? ""},
+        headers: <String, String>{'AUTH_TOKEN': userIdToken},
       );
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('jsonResponse==========>>>>>$jsonResponse');
         userData.user = jsonResponse["result"];
         userData.getUserDataFromJson(jsonResponse["result"]);
         // await userData.fetchUserInfo(context);
@@ -881,22 +981,37 @@ class _LoginPageState extends State<LoginPage> {
 
   void loginFailedMsg() {
     if (mounted) {
-      showBottomAlert(context,
-          'Login Failed. Please check your password and, if needed, click "Forgot Password" below');
+      showBottomAlert(context, wrongPassword);
+    }
+  }
+
+  void sessionExpiredMsg() {
+    if (mounted) {
+      showBottomAlert(context, sessionExpired);
     }
   }
 
   void loginFailedMsg1() {
     if (mounted) {
-      showBottomAlert(context,
-          'Login Failed. Please check your email and password, if needed, click "Forgot Password" below');
+      showBottomAlert(context, emailPasswordWrong);
     }
   }
 
   void tryAgainMsg() {
     if (mounted) {
-      showBottomAlert(context,
-          'Something went wrong. Please check your connection and try again.');
+      showBottomAlert(context, somethingWentWrong);
+    }
+  }
+
+  void internalServerError() {
+    if (mounted) {
+      showBottomAlert(context, serverError);
+    }
+  }
+
+  void serverIsBusy() {
+    if (mounted) {
+      showBottomAlert(context, serverBusy);
     }
   }
 
@@ -907,314 +1022,323 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Consumer<DataProvider>(builder: (context, value, c) {
-                  return AppImage.imageLogin(
-                    value,
-                    // media,
-                    // image: dataProvider!.allImageList
-                    //     .where((element) => element["key"] == "imageLogin")
-                    //     .first["image"],
-                    // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
-                    // // image: dataProvider!.cachedImageMap["imageLogin"],
-                    // imageKey: "imageLogin",
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: SafeArea(
-                            child: BackArrowWidget(onPress: () {
-                              Navigator.pop(context);
-                            }),
-                          ),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Consumer<DataProvider>(builder: (context, value, c) {
+                return AppImage.imageLogin(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageLogin")
+                  //     .first["image"],
+                  // // dataProvider?.screenBackgroundResponse?.imageLogin ?? "",
+                  // // image: dataProvider!.cachedImageMap["imageLogin"],
+                  // imageKey: "imageLogin",
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: SafeArea(
+                          child: BackArrowWidget(onPress: () {
+                            Navigator.pop(context);
+                          }),
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              Positioned(
+                top: ScreenUtil.horizontalScale(42),
+                child: Container(
+                  // height: 120,
+                  height: ScreenUtil.verticalScale(15),
+                  width: media.width,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/img/bbb-logo.png'),
+                      fit: BoxFit.fitHeight,
+                      opacity: 1,
                     ),
-                  );
-                }),
-              ],
-            ),
-            Positioned(
-              top: ScreenUtil.horizontalScale(42),
-              child: Container(
-                // height: 120,
-                height: ScreenUtil.verticalScale(15),
-                width: media.width,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/img/bbb-logo.png'),
-                    fit: BoxFit.fitHeight,
-                    opacity: 1,
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  ClipPath(
-                    clipper: DiagonalClipper(),
-                    child: Container(
-                      height: media.height / 9.8,
-                      width: media.width / 6,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor),
-                    ),
-                  ),
-                  Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(
-                          ScreenUtil.verticalScale(7),
-                        ),
+              Positioned(
+                bottom: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipPath(
+                      clipper: DiagonalClipper(),
+                      child: Container(
+                        height: media.height / 9.8,
+                        width: media.width / 6,
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.verticalScale(4.4)),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(3.2),
-                                ),
-                                Text(
-                                  'Sign in',
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil.verticalScale(3.32),
-                                    color: AppColors.primaryColor,
-                                    fontWeight: FontWeight.bold,
+                    Container(
+                      width: media.width,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(
+                            ScreenUtil.verticalScale(7),
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.verticalScale(4.4)),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(3.2),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(3.2),
-                                ),
-                                Container(
-                                  key: _emailFieldKey,
-                                  child: AppTextFormField(
-                                    hintText: 'Your Email',
-                                    keyboardType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.next,
-                                    controller: emailController,
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 15),
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.email,
-                                            color: Colors.grey.shade400),
-                                      ),
+                                  Text(
+                                    'Sign in',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil.verticalScale(3.32),
+                                      color: AppColors.primaryColor,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: ScreenUtil.verticalScale(2.2)),
-                                Container(
-                                  key: _passwordFieldKey,
-                                  child: AppTextFormField(
-                                    hintText: 'Your Password',
-                                    keyboardType: TextInputType.visiblePassword,
-                                    textInputAction: TextInputAction.done,
-                                    controller: passwordController,
-                                    obscureText: false,
-                                    onChanged: (value) {
-                                      if (isObscure) {
-                                        if (value.length <
-                                            previousMasked.length) {
-                                          if (realPassword.isNotEmpty) {
-                                            realPassword = StringBuffer(
-                                              realPassword.toString().substring(
-                                                  0, realPassword.length - 1),
-                                            );
-                                          }
-                                        } else if (value.length >
-                                            previousMasked.length) {
-                                          final newChar =
-                                              value[value.length - 1];
-                                          realPassword.write(newChar);
-                                        }
-
-                                        final masked = List.generate(
-                                                realPassword.length, (_) => "•")
-                                            .join();
-                                        previousMasked = masked;
-
-                                        passwordController.value =
-                                            TextEditingValue(
-                                          text: masked,
-                                          selection: TextSelection.collapsed(
-                                              offset: masked.length),
-                                        );
-                                      } else {
-                                        realPassword
-                                          ..clear()
-                                          ..write(value);
-                                        previousMasked = value;
-                                      }
-                                    },
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 15),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          isObscure = !isObscure;
-                                          if (isObscure) {
-                                            final masked = List.generate(
-                                                realPassword.length,
-                                                (_) => "•").join();
-                                            passwordController.value =
-                                                TextEditingValue(
-                                              text: masked,
-                                              selection:
-                                                  TextSelection.collapsed(
-                                                      offset: masked.length),
-                                            );
-                                          } else {
-                                            passwordController.value =
-                                                TextEditingValue(
-                                              text: realPassword.toString(),
-                                              selection:
-                                                  TextSelection.collapsed(
-                                                      offset:
-                                                          realPassword.length),
-                                            );
-                                          }
-                                          setState(() {});
-                                        },
-                                        style: ButtonStyle(
-                                            minimumSize:
-                                                WidgetStateProperty.all(
-                                                    const Size(48, 48))),
-                                        icon: Icon(
-                                          isObscure
-                                              ? Icons.visibility_off_outlined
-                                              : Icons.visibility_outlined,
-                                          color: Colors.grey.shade400,
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(3.2),
+                                  ),
+                                  Container(
+                                    key: _emailFieldKey,
+                                    child: AppTextFormField(
+                                      hintText: 'Your Email',
+                                      keyboardType: TextInputType.emailAddress,
+                                      textInputAction: TextInputAction.next,
+                                      controller: emailController,
+                                      suffixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15),
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(Icons.email,
+                                              color: Colors.grey.shade400),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: ScreenUtil.verticalScale(1.5)),
-                                Text.rich(TextSpan(
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        color: Color(0xFFA51E22),
-                                      ),
-                                      text: "Forgot password?",
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (ctx) =>
-                                                  const ResetPasswordScreen(
-                                                image: '',
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                    ),
-                                  ],
-                                )),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(4.2),
-                                ),
-                                ButtonWidget(
-                                  text: 'Sign in',
-                                  textColor: Colors.white,
-                                  color: AppColors.primaryColor,
-                                  onPress: () async {
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    prefs.setString("email", "");
-                                    prefs.setString("password", "");
+                                  SizedBox(
+                                      height: ScreenUtil.verticalScale(2.2)),
+                                  Container(
+                                    key: _passwordFieldKey,
+                                    child: AppTextFormField(
+                                      hintText: 'Your Password',
+                                      keyboardType:
+                                          TextInputType.visiblePassword,
+                                      textInputAction: TextInputAction.done,
+                                      controller: passwordController,
+                                      obscureText: false,
+                                      onChanged: (value) {
+                                        if (isObscure) {
+                                          if (value.length <
+                                              previousMasked.length) {
+                                            if (realPassword.isNotEmpty) {
+                                              realPassword = StringBuffer(
+                                                realPassword
+                                                    .toString()
+                                                    .substring(
+                                                        0,
+                                                        realPassword.length -
+                                                            1),
+                                              );
+                                            }
+                                          } else if (value.length >
+                                              previousMasked.length) {
+                                            final newChar =
+                                                value[value.length - 1];
+                                            realPassword.write(newChar);
+                                          }
 
-                                    previousMasked = passwordController.text;
-                                    if (_formKey.currentState?.validate() ==
-                                        true) {
-                                      prefs.setString(
-                                          "email", emailController.text);
-                                      prefs.setString(
-                                          "password", realPassword.toString());
-                                      signInUser(
-                                        emailController.text,
-                                        realPassword.toString(),
-                                      );
-                                    }
-                                  },
-                                  isLoading: isLoading,
-                                ),
-                                SizedBox(
-                                  height: ScreenUtil.verticalScale(0.8),
-                                ),
-                              ],
+                                          final masked = List.generate(
+                                              realPassword.length,
+                                              (_) => "•").join();
+                                          previousMasked = masked;
+
+                                          passwordController.value =
+                                              TextEditingValue(
+                                            text: masked,
+                                            selection: TextSelection.collapsed(
+                                                offset: masked.length),
+                                          );
+                                        } else {
+                                          realPassword
+                                            ..clear()
+                                            ..write(value);
+                                          previousMasked = value;
+                                        }
+                                      },
+                                      suffixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            isObscure = !isObscure;
+                                            if (isObscure) {
+                                              final masked = List.generate(
+                                                  realPassword.length,
+                                                  (_) => "•").join();
+                                              passwordController.value =
+                                                  TextEditingValue(
+                                                text: masked,
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset: masked.length),
+                                              );
+                                            } else {
+                                              passwordController.value =
+                                                  TextEditingValue(
+                                                text: realPassword.toString(),
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                        offset: realPassword
+                                                            .length),
+                                              );
+                                            }
+                                            setState(() {});
+                                          },
+                                          style: ButtonStyle(
+                                              minimumSize:
+                                                  WidgetStateProperty.all(
+                                                      const Size(48, 48))),
+                                          icon: Icon(
+                                            isObscure
+                                                ? Icons.visibility_off_outlined
+                                                : Icons.visibility_outlined,
+                                            color: Colors.grey.shade400,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height: ScreenUtil.verticalScale(1.5)),
+                                  Text.rich(TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          color: Color(0xFFA51E22),
+                                        ),
+                                        text: "Forgot password?",
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    const ResetPasswordScreen(
+                                                  image: '',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                      ),
+                                    ],
+                                  )),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(4.2),
+                                  ),
+                                  ButtonWidget(
+                                    text: 'Sign in',
+                                    textColor: Colors.white,
+                                    color: AppColors.primaryColor,
+                                    onPress: () async {
+                                      SharedPreferences prefs =
+                                          await SharedPreferences.getInstance();
+                                      prefs.setString("email", "");
+                                      prefs.setString("password", "");
+
+                                      previousMasked = passwordController.text;
+                                      if (_formKey.currentState?.validate() ==
+                                          true) {
+                                        prefs.setString(
+                                            "email", emailController.text);
+                                        prefs.setString("password",
+                                            realPassword.toString());
+                                        signInUser(
+                                          emailController.text,
+                                          realPassword.toString(),
+                                        );
+                                      }
+                                    },
+                                    isLoading: isLoading,
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil.verticalScale(0.8),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: TextStyle(
-                                fontSize: ScreenUtil.verticalScale(1.5),
-                                color: Color(0xff888888),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (!isLoading) {
-                                  Navigator.pushNamed(
-                                      context, AppRoutes.registerScreen);
-                                }
-                              },
-                              style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(65, 30),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  alignment: Alignment.center),
-                              child: Text(
-                                'Sign up for a new account',
+                          SizedBox(height: 2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account? ",
                                 style: TextStyle(
-                                  color: AppColors.primaryColor,
                                   fontSize: ScreenUtil.verticalScale(1.5),
+                                  color: Color(0xff888888),
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: ScreenUtil.verticalScale(3.4),
-                        ),
-                      ],
+                              TextButton(
+                                onPressed: () {
+                                  if (!isLoading) {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.registerScreen);
+                                  }
+                                },
+                                style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(65, 30),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    alignment: Alignment.center),
+                                child: Text(
+                                  'Sign up for a new account',
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontSize: ScreenUtil.verticalScale(1.5),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: Platform.isAndroid
+                                ? ScreenUtil.verticalScale(1.4)
+                                : ScreenUtil.verticalScale(3.4),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

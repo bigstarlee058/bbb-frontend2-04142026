@@ -931,224 +931,228 @@ class _ExercisePageState extends State<ExercisePage>
     backOffIndex = 0;
     workingIndex = 0;
 
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: loading &&
-                ((isExercise == 1
-                        ? (monthProvider
-                                    ?.exerciseDetailModel?.files?.isNotEmpty ??
-                                false) &&
-                            !videoNotInitialized &&
-                            videoSize != null
-                        : (monthProvider?.warmUpModel?.files?.isNotEmpty ??
-                                false) &&
-                            !videoNotInitialized &&
-                            videoSize != null) ==
-                    false)
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primaryColor,
-                ),
-              )
-            : (isExercise == 1 && monthProvider!.exerciseDetailModel == null) ||
-                    (isExercise == 0 && monthProvider?.warmUpModel == null)
-                ? Column(
-                    children: [
-                      backButton(media, context),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            "No data found!",
-                            style: TextStyle(fontSize: 17),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: loading &&
+                  ((isExercise == 1
+                          ? (monthProvider?.exerciseDetailModel?.files
+                                      ?.isNotEmpty ??
+                                  false) &&
+                              !videoNotInitialized &&
+                              videoSize != null
+                          : (monthProvider?.warmUpModel?.files?.isNotEmpty ??
+                                  false) &&
+                              !videoNotInitialized &&
+                              videoSize != null) ==
+                      false)
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  ),
+                )
+              : (isExercise == 1 &&
+                          monthProvider!.exerciseDetailModel == null) ||
+                      (isExercise == 0 && monthProvider?.warmUpModel == null)
+                  ? Column(
+                      children: [
+                        backButton(media, context),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              "No data found!",
+                              style: TextStyle(fontSize: 17),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
-                : SingleChildScrollView(
-                    controller: scrollController,
-                    physics: const ClampingScrollPhysics(),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          fit: StackFit.loose,
-                          children: [
-                            Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    showControlsOnTap();
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      /// VIDEO SECTION
-
-                                      videoSection(media),
-
-                                      /// BACK BUTTON
-
-                                      backButton(media, context),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            /// PLAY PAUSE REWIND CONTROL
-
-                            playPauseControl(media),
-
-                            /// VIDEO PROGRESS
-
-                            videoProgress(media, context),
-
-                            // SafeArea(
-                            //   child: Align(
-                            //     alignment: Alignment.centerRight,
-                            //     child: Padding(
-                            //       padding: const EdgeInsets.only(right: 10),
-                            //       child: PopupMenuButton<String>(
-                            //         padding: EdgeInsets.only(right: 0),
-                            //         menuPadding:
-                            //             EdgeInsets.symmetric(vertical: 5),
-                            //         position: PopupMenuPosition.under,
-                            //         color: Theme.of(context).cardColor,
-                            //         icon: const Icon(
-                            //           Icons.more_vert,
-                            //           color: Colors.white70,
-                            //         ),
-                            //         onSelected: (value) {
-                            //           if (value == 'speed') {
-                            //             _showSpeedOptions();
-                            //           } else if (value == 'download') {
-                            //             _downloadVideo();
-                            //           }
-                            //         },
-                            //         itemBuilder: (_) => [
-                            //           PopupMenuItem(
-                            //               value: 'speed',
-                            //               child: Row(
-                            //                 children: [
-                            //                   Icon(
-                            //                     Icons.slow_motion_video,
-                            //                     color: Theme.of(context)
-                            //                         .textTheme
-                            //                         .bodyLarge
-                            //                         ?.color,
-                            //                   ),
-                            //                   SizedBox(width: 5),
-                            //                   Text(
-                            //                     'Playback Speed',
-                            //                     style: TextStyle(
-                            //                       color: Theme.of(context)
-                            //                           .textTheme
-                            //                           .bodyLarge
-                            //                           ?.color,
-                            //                     ),
-                            //                   ),
-                            //                 ],
-                            //               )),
-                            //           PopupMenuItem(
-                            //             value: 'download',
-                            //             child: Row(
-                            //               children: [
-                            //                 Icon(
-                            //                   Icons.download,
-                            //                   color: Theme.of(context)
-                            //                       .textTheme
-                            //                       .bodyLarge
-                            //                       ?.color,
-                            //                 ),
-                            //                 SizedBox(width: 5),
-                            //                 Text(
-                            //                   'Download',
-                            //                   style: TextStyle(
-                            //                     color: Theme.of(context)
-                            //                         .textTheme
-                            //                         .bodyLarge
-                            //                         ?.color,
-                            //                   ),
-                            //                 ),
-                            //               ],
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-
-                        /// MAIN CONTENT
-
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: ((isExercise == 1
-                                          ? (monthProvider?.exerciseDetailModel
-                                                      ?.files?.isNotEmpty ??
-                                                  false) &&
-                                              !videoNotInitialized &&
-                                              videoSize != null
-                                          : (monthProvider?.warmUpModel?.files
-                                                      ?.isNotEmpty ??
-                                                  false) &&
-                                              !videoNotInitialized &&
-                                              videoSize != null)
-                                      ? videoSize!.height
-                                      : videoNotAvailable
-                                          ? (isExercise == 1
-                                                      ? monthProvider
-                                                              ?.exerciseDetailModel
-                                                              ?.videoThumbnail ??
-                                                          ""
-                                                      : monthProvider
-                                                              ?.warmUpModel
-                                                              ?.videoThumbnail ??
-                                                          "")
-                                                  .isEmpty
-                                              ? media.width +
-                                                  media.height * 0.0605
-                                              : media.height * 0.83
-                                          : media.height * 0.83) -
-                                  media.height * 0.121),
-                          child: Stack(
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      controller: scrollController,
+                      physics: const ClampingScrollPhysics(),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Stack(
                             clipBehavior: Clip.none,
+                            fit: StackFit.loose,
                             children: [
-                              mainContent(media),
-                              Positioned(
-                                top: -((media.height / 3.995)),
-                                right: 0,
-                                child: SizedBox(
-                                  height: media.height / 3.99,
-                                  width: media.width,
-                                  child: Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: ClipPath(
-                                      clipper: DiagonalClipper(),
-                                      child: Container(
-                                        height: media.height / 11,
-                                        width: media.width / 6,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor),
+                              Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showControlsOnTap();
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        /// VIDEO SECTION
+
+                                        videoSection(media),
+
+                                        /// BACK BUTTON
+
+                                        backButton(media, context),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              /// PLAY PAUSE REWIND CONTROL
+
+                              playPauseControl(media),
+
+                              /// VIDEO PROGRESS
+
+                              videoProgress(media, context),
+
+                              // SafeArea(
+                              //   child: Align(
+                              //     alignment: Alignment.centerRight,
+                              //     child: Padding(
+                              //       padding: const EdgeInsets.only(right: 10),
+                              //       child: PopupMenuButton<String>(
+                              //         padding: EdgeInsets.only(right: 0),
+                              //         menuPadding:
+                              //             EdgeInsets.symmetric(vertical: 5),
+                              //         position: PopupMenuPosition.under,
+                              //         color: Theme.of(context).cardColor,
+                              //         icon: const Icon(
+                              //           Icons.more_vert,
+                              //           color: Colors.white70,
+                              //         ),
+                              //         onSelected: (value) {
+                              //           if (value == 'speed') {
+                              //             _showSpeedOptions();
+                              //           } else if (value == 'download') {
+                              //             _downloadVideo();
+                              //           }
+                              //         },
+                              //         itemBuilder: (_) => [
+                              //           PopupMenuItem(
+                              //               value: 'speed',
+                              //               child: Row(
+                              //                 children: [
+                              //                   Icon(
+                              //                     Icons.slow_motion_video,
+                              //                     color: Theme.of(context)
+                              //                         .textTheme
+                              //                         .bodyLarge
+                              //                         ?.color,
+                              //                   ),
+                              //                   SizedBox(width: 5),
+                              //                   Text(
+                              //                     'Playback Speed',
+                              //                     style: TextStyle(
+                              //                       color: Theme.of(context)
+                              //                           .textTheme
+                              //                           .bodyLarge
+                              //                           ?.color,
+                              //                     ),
+                              //                   ),
+                              //                 ],
+                              //               )),
+                              //           PopupMenuItem(
+                              //             value: 'download',
+                              //             child: Row(
+                              //               children: [
+                              //                 Icon(
+                              //                   Icons.download,
+                              //                   color: Theme.of(context)
+                              //                       .textTheme
+                              //                       .bodyLarge
+                              //                       ?.color,
+                              //                 ),
+                              //                 SizedBox(width: 5),
+                              //                 Text(
+                              //                   'Download',
+                              //                   style: TextStyle(
+                              //                     color: Theme.of(context)
+                              //                         .textTheme
+                              //                         .bodyLarge
+                              //                         ?.color,
+                              //                   ),
+                              //                 ),
+                              //               ],
+                              //             ),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+
+                          /// MAIN CONTENT
+
+                          Container(
+                            margin: EdgeInsets.only(
+                                top: ((isExercise == 1
+                                            ? (monthProvider?.exerciseDetailModel
+                                                        ?.files?.isNotEmpty ??
+                                                    false) &&
+                                                !videoNotInitialized &&
+                                                videoSize != null
+                                            : (monthProvider?.warmUpModel?.files
+                                                        ?.isNotEmpty ??
+                                                    false) &&
+                                                !videoNotInitialized &&
+                                                videoSize != null)
+                                        ? videoSize!.height
+                                        : videoNotAvailable
+                                            ? (isExercise == 1
+                                                        ? monthProvider
+                                                                ?.exerciseDetailModel
+                                                                ?.videoThumbnail ??
+                                                            ""
+                                                        : monthProvider
+                                                                ?.warmUpModel
+                                                                ?.videoThumbnail ??
+                                                            "")
+                                                    .isEmpty
+                                                ? media.width +
+                                                    media.height * 0.0605
+                                                : media.height * 0.83
+                                            : media.height * 0.83) -
+                                    media.height * 0.121),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                mainContent(media),
+                                Positioned(
+                                  top: -((media.height / 3.995)),
+                                  right: 0,
+                                  child: SizedBox(
+                                    height: media.height / 3.99,
+                                    width: media.width,
+                                    child: Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: ClipPath(
+                                        clipper: DiagonalClipper(),
+                                        child: Container(
+                                          height: media.height / 11,
+                                          width: media.width / 6,
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .scaffoldBackgroundColor),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
+        ),
       ),
     );
   }

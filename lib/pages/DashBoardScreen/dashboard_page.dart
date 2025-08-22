@@ -170,26 +170,30 @@ class _DashboardPageState extends State<DashboardPage> {
             Consumer<DataProvider>(
               builder: (context, value, c) {
                 return value.allImageList.isNotEmpty
-                    ? Column(
-                        children: [
-                          AppImage.imageDashboard(value),
-                          AppImage.imageMonthView(value),
-                          AppImage.imageStreakCalendar(value),
-                          AppImage.imageTools(value),
-                          AppImage.imageProfile(value),
-                          AppImage.imageMyProfle(value),
-                          AppImage.imageToday(value),
-                          AppImage.imageExerciseLibrary(value),
-                          AppImage.imageGraphs(value),
-                          AppImage.imageAchievement(value),
-                          AppImage.imageFaQs(value),
-                          AppImage.imageLogin(value),
-                          AppImage.imageSignup(value),
-                          AppImage.imageEmailConfirm(value),
-                          AppImage.imageForgot(value),
-                          AppImage.imageSetting(value),
-                          AppImage.imageApparel(value),
-                        ],
+                    ? SizedBox(
+                        width: 0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppImage.imageDashboard(value),
+                            AppImage.imageMonthView(value),
+                            AppImage.imageStreakCalendar(value),
+                            AppImage.imageTools(value),
+                            AppImage.imageProfile(value),
+                            AppImage.imageMyProfle(value),
+                            AppImage.imageToday(value),
+                            AppImage.imageExerciseLibrary(value),
+                            AppImage.imageGraphs(value),
+                            AppImage.imageAchievement(value),
+                            AppImage.imageFaQs(value),
+                            AppImage.imageLogin(value),
+                            AppImage.imageSignup(value),
+                            AppImage.imageEmailConfirm(value),
+                            AppImage.imageForgot(value),
+                            AppImage.imageSetting(value),
+                            AppImage.imageApparel(value),
+                          ],
+                        ),
                       )
                     : SizedBox();
               },

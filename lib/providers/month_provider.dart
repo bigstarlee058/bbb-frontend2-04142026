@@ -169,9 +169,12 @@ class MonthProvider extends ChangeNotifier {
 
   Future<void> checkPumpDayAvail() async {
     try {
+      log('dayHistoryModel==========>>>>>${jsonEncode(dayHistoryModel)}');
       final dataList = dayHistoryModel.where((element) =>
           element.type?.contains("Pump Day") == true &&
           element.status != Status.empty);
+
+      log('dataList==========>>>>>${dataList}');
 
       int pumpDayCount =
           monthDataModel?.weeks?[week! - 1].pumpDayIds?.length ?? 0;

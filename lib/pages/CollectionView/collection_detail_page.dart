@@ -218,283 +218,249 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
 
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  Column(
-                    children: [
-                      Stack(
-                        children: [
-                          appShimmerImage(
-                            height: media.height / 2.35,
-                            width: media.width,
-                            networkImageUrl: (collectionData?.photo ?? "")
-                                    .startsWith(
-                                        'https://storage.cloud.google.com/')
-                                ? (collectionData?.photo ?? "").replaceFirst(
-                                    'https://storage.cloud.google.com/',
-                                    'https://storage.googleapis.com/')
-                                : (collectionData?.photo ?? ""),
-                            fit: BoxFit.cover,
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                          SizedBox(
-                            height: media.height / 2,
-                            width: media.width,
-                            child: SafeArea(
-                              child: Column(
-                                children: [
-                                  AppBar(
-                                    toolbarHeight:
-                                        ScreenUtil.verticalScale(5.1),
-                                    surfaceTintColor: Colors.transparent,
-                                    centerTitle: true,
-                                    backgroundColor: Colors.transparent,
-                                    leading: BackArrowWidget(
-                                      onPress: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-
-                                    /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                    // Positioned(
-                                    //   left: 0,
-                                    //   child: BackArrowWidget(
-                                    //     onPress: () {
-                                    //       Navigator.pop(context);
-                                    //     },
-                                    //   ),
-                                    // leading: SizedBox(),
-                                    title: Text(
-                                      '',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize:
-                                            ScreenUtil.horizontalScale(5.5),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    Column(
+                      children: [
+                        Stack(
+                          children: [
+                            appShimmerImage(
+                              height: media.height / 2.35,
+                              width: media.width,
+                              networkImageUrl: (collectionData?.photo ?? "")
+                                      .startsWith(
+                                          'https://storage.cloud.google.com/')
+                                  ? (collectionData?.photo ?? "").replaceFirst(
+                                      'https://storage.cloud.google.com/',
+                                      'https://storage.googleapis.com/')
+                                  : (collectionData?.photo ?? ""),
+                              fit: BoxFit.cover,
+                              borderRadius: BorderRadius.circular(0),
+                            ),
+                            SizedBox(
+                              height: media.height / 2,
+                              width: media.width,
+                              child: SafeArea(
+                                child: Column(
+                                  children: [
+                                    AppBar(
+                                      toolbarHeight:
+                                          ScreenUtil.verticalScale(5.1),
+                                      surfaceTintColor: Colors.transparent,
+                                      centerTitle: true,
+                                      backgroundColor: Colors.transparent,
+                                      leading: BackArrowWidget(
+                                        onPress: () {
+                                          Navigator.pop(context);
+                                        },
                                       ),
+
+                                      /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                      // Positioned(
+                                      //   left: 0,
+                                      //   child: BackArrowWidget(
+                                      //     onPress: () {
+                                      //       Navigator.pop(context);
+                                      //     },
+                                      //   ),
+                                      // leading: SizedBox(),
+                                      title: Text(
+                                        '',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              ScreenUtil.horizontalScale(5.5),
+                                        ),
+                                      ),
+                                      actions: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 10),
+                                          child:
+                                              const CommonStreakWithNotification(
+                                                  routeString:
+                                                      '/collectionDetail'),
+                                        )
+                                      ],
                                     ),
-                                    actions: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        child:
-                                            const CommonStreakWithNotification(
-                                                routeString:
-                                                    '/collectionDetail'),
-                                      )
-                                    ],
-                                  ),
-                                  Center(
-                                    child: Container(
-                                      height: media.height / 5,
-                                      margin: EdgeInsets.symmetric(
-                                          horizontal:
-                                              ScreenUtil.horizontalScale(5),
-                                          vertical:
-                                              ScreenUtil.verticalScale(2)),
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              (collectionData?.title ?? "")
-                                                      .isNotEmpty
-                                                  ? collectionData?.title ?? ""
-                                                  : 'Collection Title',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize:
-                                                    ScreenUtil.horizontalScale(
-                                                        6.5),
-                                                fontWeight: FontWeight.bold,
-                                                height: 1.35,
+                                    Center(
+                                      child: Container(
+                                        height: media.height / 5,
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal:
+                                                ScreenUtil.horizontalScale(5),
+                                            vertical:
+                                                ScreenUtil.verticalScale(2)),
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                (collectionData?.title ?? "")
+                                                        .isNotEmpty
+                                                    ? collectionData?.title ??
+                                                        ""
+                                                    : 'Collection Title',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: ScreenUtil
+                                                      .horizontalScale(6.5),
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.35,
+                                                ),
                                               ),
-                                            ),
-                                            // Container(
-                                            //   padding: EdgeInsets.symmetric(
-                                            //       vertical: 10, horizontal: 12),
-                                            //   margin: EdgeInsets.symmetric(
-                                            //       vertical: 15),
-                                            //   decoration: BoxDecoration(
-                                            //     color: const Color(0xFFF8E6EC),
-                                            //     borderRadius:
-                                            //         BorderRadius.circular(50),
-                                            //   ),
-                                            //   child: HoldToCopy(
-                                            //     text: 'APP10',
-                                            //     child: Text(
-                                            //       'Use the code "APP10" for 10% off any order!',
-                                            //       maxLines: 3,
-                                            //       style: TextStyle(
-                                            //         color: Colors.black,
-                                            //         fontSize: ScreenUtil
-                                            //             .verticalScale(1.4),
-                                            //         fontWeight:
-                                            //             FontWeight.normal,
-                                            //       ),
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: ScreenUtil
-                                                      .horizontalScale(8)),
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: ScreenUtil
-                                                                .verticalScale(
-                                                                    1.2)),
-                                                    width: double.infinity,
-                                                    child: ElevatedButton(
-                                                      onPressed: () {},
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Color(0xFFF8E6EC),
-                                                        shape:
-                                                            Utils.buttonStyle,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
+                                              // Container(
+                                              //   padding: EdgeInsets.symmetric(
+                                              //       vertical: 10, horizontal: 12),
+                                              //   margin: EdgeInsets.symmetric(
+                                              //       vertical: 15),
+                                              //   decoration: BoxDecoration(
+                                              //     color: const Color(0xFFF8E6EC),
+                                              //     borderRadius:
+                                              //         BorderRadius.circular(50),
+                                              //   ),
+                                              //   child: HoldToCopy(
+                                              //     text: 'APP10',
+                                              //     child: Text(
+                                              //       'Use the code "APP10" for 10% off any order!',
+                                              //       maxLines: 3,
+                                              //       style: TextStyle(
+                                              //         color: Colors.black,
+                                              //         fontSize: ScreenUtil
+                                              //             .verticalScale(1.4),
+                                              //         fontWeight:
+                                              //             FontWeight.normal,
+                                              //       ),
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: ScreenUtil
+                                                        .horizontalScale(8)),
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.symmetric(
                                                           vertical: ScreenUtil
                                                               .verticalScale(
-                                                                  1.7),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            "",
-                                                            style: TextStyle(
-                                                                fontSize: ScreenUtil
-                                                                    .verticalScale(
-                                                                        2.2)),
+                                                                  1.2)),
+                                                      width: double.infinity,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {},
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Color(0xFFF8E6EC),
+                                                          shape:
+                                                              Utils.buttonStyle,
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                            vertical: ScreenUtil
+                                                                .verticalScale(
+                                                                    1.7),
                                                           ),
-                                                          HoldToCopy(
-                                                            text: 'APP10',
-                                                            child: Text(
-                                                              'Use the code "APP10" for 10% off any order!',
-                                                              maxLines: 3,
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              "",
                                                               style: TextStyle(
-                                                                fontSize: ScreenUtil
-                                                                    .verticalScale(
-                                                                        1.55),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: AppColors
-                                                                    .primaryColor,
+                                                                  fontSize: ScreenUtil
+                                                                      .verticalScale(
+                                                                          2.2)),
+                                                            ),
+                                                            HoldToCopy(
+                                                              text: 'APP10',
+                                                              child: Text(
+                                                                'Use the code "APP10" for 10% off any order!',
+                                                                maxLines: 3,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: ScreenUtil
+                                                                      .verticalScale(
+                                                                          1.55),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: AppColors
+                                                                      .primaryColor,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  ButtonWidget(
-                                                    text: "Shop Now",
-                                                    textColor: Colors.white,
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                    onPress: () {
-                                                      _launchURL(
-                                                          "https://www.bcstrength.com/discount/APP10");
-                                                    },
-                                                    isLoading: false,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
+                                                    ButtonWidget(
+                                                      text: "Shop Now",
+                                                      textColor: Colors.white,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                      onPress: () {
+                                                        _launchURL(
+                                                            "https://www.bcstrength.com/discount/APP10");
+                                                      },
+                                                      isLoading: false,
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: media.height / 2.79,
-                            width: media.width,
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                              child: ClipPath(
-                                clipper: DiagonalClipper(),
-                                child: Container(
-                                  height: media.height / 11,
-                                  width: media.width / 6,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor),
+                                  ],
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Consumer<DataProvider>(
-                    builder: (context, dataProvider, child) {
-                      return dataProvider.collectionData.equipments.isNotEmpty
-                          ? Container(
-                              margin: EdgeInsets.only(top: media.height / 2.8),
+                            SizedBox(
+                              height: media.height / 2.79,
                               width: media.width,
-                              padding: EdgeInsets.only(
-                                  top: ScreenUtil.verticalScale(2)),
-                              decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(
-                                      ScreenUtil.horizontalScale(15)),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: ClipPath(
+                                  clipper: DiagonalClipper(),
+                                  child: Container(
+                                    height: media.height / 11,
+                                    width: media.width / 6,
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor),
+                                  ),
                                 ),
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: ScreenUtil.horizontalScale(6)),
-                                child: Consumer<DataProvider>(
-                                  builder: (context, dataProvider, child) {
-                                    return Column(
-                                      children: _getPaginatedEquipments()
-                                          .map((equipment) {
-                                        return Column(
-                                          children: [
-                                            equipmentCard(
-                                              equipment.title,
-                                              equipment.thumbnail,
-                                              equipment.description,
-                                              equipment.link,
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                          : Container(
-                              margin: EdgeInsets.only(top: media.height / 2.8),
-                              child: Container(
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Consumer<DataProvider>(
+                      builder: (context, dataProvider, child) {
+                        return dataProvider.collectionData.equipments.isNotEmpty
+                            ? Container(
+                                margin:
+                                    EdgeInsets.only(top: media.height / 2.8),
                                 width: media.width,
-                                height: media.height * 0.3,
+                                padding: EdgeInsets.only(
+                                    top: ScreenUtil.verticalScale(2)),
                                 decoration: BoxDecoration(
                                   color:
                                       Theme.of(context).scaffoldBackgroundColor,
@@ -503,70 +469,111 @@ class _CollectionDetailPageState extends State<CollectionDetailPage> {
                                         ScreenUtil.horizontalScale(15)),
                                   ),
                                 ),
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: loader
-                                      ? CircularProgressIndicator(
-                                          color: AppColors.primaryColor,
-                                        )
-                                      : Text(
-                                          "No Collection",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .labelLarge
-                                                  ?.color),
-                                        ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          ScreenUtil.horizontalScale(6)),
+                                  child: Consumer<DataProvider>(
+                                    builder: (context, dataProvider, child) {
+                                      return Column(
+                                        children: _getPaginatedEquipments()
+                                            .map((equipment) {
+                                          return Column(
+                                            children: [
+                                              equipmentCard(
+                                                equipment.title,
+                                                equipment.thumbnail,
+                                                equipment.description,
+                                                equipment.link,
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 100,
-              )
-            ],
-          ),
-        ),
-        bottomSheet:
-            Consumer<DataProvider>(builder: (context, dataProvider, child) {
-          return dataProvider.collectionData.equipments.isNotEmpty
-              ? Container(
-                  alignment: Alignment.center,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  height: 65,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16)
-                        .copyWith(bottom: 10),
-                    child: _numPages > 0
-                        ? NumberPaginator(
-                            numberPages: _numPages,
-                            config: const NumberPaginatorUIConfig(
-                              height: 48,
-                              buttonSelectedForegroundColor:
-                                  AppColors.primaryColor,
-                              buttonUnselectedForegroundColor: Colors.grey,
-                              buttonUnselectedBackgroundColor:
-                                  Colors.transparent,
-                              buttonSelectedBackgroundColor: Colors.transparent,
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 0),
-                              buttonTextStyle: TextStyle(fontSize: 15),
-                            ),
-                            onPageChange: (int index) {
-                              setState(() {
-                                _currentPage = index;
-                              });
-                            },
-                          )
-                        : const SizedBox.shrink(),
-                  ),
+                              )
+                            : Container(
+                                margin:
+                                    EdgeInsets.only(top: media.height / 2.8),
+                                child: Container(
+                                  width: media.width,
+                                  height: media.height * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(
+                                          ScreenUtil.horizontalScale(15)),
+                                    ),
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: loader
+                                        ? CircularProgressIndicator(
+                                            color: AppColors.primaryColor,
+                                          )
+                                        : Text(
+                                            "No Collection",
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .labelLarge
+                                                    ?.color),
+                                          ),
+                                  ),
+                                ),
+                              );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 100,
                 )
-              : SizedBox();
-        }),
+              ],
+            ),
+          ),
+          bottomSheet:
+              Consumer<DataProvider>(builder: (context, dataProvider, child) {
+            return dataProvider.collectionData.equipments.isNotEmpty
+                ? Container(
+                    alignment: Alignment.center,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    height: 65,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16)
+                          .copyWith(bottom: 10),
+                      child: _numPages > 0
+                          ? NumberPaginator(
+                              numberPages: _numPages,
+                              config: const NumberPaginatorUIConfig(
+                                height: 48,
+                                buttonSelectedForegroundColor:
+                                    AppColors.primaryColor,
+                                buttonUnselectedForegroundColor: Colors.grey,
+                                buttonUnselectedBackgroundColor:
+                                    Colors.transparent,
+                                buttonSelectedBackgroundColor:
+                                    Colors.transparent,
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 0),
+                                buttonTextStyle: TextStyle(fontSize: 15),
+                              ),
+                              onPageChange: (int index) {
+                                setState(() {
+                                  _currentPage = index;
+                                });
+                              },
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  )
+                : SizedBox();
+          }),
+        ),
       ),
     );
   }
