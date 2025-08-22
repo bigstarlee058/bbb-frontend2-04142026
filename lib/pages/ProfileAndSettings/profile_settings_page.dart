@@ -706,13 +706,37 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                             ? true
                                             : false;
                                     if (isAppUser /*&& Platform.isIOS*/) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PaymentDetailScreen(),
-                                        ),
-                                      );
+                                      if (Platform.isIOS) {
+                                        const subscriptionUrl =
+                                            'https://apps.apple.com/account/subscriptions';
+                                        if (await canLaunchUrl(
+                                            Uri.parse(subscriptionUrl))) {
+                                          await launchUrl(
+                                              Uri.parse(subscriptionUrl),
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        }
+                                      } else {
+                                        const packageName =
+                                            "com.bootybybret.app";
+                                        final playStoreUrl =
+                                            "https://play.google.com/store/account/subscriptions?package=$packageName";
+                                        if (await canLaunchUrl(
+                                            Uri.parse(playStoreUrl))) {
+                                          await launchUrl(
+                                              Uri.parse(playStoreUrl),
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        }
+                                      }
+
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) =>
+                                      //         PaymentDetailScreen(),
+                                      //   ),
+                                      // );
 
                                       // await openAppSettings();
                                     } else {

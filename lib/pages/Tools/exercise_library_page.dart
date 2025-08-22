@@ -121,319 +121,333 @@ class _ExerciseLibraryPageState extends State<ExerciseLibraryPage> {
 
     // Fetch the exercises for the current page
     // List<ExerciseLibrary> paginatedExercises = _getPaginatedExercises();
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  Stack(
-                    children: <Widget>[
-                      // Container(
-                      //   height: media.height / 1,
-                      //   width: media.width,
-                      //   decoration: const BoxDecoration(
-                      //     image: DecorationImage(
-                      //       image: AssetImage('assets/img/back.jpg'),
-                      //       fit: BoxFit.cover,
-                      //       opacity: 1,
-                      //     ),
-                      //   ),
-                      // ),
-                      Consumer<DataProvider>(builder: (context, value, c) {
-                        return AppImage.imageExerciseLibrary(value
-                            // media,
-                            // image: dataProvider!.allImageList
-                            //     .where((element) =>
-                            //         element["key"] == "imageExerciseLibrary")
-                            //     .first["image"],
-                            // // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
-                            // // image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
-                            //
-                            // imageKey: "imageExerciseLibrary",
-                            );
-                      }),
-                      SizedBox(
-                        height: media.height / 2.5,
-                        width: media.width,
-                        child: SafeArea(
-                          child: Column(
-                            children: [
-                              AppBar(
-                                toolbarHeight: ScreenUtil.verticalScale(5.1),
-                                surfaceTintColor: Colors.transparent,
-                                backgroundColor: Colors.transparent,
-                                centerTitle: true,
-                                leading: BackArrowWidget(
-                                  onPress: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-
-                                /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
-                                // Positioned(
-                                //   left: 0,
-                                //   child: BackArrowWidget(
-                                //     onPress: () {
-                                //       Navigator.pop(context);
-                                //     },
-                                //   ),
-                                // leading: SizedBox(),
-                                title: Text(
-                                  'Exercise Library',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: ScreenUtil.horizontalScale(5.5),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    Stack(
+                      children: <Widget>[
+                        // Container(
+                        //   height: media.height / 1,
+                        //   width: media.width,
+                        //   decoration: const BoxDecoration(
+                        //     image: DecorationImage(
+                        //       image: AssetImage('assets/img/back.jpg'),
+                        //       fit: BoxFit.cover,
+                        //       opacity: 1,
+                        //     ),
+                        //   ),
+                        // ),
+                        Consumer<DataProvider>(builder: (context, value, c) {
+                          return AppImage.imageExerciseLibrary(value
+                              // media,
+                              // image: dataProvider!.allImageList
+                              //     .where((element) =>
+                              //         element["key"] == "imageExerciseLibrary")
+                              //     .first["image"],
+                              // // dataProvider?.screenBackgroundResponse?.imageExerciseLibrary ?? "",
+                              // // image: dataProvider!.cachedImageMap["imageExerciseLibrary"],
+                              //
+                              // imageKey: "imageExerciseLibrary",
+                              );
+                        }),
+                        SizedBox(
+                          height: media.height / 2.5,
+                          width: media.width,
+                          child: SafeArea(
+                            child: Column(
+                              children: [
+                                AppBar(
+                                  toolbarHeight: ScreenUtil.verticalScale(5.1),
+                                  surfaceTintColor: Colors.transparent,
+                                  backgroundColor: Colors.transparent,
+                                  centerTitle: true,
+                                  leading: BackArrowWidget(
+                                    onPress: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
+
+                                  /// IF NEED TO ADD STICKY BACK BUTTON THEN WRAP MAIN WIDGET INTO STACK AND COMMENT LOADING BUTTON AND ADD SIZED BOX AND ADD POSITION INTO BOTTOM
+                                  // Positioned(
+                                  //   left: 0,
+                                  //   child: BackArrowWidget(
+                                  //     onPress: () {
+                                  //       Navigator.pop(context);
+                                  //     },
+                                  //   ),
+                                  // leading: SizedBox(),
+                                  title: Text(
+                                    'Exercise Library',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: ScreenUtil.horizontalScale(5.5),
+                                    ),
+                                  ),
+                                  actions: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: const CommonStreakWithNotification(
+                                          routeString: '/exerciseLibrary'),
+                                    )
+                                  ],
                                 ),
-                                actions: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: const CommonStreakWithNotification(
-                                        routeString: '/exerciseLibrary'),
-                                  )
-                                ],
-                              ),
-                              // Container(
-                              //   margin: const EdgeInsets.only(right: 10),
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              //     children: [
-                              //       BackArrowWidget(
-                              //         onPress: () {
-                              //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                              //           mainPageProvider.changeTab(2);
-                              //         },
-                              //       ),
-                              //       Text(
-                              //         'Exercise Library',
-                              //         style: TextStyle(
-                              //           color: Colors.white,
-                              //           fontSize: ScreenUtil.horizontalScale(5.5),
-                              //         ),
-                              //       ),
-                              //       const CommonStreakWithNotification(routeString: '/exerciseLibrary')
-                              //     ],
-                              //   ),
-                              // ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(7),
+                                // Container(
+                                //   margin: const EdgeInsets.only(right: 10),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       BackArrowWidget(
+                                //         onPress: () {
+                                //           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                                //           mainPageProvider.changeTab(2);
+                                //         },
+                                //       ),
+                                //       Text(
+                                //         'Exercise Library',
+                                //         style: TextStyle(
+                                //           color: Colors.white,
+                                //           fontSize: ScreenUtil.horizontalScale(5.5),
+                                //         ),
+                                //       ),
+                                //       const CommonStreakWithNotification(routeString: '/exerciseLibrary')
+                                //     ],
+                                //   ),
+                                // ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7),
+                                  ),
+                                  height: media.height * 0.19,
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: ScreenUtil.horizontalScale(1),
+                                        ),
+                                        SearchExerciseField(
+                                          onChanged: (query) {
+                                            setState(() {
+                                              _currentPage = 0;
+                                              _searchQuery =
+                                                  query; // Update the search query
+                                              _applyFilters(); // Reset pagination when searching
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil.horizontalScale(3),
+                                        ),
+                                        FilterSortButton(
+                                          selectedEquipmentIds:
+                                              _selectedEquipmentIds,
+                                          selectedCategoryIds:
+                                              _selectedCategoryIds,
+                                          selectedSortBy: _selectedSortBy,
+                                          equipments: dataProvider!
+                                              .adminEquipment
+                                              .map((e) => {
+                                                    'id': e.id,
+                                                    'title': e.title
+                                                  })
+                                              .toList(),
+                                          categories: dataProvider!
+                                              .adminCategory
+                                              .map((c) => {
+                                                    'id': c.id,
+                                                    'title': c.title
+                                                  })
+                                              .toList(),
+                                          onApplyFilters:
+                                              (String selectedEquipments,
+                                                  String selectedCategories,
+                                                  String sortBy) {
+                                            setState(() {
+                                              _selectedEquipmentIds =
+                                                  selectedEquipments;
+                                              _selectedCategoryIds =
+                                                  selectedCategories;
+                                              _selectedSortBy = sortBy;
+                                            });
+                                            _applyFilters(); // Apply the filters and sorting
+                                          },
+                                        ),
+                                      ]),
                                 ),
-                                height: media.height * 0.19,
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(1),
-                                      ),
-                                      SearchExerciseField(
-                                        onChanged: (query) {
-                                          setState(() {
-                                            _currentPage = 0;
-                                            _searchQuery =
-                                                query; // Update the search query
-                                            _applyFilters(); // Reset pagination when searching
-                                          });
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: ScreenUtil.horizontalScale(3),
-                                      ),
-                                      FilterSortButton(
-                                        selectedEquipmentIds:
-                                            _selectedEquipmentIds,
-                                        selectedCategoryIds:
-                                            _selectedCategoryIds,
-                                        selectedSortBy: _selectedSortBy,
-                                        equipments: dataProvider!.adminEquipment
-                                            .map((e) =>
-                                                {'id': e.id, 'title': e.title})
-                                            .toList(),
-                                        categories: dataProvider!.adminCategory
-                                            .map((c) =>
-                                                {'id': c.id, 'title': c.title})
-                                            .toList(),
-                                        onApplyFilters:
-                                            (String selectedEquipments,
-                                                String selectedCategories,
-                                                String sortBy) {
-                                          setState(() {
-                                            _selectedEquipmentIds =
-                                                selectedEquipments;
-                                            _selectedCategoryIds =
-                                                selectedCategories;
-                                            _selectedSortBy = sortBy;
-                                          });
-                                          _applyFilters(); // Apply the filters and sorting
-                                        },
-                                      ),
-                                    ]),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: media.height / 3.19,
+                        SizedBox(
+                          height: media.height / 3.19,
+                          width: media.width,
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: media.height / 11,
+                                width: media.width / 6,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: media.height / 3.2),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          minHeight: (media.height -
+                              (media.height / 3.2) -
+                              (media.height * 0.12)),
+                        ),
                         width: media.width,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: ClipPath(
-                            clipper: DiagonalClipper(),
-                            child: Container(
-                              height: media.height / 11,
-                              width: media.width / 6,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.only(
+                            topLeft:
+                                Radius.circular(ScreenUtil.verticalScale(7)),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: media.width,
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).scaffoldBackgroundColor,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(55),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: media.height / 3.2),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minHeight: (media.height -
-                            (media.height / 3.2) -
-                            (media.height * 0.12)),
-                      ),
-                      width: media.width,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: media.width,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(55),
-                              ),
-                            ),
-                            child: Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(6),
-                                vertical: ScreenUtil.verticalScale(2),
-                              ),
-                              child: loader
-                                  ? Container(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      height: media.height - media.height / 2.4,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.primaryColor,
-                                        ),
-                                      ),
-                                    )
-                                  : dataProvider!.adminExercises.isEmpty ||
-                                          _filteredExercises.isEmpty ||
-                                          loader
-                                      ? Container(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          height:
-                                              media.height - media.height / 2.4,
-                                          child: Center(
-                                            child: Text(
-                                              textAlign: TextAlign.center,
-                                              "No Exercises found matching your filters.\nPlease try again.",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge
-                                                      ?.color),
-                                            ),
+                              child: Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(6),
+                                  vertical: ScreenUtil.verticalScale(2),
+                                ),
+                                child: loader
+                                    ? Container(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        height:
+                                            media.height - media.height / 2.4,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.primaryColor,
                                           ),
-                                        )
-                                      : Column(
-                                          children: [
-                                            SizedBox(
-                                              height:
-                                                  ScreenUtil.verticalScale(2),
-                                            ),
-                                            Column(
-                                              children: _getPaginatedExercises()
-                                                  .map((exercise) {
-                                                return Column(
-                                                  children: [
-                                                    exerciseCard(
-                                                      exercise.id,
-                                                      exercise.title,
-                                                      exercise
-                                                          .thumbnail, // Dynamically display exercise titles
-                                                    ),
-                                                    SizedBox(
-                                                      height: ScreenUtil
-                                                          .verticalScale(2),
-                                                    ),
-                                                  ],
-                                                );
-                                              }).toList(),
-                                            ),
-                                            SizedBox(
-                                              height:
-                                                  ScreenUtil.verticalScale(2),
-                                            ),
-                                          ],
                                         ),
+                                      )
+                                    : dataProvider!.adminExercises.isEmpty ||
+                                            _filteredExercises.isEmpty ||
+                                            loader
+                                        ? Container(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            height: media.height -
+                                                media.height / 2.4,
+                                            child: Center(
+                                              child: Text(
+                                                textAlign: TextAlign.center,
+                                                "No Exercises found matching your filters.\nPlease try again.",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color),
+                                              ),
+                                            ),
+                                          )
+                                        : Column(
+                                            children: [
+                                              SizedBox(
+                                                height:
+                                                    ScreenUtil.verticalScale(2),
+                                              ),
+                                              Column(
+                                                children:
+                                                    _getPaginatedExercises()
+                                                        .map((exercise) {
+                                                  return Column(
+                                                    children: [
+                                                      exerciseCard(
+                                                        exercise.id,
+                                                        exercise.title,
+                                                        exercise
+                                                            .thumbnail, // Dynamically display exercise titles
+                                                      ),
+                                                      SizedBox(
+                                                        height: ScreenUtil
+                                                            .verticalScale(2),
+                                                      ),
+                                                    ],
+                                                  );
+                                                }).toList(),
+                                              ),
+                                              SizedBox(
+                                                height:
+                                                    ScreenUtil.verticalScale(2),
+                                              ),
+                                            ],
+                                          ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 50,
-                          )
-                        ],
+                            const SizedBox(
+                              height: 50,
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        bottomSheet: Container(
-          alignment: Alignment.center,
-          color: Theme.of(context).scaffoldBackgroundColor,
-          height: 65,
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 10),
-            child: _numPages > 0
-                ? NumberPaginator(
-                    numberPages: _numPages,
-                    config: const NumberPaginatorUIConfig(
-                      height: 48,
-                      buttonSelectedForegroundColor: AppColors.primaryColor,
-                      buttonUnselectedForegroundColor: Colors.grey,
-                      buttonUnselectedBackgroundColor: Colors.transparent,
-                      buttonSelectedBackgroundColor: Colors.transparent,
-                      contentPadding: EdgeInsets.zero,
-                      buttonTextStyle: TextStyle(fontSize: 16),
-                    ),
-                    onPageChange: (int index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                  )
-                : const SizedBox.shrink(),
+          bottomSheet: Container(
+            alignment: Alignment.center,
+            color: Theme.of(context).scaffoldBackgroundColor,
+            height: 65,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16)
+                  .copyWith(bottom: 10),
+              child: _numPages > 0
+                  ? NumberPaginator(
+                      numberPages: _numPages,
+                      config: const NumberPaginatorUIConfig(
+                        height: 48,
+                        buttonSelectedForegroundColor: AppColors.primaryColor,
+                        buttonUnselectedForegroundColor: Colors.grey,
+                        buttonUnselectedBackgroundColor: Colors.transparent,
+                        buttonSelectedBackgroundColor: Colors.transparent,
+                        contentPadding: EdgeInsets.zero,
+                        buttonTextStyle: TextStyle(fontSize: 16),
+                      ),
+                      onPageChange: (int index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ),
         ),
       ),

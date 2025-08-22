@@ -124,110 +124,495 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
     var media = MediaQuery.of(context).size;
     ScreenUtil.init(context);
 
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Stack(
-          children: [
-            captureScreenShot(media),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  height: media.height,
-                  width: media.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/img/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 1),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: Stack(
+            children: [
+              captureScreenShot(media),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                    height: media.height,
+                    width: media.width,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/img/back.jpg'),
+                          fit: BoxFit.cover,
+                          opacity: 1),
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              onPressed: () async {
+                                Navigator.pushNamed(
+                                    context, '/streak-calendar');
+                              },
+                              icon: Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.all(
+                                        ScreenUtil.verticalScale(0.65)),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black12,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white),
+                                    ),
+                                    child: Consumer<MonthProvider>(builder:
+                                        (context, monthProvider, child) {
+                                      return Text(
+                                        monthProvider.streak.toString(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              ScreenUtil.verticalScale(0.8),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  Icon(
+                                    Icons.local_fire_department_outlined,
+                                    color: Colors.white,
+                                    size: ScreenUtil.verticalScale(3),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil.horizontalScale(5),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: ScreenUtil.verticalScale(5)),
+                            Text(
+                              'Congratulations!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: ScreenUtil.horizontalScale(8.5),
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
+                            ),
+                            SizedBox(height: ScreenUtil.verticalScale(1)),
+                            Text(
+                              'You completed',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: ScreenUtil.verticalScale(1.9),
+                              ),
+                            ),
+                            SizedBox(height: ScreenUtil.verticalScale(0.8)),
+                            Text(
+                              "${ModalRoute.of(context)?.settings.arguments as String?}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: ScreenUtil.horizontalScale(6),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: SafeArea(
+              ),
+              Positioned(
+                bottom: 0,
                 child: Column(
                   children: [
+                    SizedBox(
+                      height: media.height / 2.449,
+                      width: media.width,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: ClipPath(
+                          clipper: DiagonalClipper(),
+                          child: Container(
+                            height: media.height / 11,
+                            width: media.width / 6,
+                            decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor),
+                          ),
+                        ),
+                      ),
+                    ),
                     Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      width: media.width,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
+                        ),
+                      ),
+                      child: Column(
                         children: [
-                          IconButton(
-                            onPressed: () async {
-                              Navigator.pushNamed(context, '/streak-calendar');
-                            },
-                            icon: Row(
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.verticalScale(3),
+                                vertical: ScreenUtil.verticalScale(2.5)),
+                            child: Column(
                               children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: EdgeInsets.all(
-                                      ScreenUtil.verticalScale(0.65)),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black12,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white),
+                                IconRow(
+                                  fromHomeScreen: false,
+                                  icons: List.generate(
+                                    formattedDates.length,
+                                    (index) => data.any((element) =>
+                                            DateFormat('yyyy-MM-dd').format(
+                                                    Utils.formattedDate(element
+                                                        .endTime!
+                                                        .toString())) ==
+                                                formattedDates[index] &&
+                                            element.status == Status.completed)
+                                        ? IconDataWithDot(
+                                            index: index,
+                                            day: last7Days[6 - index],
+                                            icon: Icons.check,
+                                            iconColor: Colors.white,
+                                            backgroundColor:
+                                                AppColors.primaryColor,
+                                            showDot: true,
+                                            dotColor: Colors.transparent)
+                                        : IconDataWithDot(
+                                            index: index,
+                                            day: last7Days[6 - index],
+                                            icon: Icons.close,
+                                            iconColor: Colors.white,
+                                            backgroundColor: Colors.blue,
+                                            showDot: true,
+                                            dotColor: Colors.transparent),
                                   ),
-                                  child: Consumer<MonthProvider>(
-                                      builder: (context, monthProvider, child) {
-                                    return Text(
-                                      monthProvider.streak.toString(),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: ScreenUtil.verticalScale(0.8),
-                                      ),
-                                    );
-                                  }),
                                 ),
-                                Icon(
-                                  Icons.local_fire_department_outlined,
-                                  color: Colors.white,
-                                  size: ScreenUtil.verticalScale(3),
-                                )
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil.horizontalScale(5),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: ScreenUtil.verticalScale(5)),
                           Text(
-                            'Congratulations!',
+                            "Here's an overview of your today's workout.",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: ScreenUtil.horizontalScale(8.5),
-                              fontWeight: FontWeight.bold,
-                              height: 1,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
+                              fontSize: ScreenUtil.horizontalScale(3.6),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: ScreenUtil.verticalScale(1)),
                           Text(
-                            'You completed',
+                            "Now recover and get ready for tomorrow!",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: ScreenUtil.verticalScale(1.9),
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
+                              fontSize: ScreenUtil.horizontalScale(3.6),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: ScreenUtil.verticalScale(0.8)),
-                          Text(
-                            "${ModalRoute.of(context)?.settings.arguments as String?}",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: ScreenUtil.horizontalScale(6),
+                          SizedBox(height: ScreenUtil.verticalScale(2.5)),
+                          GestureDetector(
+                            onTap: () {
+                              monthProvider?.updateGraphType("Exercise");
+                              Navigator.pushNamed(context, '/graphAndReports');
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.horizontalScale(8)),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil.verticalScale(4.1),
+                                  vertical: ScreenUtil.verticalScale(2)),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(ScreenUtil.verticalScale(3)),
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    spreadRadius: 2,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Exercises Completed',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.color,
+                                          fontSize: 16.5),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      "$exerciseCompleted",
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Color(0xFFDD1166),
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(8),
+                                vertical: ScreenUtil.verticalScale(2.5)),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // monthProvider?.updateGraphType("Weight");
+                                      // Navigator.pushNamed(
+                                      //     context, '/graphAndReports');
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                              ScreenUtil.verticalScale(2)),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(
+                                              ScreenUtil.verticalScale(3)),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 2,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Weight Lifted',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.color,
+                                                fontSize: 16.5),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Builder(
+                                            builder: (context) {
+                                              final cValue = isKg
+                                                  ? Utils.formatDouble(
+                                                      (totalWeight) *
+                                                          0.45359237)
+                                                  : totalWeight;
+                                              return Text(
+                                                "${NumberFormat.decimalPattern('en_US').format(double.parse("$cValue"))}${isKg ? 'kg' : 'lbs'}",
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                    color: Color(0xFFDD1166),
+                                                    fontSize: 17,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                    width: ScreenUtil.horizontalScale(4.5)),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // monthProvider?.updateGraphType("RIR");
+                                      //
+                                      // Navigator.pushNamed(
+                                      //     context, '/graphAndReports');
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                              ScreenUtil.verticalScale(2)),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(
+                                              ScreenUtil.verticalScale(3)),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 2,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Streak Achieved',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.color,
+                                                fontSize: 16.5),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Consumer<MonthProvider>(
+                                              builder: (context, value, c) {
+                                            return Text(
+                                              "${value.streak}",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                  color: Color(0xFFDD1166),
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500),
+                                            );
+                                          })
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil.horizontalScale(7)),
+                            child: ButtonWidget(
+                              text: "Back to Dashboard",
+                              // textColor: const Color(0x40000000),
+                              textColor: Colors.white,
+                              onPress: () {
+                                if (monthProvider!.isPumpDay) {
+                                  monthProvider?.checkForPumpDay();
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                } else {
+                                  monthProvider?.checkForPumpDay();
+                                  mainPageProvider?.changeTab(0);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/home', (route) => false);
+                                }
+                                // HapticFeedBack.buttonClick();
+
+                                // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              },
+                              // color: const Color(0xC0FFFFFF),
+                              color: AppColors.primaryColor,
+                              isLoading: false,
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.horizontalScale(7))
+                                .copyWith(
+                                    bottom: Platform.isIOS
+                                        ? ScreenUtil.verticalScale(3)
+                                        : ScreenUtil.verticalScale(2),
+                                    top: ScreenUtil.verticalScale(1)),
+                            child: GestureDetector(
+                              onTap: isOnTap
+                                  ? null
+                                  : () async {
+                                      HapticFeedBack.buttonClick();
+                                      updateOnTap(true);
+                                      try {
+                                        await screenshotController
+                                            .capture(
+                                                delay:
+                                                    Duration(milliseconds: 200))
+                                            .then(
+                                          (image) async {
+                                            if (image == null) return;
+                                            final directory =
+                                                await getTemporaryDirectory();
+                                            final imagePath = File(
+                                                '${directory.path}/screenshot.png');
+                                            await imagePath.writeAsBytes(image);
+                                            await Share.shareXFiles([
+                                              XFile(imagePath.path)
+                                            ], text: 'I just completed ${ModalRoute.of(context)?.settings.arguments as String?} of Booty By Bret! Join me in the app at https://bootybybret.com')
+                                                .then(
+                                              (value) {
+                                                updateOnTap(false);
+                                              },
+                                            );
+                                          },
+                                        );
+                                      } catch (e) {
+                                        debugPrint(
+                                            'Error capturing and sharing screenshot: $e');
+                                      }
+                                    },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: ScreenUtil.verticalScale(1.7),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.blueColor,
+                                  borderRadius: Utils.buttonRadius,
+                                ),
+                                child: Center(
+                                  child: isOnTap
+                                      ? SizedBox(
+                                          width: ScreenUtil.verticalScale(3.2),
+                                          height: ScreenUtil.verticalScale(3.2),
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.0,
+                                          ))
+                                      : Text(
+                                          "Share",
+                                          style: TextStyle(
+                                            fontSize:
+                                                ScreenUtil.verticalScale(2.2),
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -236,380 +621,8 @@ class _DayCompletedPageState extends State<DayCompletedPage> {
                   ],
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 0,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: media.height / 2.449,
-                    width: media.width,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: ClipPath(
-                        clipper: DiagonalClipper(),
-                        child: Container(
-                          height: media.height / 11,
-                          width: media.width / 6,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: media.width,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ScreenUtil.verticalScale(7)),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.verticalScale(3),
-                              vertical: ScreenUtil.verticalScale(2.5)),
-                          child: Column(
-                            children: [
-                              IconRow(
-                                fromHomeScreen: false,
-                                icons: List.generate(
-                                  formattedDates.length,
-                                  (index) => data.any((element) =>
-                                          DateFormat('yyyy-MM-dd').format(
-                                                  Utils.formattedDate(element
-                                                      .endTime!
-                                                      .toString())) ==
-                                              formattedDates[index] &&
-                                          element.status == Status.completed)
-                                      ? IconDataWithDot(
-                                          index: index,
-                                          day: last7Days[6 - index],
-                                          icon: Icons.check,
-                                          iconColor: Colors.white,
-                                          backgroundColor:
-                                              AppColors.primaryColor,
-                                          showDot: true,
-                                          dotColor: Colors.transparent)
-                                      : IconDataWithDot(
-                                          index: index,
-                                          day: last7Days[6 - index],
-                                          icon: Icons.close,
-                                          iconColor: Colors.white,
-                                          backgroundColor: Colors.blue,
-                                          showDot: true,
-                                          dotColor: Colors.transparent),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          "Here's an overview of your today's workout.",
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
-                            fontSize: ScreenUtil.horizontalScale(3.6),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          "Now recover and get ready for tomorrow!",
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
-                            fontSize: ScreenUtil.horizontalScale(3.6),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: ScreenUtil.verticalScale(2.5)),
-                        GestureDetector(
-                          onTap: () {
-                            monthProvider?.updateGraphType("Exercise");
-                            Navigator.pushNamed(context, '/graphAndReports');
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.horizontalScale(8)),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil.verticalScale(4.1),
-                                vertical: ScreenUtil.verticalScale(2)),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(ScreenUtil.verticalScale(3)),
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  spreadRadius: 2,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Exercises Completed',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.color,
-                                        fontSize: 16.5),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "$exerciseCompleted",
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Color(0xFFDD1166),
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(8),
-                              vertical: ScreenUtil.verticalScale(2.5)),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // monthProvider?.updateGraphType("Weight");
-                                    // Navigator.pushNamed(
-                                    //     context, '/graphAndReports');
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: ScreenUtil.verticalScale(2)),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            ScreenUtil.verticalScale(3)),
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Weight Lifted',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.color,
-                                              fontSize: 16.5),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Builder(
-                                          builder: (context) {
-                                            final cValue = isKg
-                                                ? Utils.formatDouble(
-                                                    (totalWeight) * 0.45359237)
-                                                : totalWeight;
-                                            return Text(
-                                              "${NumberFormat.decimalPattern('en_US').format(double.parse("$cValue"))}${isKg ? 'kg' : 'lbs'}",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                  color: Color(0xFFDD1166),
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w500),
-                                            );
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: ScreenUtil.horizontalScale(4.5)),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // monthProvider?.updateGraphType("RIR");
-                                    //
-                                    // Navigator.pushNamed(
-                                    //     context, '/graphAndReports');
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: ScreenUtil.verticalScale(2)),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            ScreenUtil.verticalScale(3)),
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          spreadRadius: 2,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Streak Achieved',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.color,
-                                              fontSize: 16.5),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Consumer<MonthProvider>(
-                                            builder: (context, value, c) {
-                                          return Text(
-                                            "${value.streak}",
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                                color: Color(0xFFDD1166),
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500),
-                                          );
-                                        })
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil.horizontalScale(7)),
-                          child: ButtonWidget(
-                            text: "Back to Dashboard",
-                            // textColor: const Color(0x40000000),
-                            textColor: Colors.white,
-                            onPress: () {
-                              if (monthProvider!.isPumpDay) {
-                                monthProvider?.checkForPumpDay();
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              } else {
-                                monthProvider?.checkForPumpDay();
-                                mainPageProvider?.changeTab(0);
-                                Navigator.pushNamedAndRemoveUntil(
-                                    context, '/home', (route) => false);
-                              }
-                              // HapticFeedBack.buttonClick();
-
-                              // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                            },
-                            // color: const Color(0xC0FFFFFF),
-                            color: AppColors.primaryColor,
-                            isLoading: false,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.horizontalScale(7))
-                              .copyWith(
-                                  bottom: ScreenUtil.verticalScale(3),
-                                  top: ScreenUtil.verticalScale(1)),
-                          child: GestureDetector(
-                            onTap: isOnTap
-                                ? null
-                                : () async {
-                                    HapticFeedBack.buttonClick();
-                                    updateOnTap(true);
-                                    try {
-                                      await screenshotController
-                                          .capture(
-                                              delay:
-                                                  Duration(milliseconds: 200))
-                                          .then(
-                                        (image) async {
-                                          if (image == null) return;
-                                          final directory =
-                                              await getTemporaryDirectory();
-                                          final imagePath = File(
-                                              '${directory.path}/screenshot.png');
-                                          await imagePath.writeAsBytes(image);
-                                          await Share.shareXFiles([
-                                            XFile(imagePath.path)
-                                          ], text: 'I just completed ${ModalRoute.of(context)?.settings.arguments as String?} of Booty By Bret! Join me in the app at https://bootybybret.com')
-                                              .then(
-                                            (value) {
-                                              updateOnTap(false);
-                                            },
-                                          );
-                                        },
-                                      );
-                                    } catch (e) {
-                                      debugPrint(
-                                          'Error capturing and sharing screenshot: $e');
-                                    }
-                                  },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: ScreenUtil.verticalScale(1.7),
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.blueColor,
-                                borderRadius: Utils.buttonRadius,
-                              ),
-                              child: Center(
-                                child: isOnTap
-                                    ? SizedBox(
-                                        width: ScreenUtil.verticalScale(3.2),
-                                        height: ScreenUtil.verticalScale(3.2),
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2.0,
-                                        ))
-                                    : Text(
-                                        "Share",
-                                        style: TextStyle(
-                                          fontSize:
-                                              ScreenUtil.verticalScale(2.2),
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

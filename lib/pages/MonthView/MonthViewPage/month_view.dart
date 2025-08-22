@@ -187,13 +187,16 @@ class _MonthViewState extends State<MonthView> {
           clipBehavior: Clip.none,
           children: [
             Consumer<DataProvider>(builder: (context, value, c) {
-              return AppImage.imageMonthView(
-                value,
-                // media,
-                // image: dataProvider!.allImageList
-                //     .where((element) => element["key"] == "imageMonthView")
-                //     .first["image"],
-                // imageKey: "imageMonthView",
+              return SizedBox(
+                height: ScreenUtil.verticalScale(97),
+                child: AppImage.imageMonthView(
+                  value,
+                  // media,
+                  // image: dataProvider!.allImageList
+                  //     .where((element) => element["key"] == "imageMonthView")
+                  //     .first["image"],
+                  // imageKey: "imageMonthView",
+                ),
               );
             }),
             RefreshIndicator(
@@ -445,7 +448,7 @@ class _MonthViewState extends State<MonthView> {
                           ),
                         ),
                         margin: EdgeInsets.only(
-                            top: media.height / 3.23 +
+                            top: media.height / 3.229 +
                                 ScreenUtil.verticalScale(4) +
                                 MediaQuery.of(context).padding.top),
                         child: Column(

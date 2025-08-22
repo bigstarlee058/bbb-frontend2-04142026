@@ -460,29 +460,32 @@ Future<void> showCupertinoHeightPicker({
     context: context,
     barrierColor: barrierColor,
     builder: (context) {
-      return SafeArea(
-        top: false,
-        bottom: Platform.isAndroid ? true : false,
-        child: Theme(
-          data: Theme.of(context)
-              .copyWith(primaryColor: Theme.of(context).cardColor),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
-              topRight: Radius.circular(ScreenUtil.verticalScale(2.5)),
-            ),
-            child: SizedBox(
-              height: modalHeight,
-              width: maxModalWidth ?? double.infinity,
-              child: ColoredBox(
-                color: Theme.of(context).cardColor,
-                child: HeightPicker(
-                  key: key,
-                  initialHeight: initialHeight,
-                  initialSelectedHeightUnit: initialSelectedHeightUnit,
-                  showSeparationText: showSeparationText,
-                  canConvertUnit: canConvertUnit,
-                  onHeightChanged: onHeightChanged,
+      return Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SafeArea(
+          top: false,
+          bottom: Platform.isAndroid ? true : false,
+          child: Theme(
+            data: Theme.of(context)
+                .copyWith(primaryColor: Theme.of(context).cardColor),
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(ScreenUtil.verticalScale(2.5)),
+                topRight: Radius.circular(ScreenUtil.verticalScale(2.5)),
+              ),
+              child: SizedBox(
+                height: modalHeight,
+                width: maxModalWidth ?? double.infinity,
+                child: ColoredBox(
+                  color: Theme.of(context).cardColor,
+                  child: HeightPicker(
+                    key: key,
+                    initialHeight: initialHeight,
+                    initialSelectedHeightUnit: initialSelectedHeightUnit,
+                    showSeparationText: showSeparationText,
+                    canConvertUnit: canConvertUnit,
+                    onHeightChanged: onHeightChanged,
+                  ),
                 ),
               ),
             ),

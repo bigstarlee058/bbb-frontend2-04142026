@@ -100,192 +100,203 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Form(
-          key: _formKey,
-          child: Stack(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Consumer<DataProvider>(builder: (context, value, c) {
-                    return AppImage.imageForgot(
-                      value,
-                      // media,
-                      // image: dataProvider!.allImageList
-                      //     .where((element) => element["key"] == "imageForgot")
-                      //     .first["image"],
-                      // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
-                      // // image: dataProvider!.cachedImageMap["imageForgot"],
-                      // imageKey: "imageForgot",
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: SafeArea(
-                              child: BackArrowWidget(onPress: () {
-                                Navigator.pop(context);
-                              }),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Form(
+            key: _formKey,
+            child: Stack(
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Consumer<DataProvider>(builder: (context, value, c) {
+                      return AppImage.imageForgot(
+                        value,
+                        // media,
+                        // image: dataProvider!.allImageList
+                        //     .where((element) => element["key"] == "imageForgot")
+                        //     .first["image"],
+                        // // dataProvider?.screenBackgroundResponse?.imageForgot ?? "",
+                        // // image: dataProvider!.cachedImageMap["imageForgot"],
+                        // imageKey: "imageForgot",
+                        child: Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: SafeArea(
+                                child: BackArrowWidget(onPress: () {
+                                  Navigator.pop(context);
+                                }),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  })
-                ],
-              ),
-              Positioned(
-                top: ScreenUtil.horizontalScale(50),
-                child: Container(
-                  // height: 120,
-                  height: ScreenUtil.verticalScale(15),
-                  width: media.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/img/bbb-logo.png'),
-                        fit: BoxFit.fitHeight,
-                        opacity: 1),
+                          ],
+                        ),
+                      );
+                    })
+                  ],
+                ),
+                Positioned(
+                  top: ScreenUtil.horizontalScale(50),
+                  child: Container(
+                    // height: 120,
+                    height: ScreenUtil.verticalScale(15),
+                    width: media.width,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/img/bbb-logo.png'),
+                          fit: BoxFit.fitHeight,
+                          opacity: 1),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                  bottom: -0.7,
-                  child: Column(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ClipPath(
-                            clipper: DiagonalClipper(),
-                            child: Container(
-                              height: media.height / 9.8,
-                              width: media.width / 6,
+                Positioned(
+                    bottom: -0.7,
+                    child: Column(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: media.height / 9.8,
+                                width: media.width / 6,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: media.width,
                               decoration: BoxDecoration(
                                 color:
                                     Theme.of(context).scaffoldBackgroundColor,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(
+                                      ScreenUtil.verticalScale(7)),
+                                ),
                               ),
-                            ),
-                          ),
-                          Container(
-                            width: media.width,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(
-                                    ScreenUtil.verticalScale(7)),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil.verticalScale(4.4)),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(3.2),
-                                  ),
-                                  Text(
-                                    'Set your password',
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil.verticalScale(3.32),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: ScreenUtil.verticalScale(4.4)),
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(3.2),
+                                    ),
+                                    Text(
+                                      'Set your password',
+                                      style: TextStyle(
+                                        fontSize:
+                                            ScreenUtil.verticalScale(3.32),
+                                        color: AppColors.primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(2.5),
+                                    ),
+                                    AppTextFormField(
+                                      hintText: 'Password',
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.next,
+                                      onChanged: (value) {},
+                                      controller: passwordController,
+                                      suffixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15),
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          style: ButtonStyle(
+                                            minimumSize:
+                                                WidgetStateProperty.all(
+                                              const Size(48, 48),
+                                            ),
+                                          ),
+                                          icon: Icon(
+                                            Icons.email,
+                                            color: Colors.grey.shade400,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: ScreenUtil.verticalScale(2),
+                                    ),
+                                    AppTextFormField(
+                                      hintText: 'Confirm Password',
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.done,
+                                      onChanged: (value) {},
+                                      // validator: (value) {
+                                      //   return value!.isEmpty
+                                      //       ? 'Please, Enter Email Address'
+                                      //       : AppConstants.emailRegex.hasMatch(value)
+                                      //           ? null
+                                      //           : 'Invalid Email Address';
+                                      // },
+                                      controller: cPasswordController,
+                                      suffixIcon: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 15),
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          style: ButtonStyle(
+                                            minimumSize:
+                                                WidgetStateProperty.all(
+                                              const Size(48, 48),
+                                            ),
+                                          ),
+                                          icon: Icon(
+                                            Icons.email,
+                                            color: Colors.grey.shade400,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: ScreenUtil.horizontalScale(7),
+                                    ),
+                                    ButtonWidget(
+                                      text: 'Set Password',
+                                      textColor: Colors.white,
                                       color: AppColors.primaryColor,
-                                      fontWeight: FontWeight.bold,
+                                      onPress: loader
+                                          ? () {}
+                                          : () {
+                                              if (_formKey.currentState
+                                                      ?.validate() ==
+                                                  true) {
+                                                resetPassword(
+                                                  passwordController.text,
+                                                  cPasswordController.text,
+                                                );
+                                              }
+                                            },
+                                      isLoading: loader,
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(2.5),
-                                  ),
-                                  AppTextFormField(
-                                    hintText: 'Password',
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.next,
-                                    onChanged: (value) {},
-                                    controller: passwordController,
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 15),
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        style: ButtonStyle(
-                                          minimumSize: WidgetStateProperty.all(
-                                            const Size(48, 48),
-                                          ),
-                                        ),
-                                        icon: Icon(
-                                          Icons.email,
-                                          color: Colors.grey.shade400,
-                                        ),
-                                      ),
+                                    SizedBox(
+                                      height: Platform.isAndroid
+                                          ? ScreenUtil.verticalScale(3)
+                                          : ScreenUtil.verticalScale(4),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(2),
-                                  ),
-                                  AppTextFormField(
-                                    hintText: 'Confirm Password',
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.done,
-                                    onChanged: (value) {},
-                                    // validator: (value) {
-                                    //   return value!.isEmpty
-                                    //       ? 'Please, Enter Email Address'
-                                    //       : AppConstants.emailRegex.hasMatch(value)
-                                    //           ? null
-                                    //           : 'Invalid Email Address';
-                                    // },
-                                    controller: cPasswordController,
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 15),
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        style: ButtonStyle(
-                                          minimumSize: WidgetStateProperty.all(
-                                            const Size(48, 48),
-                                          ),
-                                        ),
-                                        icon: Icon(
-                                          Icons.email,
-                                          color: Colors.grey.shade400,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: ScreenUtil.horizontalScale(7),
-                                  ),
-                                  ButtonWidget(
-                                    text: 'Set Password',
-                                    textColor: Colors.white,
-                                    color: AppColors.primaryColor,
-                                    onPress: loader
-                                        ? () {}
-                                        : () {
-                                            if (_formKey.currentState
-                                                    ?.validate() ==
-                                                true) {
-                                              resetPassword(
-                                                passwordController.text,
-                                                cPasswordController.text,
-                                              );
-                                            }
-                                          },
-                                    isLoading: loader,
-                                  ),
-                                  SizedBox(
-                                    height: ScreenUtil.verticalScale(4),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ))
-            ],
+                          ],
+                        ),
+                      ],
+                    ))
+              ],
+            ),
           ),
         ),
       ),

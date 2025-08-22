@@ -776,8 +776,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                             "0";
                                                         setState(() {});
                                                       }
-                                                      // await weightOnTap(
-                                                      //     context);
                                                     },
                                                     onEditingComplete: () {
                                                       if (_weightController
@@ -798,14 +796,17 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                       if (value.isEmpty) {
                                                         _weightController.text =
                                                             "0";
-                                                        setState(() {});
                                                       }
                                                       if (_weightController
                                                           .text.isEmpty) {
                                                         _weightController.text =
                                                             "0";
-                                                        setState(() {});
                                                       }
+
+                                                      _weightController.text =
+                                                          value.replaceAll(
+                                                              ",", ".");
+                                                      setState(() {});
                                                     },
                                                     // inputFormatters: [
                                                     //   FilteringTextInputFormatter
@@ -899,8 +900,7 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                             .isAndroid
                                                         ?*/
                                                     TextInputType
-                                                        .numberWithOptions(
-                                                            decimal: true)
+                                                        .numberWithOptions()
                                                 /*: const TextInputType
                                                             .numberWithOptions(
                                                             decimal: false,
@@ -1207,7 +1207,8 @@ class WeightInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    String text = newValue.text;
+    String text = newValue.text.replaceAll(',', '.');
+
     if (!RegExp(r'^\d*\.?\d*$').hasMatch(text)) {
       return oldValue;
     }

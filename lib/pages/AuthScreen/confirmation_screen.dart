@@ -31,55 +31,57 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Consumer<DataProvider>(builder: (context, value, c) {
-                  return AppImage.imageEmailConfirm(
-                    value,
-                    // media,
-                    // image: dataProvider!.allImageList
-                    //     .where((element) => element["key"] == "imageEmailConfirm")
-                    //     .first["image"],
-                    // // image: dataProvider!.cachedImageMap["imageEmailConfirm"],
-                    // imageKey: "imageEmailConfirm",
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: SafeArea(
-                            child: BackArrowWidget(onPress: () {
-                              Navigator.pop(context);
-                            }),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Consumer<DataProvider>(builder: (context, value, c) {
+                    return AppImage.imageEmailConfirm(
+                      value,
+                      // media,
+                      // image: dataProvider!.allImageList
+                      //     .where((element) => element["key"] == "imageEmailConfirm")
+                      //     .first["image"],
+                      // // image: dataProvider!.cachedImageMap["imageEmailConfirm"],
+                      // imageKey: "imageEmailConfirm",
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: SafeArea(
+                              child: BackArrowWidget(onPress: () {
+                                Navigator.pop(context);
+                              }),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                })
-              ],
-            ),
-            Positioned(
-              top: ScreenUtil.horizontalScale(38),
-              child: Container(
-                height: ScreenUtil.verticalScale(15),
-                width: media.width,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/img/bbb-logo.png'),
-                      fit: BoxFit.fitHeight,
-                      opacity: 1),
+                        ],
+                      ),
+                    );
+                  })
+                ],
+              ),
+              Positioned(
+                top: ScreenUtil.horizontalScale(38),
+                child: Container(
+                  height: ScreenUtil.verticalScale(15),
+                  width: media.width,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/img/bbb-logo.png'),
+                        fit: BoxFit.fitHeight,
+                        opacity: 1),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
+              Positioned(
                 bottom: -1.3,
                 child: Container(
                   width: media.width,
@@ -186,15 +188,19 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                               ),
                             ),
                             SizedBox(
-                              height: ScreenUtil.horizontalScale(10),
+                              height: Platform.isAndroid
+                                  ? ScreenUtil.horizontalScale(4)
+                                  : ScreenUtil.horizontalScale(10),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                ))
-          ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

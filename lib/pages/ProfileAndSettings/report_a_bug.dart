@@ -67,90 +67,93 @@ class _ReportABugScreenState extends State<ReportABugScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      bottom: Platform.isAndroid ? true : false,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: BackArrowWidget(onPress: () => Navigator.pop(context)),
-          toolbarHeight: ScreenUtil.verticalScale(5.1),
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          title: Text(
-            'Report a Bug',
-            style: TextStyle(
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-              fontSize: ScreenUtil.verticalScale(2.3),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        bottom: Platform.isAndroid ? true : false,
+        child: Scaffold(
+          appBar: AppBar(
+            leading: BackArrowWidget(onPress: () => Navigator.pop(context)),
+            toolbarHeight: ScreenUtil.verticalScale(5.1),
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            title: Text(
+              'Report a Bug',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontSize: ScreenUtil.verticalScale(2.3),
+              ),
             ),
           ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: EdgeInsets.only(
-            bottom: ScreenUtil.verticalScale(3.2),
-            right: ScreenUtil.horizontalScale(7),
-            left: ScreenUtil.horizontalScale(7),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Consumer<DataProvider>(builder: (context, value, child) {
-                return ButtonWidget(
-                  text: "Submit",
-                  textColor: Colors.white,
-                  color: AppColors.primaryColor,
-                  onPress: () async {
-                    if (titleController.text.isEmpty &&
-                        descriptionController.text.isEmpty) {
-                      showBottomAlert(context, "Please enter details");
-                    } else if (titleController.text.isEmpty) {
-                      showBottomAlert(context, "Please enter title");
-                    } else if (descriptionController.text.isEmpty) {
-                      showBottomAlert(context, "Please enter description");
-                    } else {
-                      bool val = await value.addOwnSpotlight(
-                        titleController.text.trim(),
-                        descriptionController.text.trim(),
-                        image,
-                        isFromReport: true,
-                        osVersion: mobileVersion,
-                        appVersion: appVersion,
-                      );
-                      if (val == true) {
-                        Fluttertoast.showToast(
-                          msg: "Feedback submitted successfully!",
-                          toastLength: Toast.LENGTH_LONG,
-                          gravity: ToastGravity.TOP_RIGHT,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: AppColors.primaryColor,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
-                        );
-                        Navigator.pop(context);
+          bottomNavigationBar: Padding(
+            padding: EdgeInsets.only(
+              bottom: ScreenUtil.verticalScale(3.2),
+              right: ScreenUtil.horizontalScale(7),
+              left: ScreenUtil.horizontalScale(7),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Consumer<DataProvider>(builder: (context, value, child) {
+                  return ButtonWidget(
+                    text: "Submit",
+                    textColor: Colors.white,
+                    color: AppColors.primaryColor,
+                    onPress: () async {
+                      if (titleController.text.isEmpty &&
+                          descriptionController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter details");
+                      } else if (titleController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter title");
+                      } else if (descriptionController.text.isEmpty) {
+                        showBottomAlert(context, "Please enter description");
                       } else {
-                        Fluttertoast.showToast(
-                          msg: "Failed to submit feedback, Please try again!",
-                          toastLength: Toast.LENGTH_LONG,
-                          gravity: ToastGravity.TOP_RIGHT,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: AppColors.primaryColor,
-                          textColor: Colors.white,
-                          fontSize: 16.0,
+                        bool val = await value.addOwnSpotlight(
+                          titleController.text.trim(),
+                          descriptionController.text.trim(),
+                          image,
+                          isFromReport: true,
+                          osVersion: mobileVersion,
+                          appVersion: appVersion,
                         );
+                        if (val == true) {
+                          Fluttertoast.showToast(
+                            msg: "Feedback submitted successfully!",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.TOP_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: AppColors.primaryColor,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                          Navigator.pop(context);
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Failed to submit feedback, Please try again!",
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.TOP_RIGHT,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: AppColors.primaryColor,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        }
                       }
-                    }
-                  },
-                  isLoading: value.storyLoader,
-                );
-              }),
-            ],
+                    },
+                    isLoading: value.storyLoader,
+                  );
+                }),
+              ],
+            ),
           ),
-        ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
-          child: form(),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: ScreenUtil.horizontalScale(6)),
+            child: form(),
+          ),
         ),
       ),
     );

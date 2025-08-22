@@ -163,12 +163,11 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     }
 
     return Container(
-      color: Colors.white,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         top: false,
         bottom: Platform.isAndroid ? true : false,
         child: Scaffold(
-          backgroundColor: Colors.white,
           body: Consumer<DataProvider>(builder: (context, dataProvider, c) {
             return Stack(
               clipBehavior: Clip.none,
@@ -318,7 +317,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: ScreenUtil.horizontalScale(7.2),
+                                    height: Platform.isAndroid
+                                        ? ScreenUtil.horizontalScale(3.2)
+                                        : ScreenUtil.horizontalScale(7.2),
                                   ),
                                 ],
                               ),

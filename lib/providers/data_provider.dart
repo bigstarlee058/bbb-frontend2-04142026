@@ -838,7 +838,6 @@ class DataProvider extends ChangeNotifier {
   Future fetchMonthWorkouts(int month) async {
     final Dio dio = Dio();
     final String url = '${AppConstants.serverUrl}/api/workouts/current';
-    print("11================::::::::::::${DateTime.now()}");
     try {
       DateTime now = await NTP.now();
 
@@ -861,14 +860,9 @@ class DataProvider extends ChangeNotifier {
           },
         ),
       );
-      print("22================::::::::::::${DateTime.now()}");
 
       if (response.statusCode == 200 && response.data != null) {
-        print("33================::::::::::::${DateTime.now()}");
-
         await getMonthInfoFromJson(responseData: response.data);
-        print("44================::::::::::::${DateTime.now()}");
-
         notifyListeners();
       } else {
         await getMonthInfoFromJson();
@@ -1002,239 +996,15 @@ class DataProvider extends ChangeNotifier {
         await preferences.putString(
             "${SplitType.split5}-${monthDataModelSplit5.id}",
             jsonEncode(monthDataModelSplit5));
-        // final dataList = [];
-
-        // for (var element in monthDataModelSplit3.weeks ?? []) {
-        //   final data =
-        //       await monthProvider?.fetchRestDay(element.restdayId ?? "");
-        //   dataList.add(data);
-        //   await preferences.putString(
-        //       "REST-${monthDataModelSplit3.id}", jsonEncode(dataList));
-        // }
 
         final value = await DatabaseHelper().areAllTablesEmpty();
 
-        /*if (value) {
-          log('responseData=========5=========>>>>>${DateTime.now()}');
-
-          List<MonthEnrollmentDataModel> monthEnrollment = await ApiRepo.fetchMonthEnrollment();
-          if (monthEnrollment.isNotEmpty) {
-            for (var element in monthEnrollment) {
-              final body = {
-                "monthId": element.id ?? "",
-                "monthStartDate": element.startDate.toString(),
-                "monthEndDate": element.endDate.toString(),
-              };
-              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.monthHistory);
-            }
-          } else {
-            MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel.firstWhere(
-                (element) => element.monthId == monthDataModelSplit3.id,
-                orElse: () => MonthResponseModel());
-
-            final data = {
-              "monthId": monthDataModelSplit3.id,
-              "monthStartDate": monthDataModelSplit3.startDate.toString(),
-              "monthEndDate": monthDataModelSplit3.endDate.toString()
-            };
-
-            if (matchingElement?.id == null) {
-              await DatabaseHelper().insertData(data: data, tableName: DatabaseHelper.monthHistory);
-            }
-          }
-
-          // log('responseData=========6=========>>>>>${DateTime.now()}');
-          //
-          // List<AchievementsDataModel> achievementsData = await ApiRepo.fetchAchievementsList();
-          // if (achievementsData.isNotEmpty) {
-          //   for (var element in achievementsData) {
-          //     final body = {
-          //       "achievementsTitle": element.achievementsTitle ?? "",
-          //       "achievementsSubtitle": element.achievementsSubtitle ?? "",
-          //       "achievementsDate": element.achievementsDate.toString(),
-          //     };
-          //     await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.achievementHistory);
-          //   }
-          // }
-
-          log('responseData=========7=========>>>>>${DateTime.now()}');
-
-          StreakDataModel? streakDataModel = await ApiRepo.fetchStreakCount();
-          await preferences.putInt(SharedPreference.lastStreakCount, int.parse((streakDataModel?.count ?? "0")));
-
-          List<DayStatusDataModel> dayStatus = await ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? "");
-
-          if (dayStatus.isNotEmpty) {
-            for (var element in dayStatus) {
-              final body = {
-                "title": element.title ?? "",
-                "dataId": element.dataId ?? " ",
-                "monthId": element.monthId ?? "",
-                "weekId": element.weekId ?? "",
-                "dayId": element.dayId ?? "",
-                "split": element.split ?? "",
-                "date": element.date ?? "",
-                "status": element.status ?? "",
-                "type": element.type ?? "",
-                "startTime": element.startTime ?? "",
-                "endTime": element.endTime ?? "",
-                "completedExercise": element.completedExerciseCount ?? "",
-                "totalWeight": element.totalWeight ?? "",
-                "averageRIR": element.averageRIR ?? "",
-              };
-              await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.dayStatus);
-            }
-            log('responseData=========8=========>>>>>${DateTime.now()}');
-
-            List<ExerciseHistoryDataModel> exerciseHistroy =
-                await ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? "");
-            if (exerciseHistroy.isNotEmpty) {
-              for (var element in exerciseHistroy) {
-                final body = {
-                  "split": element.split ?? "",
-                  "dataId": element.dataId ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "extraId": element.extraId ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "sets": element.sets?.toString() ?? "",
-                  "reps": element.reps?.toString() ?? "",
-                  "weight": element.weight?.toString() ?? "",
-                  "rest": element.rest?.toString() ?? "",
-                  "load": element.load?.toString() ?? "",
-                  "type": element.type ?? "",
-                  "effort": element.effort?.toString() ?? "",
-                  "date": element.date?.toString() ?? "",
-                  "index": int.parse(element.index ?? "0"),
-                  "subIndex": int.parse(element.subIndex ?? ""),
-                  "status": element.status ?? "",
-                  "totalSet": element.totalSet?.toString() ?? "",
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
-              }
-            }
-            log('responseData=========9=========>>>>>${DateTime.now()}');
-
-            List<ExerciseStatusDataModel> exerciseStatus =
-                await ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? "");
-            if (exerciseStatus.isNotEmpty) {
-              for (var element in exerciseStatus) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "split": element.split ?? "",
-                  "date": element.date ?? "",
-                  "status": element.status ?? "",
-                  "type": element.type ?? "",
-                  "totalWeight": element.totalWeight ?? "",
-                  "totalSet": element.totalSet ?? "",
-                  "totalRIR": element.totalRIR ?? "",
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
-              }
-            }
-            log('responseData=========10=========>>>>>${DateTime.now()}');
-
-            List<ExerciseNotesDataModel> exerciseNotes = await ApiRepo.fetchExerciseNotes();
-            if (exerciseNotes.isNotEmpty) {
-              for (var element in exerciseNotes) {
-                final body = {
-                  "exerciseId": element.exerciseId ?? "",
-                  "date": element.date ?? "",
-                  "note": element.note ?? "",
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.exerciseNotes);
-              }
-            }
-            log('responseData=========11=========>>>>>${DateTime.now()}');
-
-            List<ExtraSetDataModel> extraSet = await ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? "");
-            if (extraSet.isNotEmpty) {
-              for (var element in extraSet) {
-                final body = {
-                  "sets": int.parse(element.sets ?? ""),
-                  "reps": int.parse(element.reps ?? ""),
-                  "weight": int.parse(element.weight ?? ""),
-                  "rest": int.parse(element.reps ?? ""),
-                  "load": int.parse(element.load ?? ""),
-                  "type": int.parse(element.type ?? ""),
-                  "extraId": "${element.extraId}",
-                  "date": element.date,
-                  "dataId": element.dataId,
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraSetHistory);
-              }
-            }
-            log('responseData=========12=========>>>>>${DateTime.now()}');
-
-            List<RemovedExerciseDataModel> removedExercise =
-                await ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? "");
-            if (removedExercise.isNotEmpty) {
-              for (var element in removedExercise) {
-                final body = {
-                  "exerciseId": element.exerciseId ?? "",
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dataId ?? "",
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
-              }
-            }
-            log('responseData=========13=========>>>>>${DateTime.now()}');
-
-            List<ExtraExerciseDataModel> extraExercise =
-                await ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? "");
-            if (extraExercise.isNotEmpty) {
-              for (var element in extraExercise) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "date": element.date ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "exerciseJson": element.exerciseJson ?? ""
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
-              }
-            }
-            log('responseData=========14=========>>>>>${DateTime.now()}');
-
-            List<SwapExerciseDataModel> swapExercise = await ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? "");
-            if (swapExercise.isNotEmpty) {
-              for (var element in swapExercise) {
-                final body = {
-                  "dataId": element.dataId ?? "",
-                  "split": element.split ?? "",
-                  "monthId": element.monthId ?? "",
-                  "weekId": element.weekId ?? "",
-                  "dayId": element.dayId ?? "",
-                  "date": element.date ?? "",
-                  "exerciseId": element.exerciseId ?? "",
-                  "exerciseJson": element.exerciseJson ?? "",
-                  "insertIndex": element.insertIndex ?? ""
-                };
-                await DatabaseHelper().insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
-              }
-            }
-            log('responseData=========15=========>>>>>${DateTime.now()}');
-          }
-        }*/
         if (value) {
           await fetchAndStoreDayData(monthDataModelSplit3);
           fetchAndStoreAllData(monthDataModelSplit3);
         }
       }
-
       await monthProvider?.fetchMonthLocalData();
-
       notifyListeners();
     } catch (e) {
       log("issue in month view loading=> $e");
@@ -1277,17 +1047,9 @@ class DataProvider extends ChangeNotifier {
         }
       }
 
-      final streakDataModelFuture = ApiRepo.fetchStreakCount();
-      log('streakDataModelFuture==========>>>>>$streakDataModelFuture');
+      final streakDataModelFuture = await ApiRepo.fetchStreakCount();
       final apiResults = await Future.wait([
         ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchExerciseNotes(),
-        // ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? ""),
-        // ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? ""),
       ]);
 
       final streakDataModel = await streakDataModelFuture;
@@ -1297,13 +1059,6 @@ class DataProvider extends ChangeNotifier {
       );
 
       final dayStatus = apiResults[0];
-      // final exerciseHistory = apiResults[1] as List<ExerciseHistoryDataModel>;
-      // final exerciseStatus = apiResults[2] as List<ExerciseStatusDataModel>;
-      // final exerciseNotes = apiResults[3] as List<ExerciseNotesDataModel>;
-      // final extraSet = apiResults[4] as List<ExtraSetDataModel>;
-      // final removedExercise = apiResults[5] as List<RemovedExerciseDataModel>;
-      // final extraExercise = apiResults[6] as List<ExtraExerciseDataModel>;
-      // final swapExercise = apiResults[7] as List<SwapExerciseDataModel>;
 
       await Future.wait([
         // Insert Day Status
@@ -1326,121 +1081,6 @@ class DataProvider extends ChangeNotifier {
           };
           return db.insertData(data: body, tableName: DatabaseHelper.dayStatus);
         }),
-
-        // // Insert Exercise History
-        // ...exerciseHistory.map((e) {
-        //   final body = {
-        //     "split": e.split ?? "",
-        //     "dataId": e.dataId ?? "",
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "extraId": e.extraId ?? "",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //     "sets": e.sets?.toString() ?? "",
-        //     "reps": e.reps?.toString() ?? "",
-        //     "weight": e.weight?.toString() ?? "",
-        //     "rest": e.rest?.toString() ?? "",
-        //     "load": e.load?.toString() ?? "",
-        //     "type": e.type ?? "",
-        //     "effort": e.effort?.toString() ?? "",
-        //     "date": e.date?.toString() ?? "",
-        //     "index": int.tryParse(e.index ?? "0") ?? 0,
-        //     "subIndex": int.tryParse(e.subIndex ?? "0") ?? 0,
-        //     "status": e.status ?? "",
-        //     "totalSet": e.totalSet?.toString() ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.exerciseHistory);
-        // }),
-        //
-        // // Insert Exercise Status
-        // ...exerciseStatus.map((e) {
-        //   final body = {
-        //     "dataId": e.dataId ?? "",
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //     "split": e.split ?? "",
-        //     "date": e.date ?? "",
-        //     "status": e.status ?? "",
-        //     "type": e.type ?? "",
-        //     "totalWeight": e.totalWeight ?? "",
-        //     "totalSet": e.totalSet ?? "",
-        //     "totalRIR": e.totalRIR ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.exerciseStatus);
-        // }),
-        //
-        // // Insert Exercise Notes
-        // ...exerciseNotes.map((e) {
-        //   final body = {
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "date": e.date ?? "",
-        //     "note": e.note ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.exerciseNotes);
-        // }),
-        //
-        // // Insert Extra Set
-        // ...extraSet.map((e) {
-        //   final body = {
-        //     "sets": int.tryParse(e.sets ?? "0") ?? 0,
-        //     "reps": int.tryParse(e.reps ?? "0") ?? 0,
-        //     "weight": int.tryParse(e.weight ?? "0") ?? 0,
-        //     "rest": int.tryParse(e.rest ?? "0") ?? 0,
-        //     "load": int.tryParse(e.load ?? "0") ?? 0,
-        //     "type": int.tryParse(e.type ?? "0") ?? 0,
-        //     "extraId": e.extraId ?? "",
-        //     "date": e.date ?? "",
-        //     "dataId": e.dataId ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.extraSetHistory);
-        // }),
-        //
-        // // Insert Removed Exercise
-        // ...removedExercise.map((e) {
-        //   final body = {
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "dataId": e.dataId ?? "",
-        //     "split": e.split ?? "",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.removedExerciseHistory);
-        // }),
-        //
-        // // Insert Extra Exercise
-        // ...extraExercise.map((e) {
-        //   final body = {
-        //     "dataId": e.dataId ?? "",
-        //     "split": e.split ?? "",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //     "date": e.date ?? "",
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "exerciseJson": e.exerciseJson ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.extraExerciseHistory);
-        // }),
-        //
-        // // Insert Swap Exercise
-        // ...swapExercise.map((e) {
-        //   final body = {
-        //     "dataId": e.dataId ?? "",
-        //     "split": e.split ?? "",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //     "date": e.date ?? "",
-        //     "exerciseId": e.exerciseId ?? "",
-        //     "exerciseJson": e.exerciseJson ?? "",
-        //     "insertIndex": e.insertIndex ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.swapExerciseHistory);
-        // }),
       ]);
 
       log('All data fetched and stored successfully at ${DateTime.now()}');
@@ -1450,41 +1090,11 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> fetchAndStoreAllData(MonthDataModel monthDataModelSplit3) async {
+    final db = DatabaseHelper();
+
     try {
-      final db = DatabaseHelper();
-
-      // /// Fetch month enrollment first
-      // final monthEnrollment = await ApiRepo.fetchMonthEnrollment();
-      // if (monthEnrollment.isNotEmpty) {
-      //   for (var element in monthEnrollment) {
-      //     final body = {
-      //       "monthId": element.id ?? "",
-      //       "monthStartDate": element.startDate.toString(),
-      //       "monthEndDate": element.endDate.toString(),
-      //     };
-      //     await db.insertData(data: body, tableName: DatabaseHelper.monthHistory);
-      //   }
-      // } else {
-      //   MonthResponseModel? matchingElement = monthProvider?.monthLocalDataModel.firstWhere(
-      //     (element) => element.monthId == monthDataModelSplit3.id,
-      //     orElse: () => MonthResponseModel(),
-      //   );
-      //
-      //   final fallbackData = {
-      //     "monthId": monthDataModelSplit3.id,
-      //     "monthStartDate": monthDataModelSplit3.startDate.toString(),
-      //     "monthEndDate": monthDataModelSplit3.endDate.toString()
-      //   };
-      //
-      //   if (matchingElement?.id == null) {
-      //     await db.insertData(data: fallbackData, tableName: DatabaseHelper.monthHistory);
-      //   }
-      // }
-
-      // final streakDataModelFuture = ApiRepo.fetchStreakCount();
-
+      // Fetch all APIs together
       final apiResults = await Future.wait([
-        // ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? ""),
         ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? ""),
         ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? ""),
         ApiRepo.fetchExerciseNotes(),
@@ -1494,13 +1104,6 @@ class DataProvider extends ChangeNotifier {
         ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? ""),
       ]);
 
-      // final streakDataModel = await streakDataModelFuture;
-      // await preferences.putInt(
-      //   SharedPreference.lastStreakCount,
-      //   int.parse(streakDataModel?.count ?? "0"),
-      // );
-
-      // final dayStatus = apiResults[0] as List<DayStatusDataModel>;
       final exerciseHistory = apiResults[0] as List<ExerciseHistoryDataModel>;
       final exerciseStatus = apiResults[1] as List<ExerciseStatusDataModel>;
       final exerciseNotes = apiResults[2] as List<ExerciseNotesDataModel>;
@@ -1509,156 +1112,283 @@ class DataProvider extends ChangeNotifier {
       final extraExercise = apiResults[5] as List<ExtraExerciseDataModel>;
       final swapExercise = apiResults[6] as List<SwapExerciseDataModel>;
 
+      Future<void> safeInsert(
+          Future<void> Function() action, String tag) async {
+        try {
+          await action();
+        } catch (e, st) {
+          log("❌ Insert failed [$tag]: $e\n$st");
+        }
+      }
+
       await Future.wait([
-        // // Insert Day Status
-        // ...dayStatus.map((e) {
-        //   final body = {
-        //     "title": e.title ?? "",
-        //     "dataId": e.dataId ?? " ",
-        //     "monthId": e.monthId ?? "",
-        //     "weekId": e.weekId ?? "",
-        //     "dayId": e.dayId ?? "",
-        //     "split": e.split ?? "",
-        //     "date": e.date ?? "",
-        //     "status": e.status ?? "",
-        //     "type": e.type ?? "",
-        //     "startTime": e.startTime ?? "",
-        //     "endTime": e.endTime ?? "",
-        //     "completedExercise": e.completedExerciseCount ?? "",
-        //     "totalWeight": e.totalWeight ?? "",
-        //     "averageRIR": e.averageRIR ?? "",
-        //   };
-        //   return db.insertData(data: body, tableName: DatabaseHelper.dayStatus);
-        // }),
-
-        // Insert Exercise History
-        ...exerciseHistory.map((e) {
-          final body = {
-            "split": e.split ?? "",
-            "dataId": e.dataId ?? "",
-            "exerciseId": e.exerciseId ?? "",
-            "extraId": e.extraId ?? "",
-            "monthId": e.monthId ?? "",
-            "weekId": e.weekId ?? "",
-            "dayId": e.dayId ?? "",
-            "sets": e.sets?.toString() ?? "",
-            "reps": e.reps?.toString() ?? "",
-            "weight": e.weight?.toString() ?? "",
-            "rest": e.rest?.toString() ?? "",
-            "load": e.load?.toString() ?? "",
-            "type": e.type ?? "",
-            "effort": e.effort?.toString() ?? "",
-            "date": e.date?.toString() ?? "",
-            "index": int.tryParse(e.index ?? "0") ?? 0,
-            "subIndex": int.tryParse(e.subIndex ?? "0") ?? 0,
-            "status": e.status ?? "",
-            "totalSet": e.totalSet?.toString() ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.exerciseHistory);
-        }),
-
-        // Insert Exercise Status
-        ...exerciseStatus.map((e) {
-          final body = {
-            "dataId": e.dataId ?? "",
-            "exerciseId": e.exerciseId ?? "",
-            "monthId": e.monthId ?? "",
-            "weekId": e.weekId ?? "",
-            "dayId": e.dayId ?? "",
-            "split": e.split ?? "",
-            "date": e.date ?? "",
-            "status": e.status ?? "",
-            "type": e.type ?? "",
-            "totalWeight": e.totalWeight ?? "",
-            "totalSet": e.totalSet ?? "",
-            "totalRIR": e.totalRIR ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.exerciseStatus);
-        }),
-
-        // Insert Exercise Notes
-        ...exerciseNotes.map((e) {
-          final body = {
-            "exerciseId": e.exerciseId ?? "",
-            "date": e.date ?? "",
-            "note": e.note ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.exerciseNotes);
-        }),
-
-        // Insert Extra Set
-        ...extraSet.map((e) {
-          final body = {
-            "sets": int.tryParse(e.sets ?? "0") ?? 0,
-            "reps": int.tryParse(e.reps ?? "0") ?? 0,
-            "weight": int.tryParse(e.weight ?? "0") ?? 0,
-            "rest": int.tryParse(e.rest ?? "0") ?? 0,
-            "load": int.tryParse(e.load ?? "0") ?? 0,
-            "type": int.tryParse(e.type ?? "0") ?? 0,
-            "extraId": e.extraId ?? "",
-            "date": e.date ?? "",
-            "dataId": e.dataId ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.extraSetHistory);
-        }),
-
-        // Insert Removed Exercise
-        ...removedExercise.map((e) {
-          final body = {
-            "exerciseId": e.exerciseId ?? "",
-            "dataId": e.dataId ?? "",
-            "split": e.split ?? "",
-            "monthId": e.monthId ?? "",
-            "weekId": e.weekId ?? "",
-            "dayId": e.dayId ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.removedExerciseHistory);
-        }),
-
-        // Insert Extra Exercise
-        ...extraExercise.map((e) {
-          final body = {
-            "dataId": e.dataId ?? "",
-            "split": e.split ?? "",
-            "monthId": e.monthId ?? "",
-            "weekId": e.weekId ?? "",
-            "dayId": e.dayId ?? "",
-            "date": e.date ?? "",
-            "exerciseId": e.exerciseId ?? "",
-            "exerciseJson": e.exerciseJson ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.extraExerciseHistory);
-        }),
-
-        // Insert Swap Exercise
-        ...swapExercise.map((e) {
-          final body = {
-            "dataId": e.dataId ?? "",
-            "split": e.split ?? "",
-            "monthId": e.monthId ?? "",
-            "weekId": e.weekId ?? "",
-            "dayId": e.dayId ?? "",
-            "date": e.date ?? "",
-            "exerciseId": e.exerciseId ?? "",
-            "exerciseJson": e.exerciseJson ?? "",
-            "insertIndex": e.insertIndex ?? "",
-          };
-          return db.insertData(
-              data: body, tableName: DatabaseHelper.swapExerciseHistory);
-        }),
+        ...exerciseHistory.map((e) => safeInsert(() async {
+              final body = {
+                "split": e.split ?? "",
+                "dataId": e.dataId ?? "",
+                "exerciseId": e.exerciseId ?? "",
+                "extraId": e.extraId ?? "",
+                "monthId": e.monthId ?? "",
+                "weekId": e.weekId ?? "",
+                "dayId": e.dayId ?? "",
+                "sets": e.sets?.toString() ?? "",
+                "reps": e.reps?.toString() ?? "",
+                "weight": e.weight?.toString() ?? "",
+                "rest": e.rest?.toString() ?? "",
+                "load": e.load?.toString() ?? "",
+                "type": e.type ?? "",
+                "effort": e.effort?.toString() ?? "",
+                "date": e.date?.toString() ?? "",
+                "index": int.tryParse(e.index ?? "0") ?? 0,
+                "subIndex": int.tryParse(e.subIndex ?? "0") ?? 0,
+                "status": e.status ?? "",
+                "totalSet": e.totalSet?.toString() ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.exerciseHistory);
+            }, "ExerciseHistory")),
+        ...exerciseStatus.map((e) => safeInsert(() async {
+              final body = {
+                "dataId": e.dataId ?? "",
+                "exerciseId": e.exerciseId ?? "",
+                "monthId": e.monthId ?? "",
+                "weekId": e.weekId ?? "",
+                "dayId": e.dayId ?? "",
+                "split": e.split ?? "",
+                "date": e.date ?? "",
+                "status": e.status ?? "",
+                "type": e.type ?? "",
+                "totalWeight": e.totalWeight ?? "",
+                "totalSet": e.totalSet ?? "",
+                "totalRIR": e.totalRIR ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.exerciseStatus);
+            }, "ExerciseStatus")),
+        ...exerciseNotes.map((e) => safeInsert(() async {
+              final body = {
+                "exerciseId": e.exerciseId ?? "",
+                "date": e.date ?? "",
+                "note": e.note ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.exerciseNotes);
+            }, "ExerciseNotes")),
+        ...extraSet.map((e) => safeInsert(() async {
+              final body = {
+                "sets": int.tryParse(e.sets ?? "0") ?? 0,
+                "reps": int.tryParse(e.reps ?? "0") ?? 0,
+                "weight": int.tryParse(e.weight ?? "0") ?? 0,
+                "rest": int.tryParse(e.rest ?? "0") ?? 0,
+                "load": int.tryParse(e.load ?? "0") ?? 0,
+                "type": int.tryParse(e.type ?? "0") ?? 0,
+                "extraId": e.extraId ?? "",
+                "date": e.date ?? "",
+                "dataId": e.dataId ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.extraSetHistory);
+            }, "ExtraSet")),
+        ...removedExercise.map((e) => safeInsert(() async {
+              final body = {
+                "exerciseId": e.exerciseId ?? "",
+                "dataId": e.dataId ?? "",
+                "split": e.split ?? "",
+                "monthId": e.monthId ?? "",
+                "weekId": e.weekId ?? "",
+                "dayId": e.dayId ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.removedExerciseHistory);
+            }, "RemovedExercise")),
+        ...extraExercise.map((e) => safeInsert(() async {
+              final body = {
+                "dataId": e.dataId ?? "",
+                "split": e.split ?? "",
+                "monthId": e.monthId ?? "",
+                "weekId": e.weekId ?? "",
+                "dayId": e.dayId ?? "",
+                "date": e.date ?? "",
+                "exerciseId": e.exerciseId ?? "",
+                "exerciseJson": e.exerciseJson ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.extraExerciseHistory);
+            }, "ExtraExercise")),
+        ...swapExercise.map((e) => safeInsert(() async {
+              final body = {
+                "dataId": e.dataId ?? "",
+                "split": e.split ?? "",
+                "monthId": e.monthId ?? "",
+                "weekId": e.weekId ?? "",
+                "dayId": e.dayId ?? "",
+                "date": e.date ?? "",
+                "exerciseId": e.exerciseId ?? "",
+                "exerciseJson": e.exerciseJson ?? "",
+                "insertIndex": e.insertIndex ?? "",
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.swapExerciseHistory);
+            }, "SwapExercise")),
       ]);
 
-      log('All data fetched and stored successfully at ${DateTime.now()}');
+      log('✅ All data fetched and stored successfully at ${DateTime.now()}');
     } catch (e, stacktrace) {
-      log('Error in fetchAndStoreAllData: $e\n$stacktrace');
+      log('🔥 Fatal error in fetchAndStoreAllData: $e\n$stacktrace');
     }
   }
+
+  // Future<void> fetchAndStoreAllData(MonthDataModel monthDataModelSplit3) async {
+  //   try {
+  //     final db = DatabaseHelper();
+  //
+  //     final apiResults = await Future.wait([
+  //       ApiRepo.fetchExerciseHistory(monthDataModelSplit3.id ?? ""),
+  //       ApiRepo.fetchExerciseStatus(monthDataModelSplit3.id ?? ""),
+  //       ApiRepo.fetchExerciseNotes(),
+  //       ApiRepo.fetchExtraSet(monthDataModelSplit3.id ?? ""),
+  //       ApiRepo.fetchRemovedExercise(monthDataModelSplit3.id ?? ""),
+  //       ApiRepo.fetchExtraExercise(monthDataModelSplit3.id ?? ""),
+  //       ApiRepo.fetchSwapExercise(monthDataModelSplit3.id ?? ""),
+  //     ]);
+  //
+  //     final exerciseHistory = apiResults[0] as List<ExerciseHistoryDataModel>;
+  //     final exerciseStatus = apiResults[1] as List<ExerciseStatusDataModel>;
+  //     final exerciseNotes = apiResults[2] as List<ExerciseNotesDataModel>;
+  //     final extraSet = apiResults[3] as List<ExtraSetDataModel>;
+  //     final removedExercise = apiResults[4] as List<RemovedExerciseDataModel>;
+  //     final extraExercise = apiResults[5] as List<ExtraExerciseDataModel>;
+  //     final swapExercise = apiResults[6] as List<SwapExerciseDataModel>;
+  //
+  //     await Future.wait([
+  //       // Insert Exercise History
+  //       ...exerciseHistory.map((e) {
+  //         final body = {
+  //           "split": e.split ?? "",
+  //           "dataId": e.dataId ?? "",
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "extraId": e.extraId ?? "",
+  //           "monthId": e.monthId ?? "",
+  //           "weekId": e.weekId ?? "",
+  //           "dayId": e.dayId ?? "",
+  //           "sets": e.sets?.toString() ?? "",
+  //           "reps": e.reps?.toString() ?? "",
+  //           "weight": e.weight?.toString() ?? "",
+  //           "rest": e.rest?.toString() ?? "",
+  //           "load": e.load?.toString() ?? "",
+  //           "type": e.type ?? "",
+  //           "effort": e.effort?.toString() ?? "",
+  //           "date": e.date?.toString() ?? "",
+  //           "index": int.tryParse(e.index ?? "0") ?? 0,
+  //           "subIndex": int.tryParse(e.subIndex ?? "0") ?? 0,
+  //           "status": e.status ?? "",
+  //           "totalSet": e.totalSet?.toString() ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.exerciseHistory);
+  //       }),
+  //
+  //       // Insert Exercise Status
+  //       ...exerciseStatus.map((e) {
+  //         final body = {
+  //           "dataId": e.dataId ?? "",
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "monthId": e.monthId ?? "",
+  //           "weekId": e.weekId ?? "",
+  //           "dayId": e.dayId ?? "",
+  //           "split": e.split ?? "",
+  //           "date": e.date ?? "",
+  //           "status": e.status ?? "",
+  //           "type": e.type ?? "",
+  //           "totalWeight": e.totalWeight ?? "",
+  //           "totalSet": e.totalSet ?? "",
+  //           "totalRIR": e.totalRIR ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.exerciseStatus);
+  //       }),
+  //
+  //       // Insert Exercise Notes
+  //       ...exerciseNotes.map((e) {
+  //         final body = {
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "date": e.date ?? "",
+  //           "note": e.note ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.exerciseNotes);
+  //       }),
+  //
+  //       // Insert Extra Set
+  //       ...extraSet.map((e) {
+  //         final body = {
+  //           "sets": int.tryParse(e.sets ?? "0") ?? 0,
+  //           "reps": int.tryParse(e.reps ?? "0") ?? 0,
+  //           "weight": int.tryParse(e.weight ?? "0") ?? 0,
+  //           "rest": int.tryParse(e.rest ?? "0") ?? 0,
+  //           "load": int.tryParse(e.load ?? "0") ?? 0,
+  //           "type": int.tryParse(e.type ?? "0") ?? 0,
+  //           "extraId": e.extraId ?? "",
+  //           "date": e.date ?? "",
+  //           "dataId": e.dataId ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.extraSetHistory);
+  //       }),
+  //
+  //       // Insert Removed Exercise
+  //       ...removedExercise.map((e) {
+  //         final body = {
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "dataId": e.dataId ?? "",
+  //           "split": e.split ?? "",
+  //           "monthId": e.monthId ?? "",
+  //           "weekId": e.weekId ?? "",
+  //           "dayId": e.dayId ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.removedExerciseHistory);
+  //       }),
+  //
+  //       // Insert Extra Exercise
+  //       ...extraExercise.map((e) {
+  //         final body = {
+  //           "dataId": e.dataId ?? "",
+  //           "split": e.split ?? "",
+  //           "monthId": e.monthId ?? "",
+  //           "weekId": e.weekId ?? "",
+  //           "dayId": e.dayId ?? "",
+  //           "date": e.date ?? "",
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "exerciseJson": e.exerciseJson ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.extraExerciseHistory);
+  //       }),
+  //
+  //       // Insert Swap Exercise
+  //       ...swapExercise.map((e) {
+  //         final body = {
+  //           "dataId": e.dataId ?? "",
+  //           "split": e.split ?? "",
+  //           "monthId": e.monthId ?? "",
+  //           "weekId": e.weekId ?? "",
+  //           "dayId": e.dayId ?? "",
+  //           "date": e.date ?? "",
+  //           "exerciseId": e.exerciseId ?? "",
+  //           "exerciseJson": e.exerciseJson ?? "",
+  //           "insertIndex": e.insertIndex ?? "",
+  //         };
+  //         return db.insertData(
+  //             data: body, tableName: DatabaseHelper.swapExerciseHistory);
+  //       }),
+  //     ]);
+  //
+  //     log('All data fetched and stored successfully at ${DateTime.now()}');
+  //   } catch (e, stacktrace) {
+  //     log('Error in fetchAndStoreAllData: $e\n$stacktrace');
+  //   }
+  // }
 
   Future<void> fetchCheckoutPoint() async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/settings/');
@@ -1862,8 +1592,12 @@ class DataProvider extends ChangeNotifier {
       if (isFromReport) {
         // request.fields['app_version'] = osVersion ?? "";
         // request.fields['device_version'] = appVersion ?? "";
-        final version = (osVersion ?? "") + (appVersion ?? "");
-        request.fields['description'] = "$description\nVersion: [$version]";
+        final version =
+            "OS VERSION: ${"${osVersion ?? ""}, APP VERSION: ${(appVersion ?? "")}"}";
+
+        log('version==========>>>>>$version');
+
+        request.fields['description'] = "$description\n [$version]";
       } else {
         request.fields['description'] = description;
       }

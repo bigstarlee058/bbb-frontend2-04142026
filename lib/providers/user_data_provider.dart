@@ -38,7 +38,7 @@ class UserDataProvider extends ChangeNotifier {
     );
 
     switch (response.statusCode) {
-      case 200:
+      case ApiStatus.ok:
         final jsonResponse = jsonDecode(response.body);
         getUserDataFromJson(jsonResponse);
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -46,7 +46,7 @@ class UserDataProvider extends ChangeNotifier {
         user = jsonResponse;
         notifyListeners();
         return jsonResponse;
-      case 401:
+      case ApiStatus.unauthorized:
         if (!_hasTriedAutoLogin && !_isAutoLoginInProgress) {
           _hasTriedAutoLogin = true;
           _isAutoLoginInProgress = true;
@@ -56,25 +56,17 @@ class UserDataProvider extends ChangeNotifier {
             _isAutoLoginInProgress = false;
           }
         } else {
-          _handleLogout(context,
-              "Your session has expired. Please log in again to continue.",
-              isFromLogin: isFromLogin);
+          _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
         }
-
         return {"code": response.statusCode};
-      case 503:
-        _handleLogout(context, "Server is busy. Please try again in a moment.",
-            isFromLogin: isFromLogin);
+      case ApiStatus.serverBusy:
+        _handleLogout(context, serverBusy, isFromLogin: isFromLogin);
         return {"code": response.statusCode};
-      case 500:
-        _handleLogout(
-            context, "Internal server error. Please try again in a moment.",
-            isFromLogin: isFromLogin);
+      case ApiStatus.serverError:
+        _handleLogout(context, serverError, isFromLogin: isFromLogin);
         return {"code": response.statusCode};
       default:
-        _handleLogout(
-            context, "An unexpected error occurred. Please try again.",
-            isFromLogin: isFromLogin);
+        _handleLogout(context, unexpectedError, isFromLogin: isFromLogin);
         return {"code": response.statusCode};
     }
   }
@@ -89,9 +81,7 @@ class UserDataProvider extends ChangeNotifier {
       _hasTriedAutoLogin = true;
       await fetchUserInfo(context, isFromLogin: isFromLogin);
     } else {
-      _handleLogout(
-          context, "Your session has expired. Please log in again to continue.",
-          isFromLogin: isFromLogin);
+      _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
     }
   }
 
@@ -117,25 +107,17 @@ class UserDataProvider extends ChangeNotifier {
         final wooData = jsonDecode(wooResponse.body);
         String code = wooData['code'].toString();
 
-        if (code.contains("incorrect_password")) {
-          _handleLogout(context,
-              'Login Failed. Please check your password and, if needed, click "Forgot Password" below',
-              isFromLogin: isFromLogin);
-          return;
-        }
         if (code.contains("invalid_email")) {
           await _tryMobileLogin(emailAddress, password, context, isFromLogin);
           return;
+        } else {
+          _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
+          return;
         }
       }
-
-      _handleLogout(
-          context, "Your session has expired. Please log in again to continue.",
-          isFromLogin: isFromLogin);
+      _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
     } catch (e) {
-      _handleLogout(
-          context, "Your session has expired. Please log in again to continue.",
-          isFromLogin: isFromLogin);
+      _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
     }
   }
 
@@ -153,18 +135,9 @@ class UserDataProvider extends ChangeNotifier {
     if (mobileResponse.statusCode == 200) {
       await _handleLoginSuccess(mobileResponse);
       return;
+    } else {
+      _handleLogout(context, sessionExpired, isFromLogin: isFromLogin);
     }
-
-    if (mobileResponse.statusCode == 403) {
-      _handleLogout(
-          context, "Your session has expired. Please log in again to continue.",
-          isFromLogin: isFromLogin);
-      return;
-    }
-
-    _handleLogout(
-        context, "Your session has expired. Please log in again to continue.",
-        isFromLogin: isFromLogin);
   }
 
   Future<void> _handleLoginSuccess(http.Response response) async {

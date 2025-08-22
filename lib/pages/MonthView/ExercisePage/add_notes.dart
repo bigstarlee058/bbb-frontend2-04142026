@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bbb/components/app_alert_dialog.dart';
@@ -111,7 +112,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                   ButtonWidget(
                     text: "Save",
                     textColor: Colors.white,
-                    onPress: () {
+                    onPress: () async {
                       if (_noteController.text.isEmpty) {
                         showDialog(
                           context: context,
@@ -124,7 +125,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                           },
                         );
                       } else {
-                        addNewNote();
+                        await addNewNote();
                         _noteController.clear();
                       }
                     },
@@ -132,7 +133,6 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                     isLoading: false,
                   ),
                   const SizedBox(height: 15),
-
                   _buildPreviouslyAddedNotes(),
                 ],
               ),
@@ -216,13 +216,15 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              content,
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-            ),
+            child: Builder(builder: (context) {
+              return Text(
+                content,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              );
+            }),
           ),
         ],
       ),
@@ -258,6 +260,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
 
     final data = await DatabaseHelper().getDataFromTable(
         tableName: DatabaseHelper.exerciseNotes, id: id, where: "exerciseId");
+    log('data==========>>>>>$data');
     if (data.isNotEmpty) {
       dataList = List<ExerciseNotesModel>.from(json
           .decode(jsonEncode(data))

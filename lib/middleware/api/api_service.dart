@@ -44,8 +44,7 @@ class ApiService extends BaseService {
           return returnResponse(
               retryResult.statusCode ?? 500, retryResult.data);
         } else {
-          _handleLogout("Your session has expired. Please log in to continue.",
-              isFromLogin: false);
+          _handleLogout(sessionExpired, isFromLogin: false);
         }
       }
       log('Error => $mainUrl ERROR: $e');
@@ -88,16 +87,14 @@ class ApiService extends BaseService {
     String? email = prefs.getString("email");
     String? password = prefs.getString("password");
     if (email == null || password == null) {
-      _handleLogout("Your session has expired. Please log in to continue.",
-          isFromLogin: false);
+      _handleLogout(sessionExpired, isFromLogin: false);
       return false;
     }
     try {
       await signInUser(email, password, false);
       return true;
     } catch (e) {
-      _handleLogout("Your session has expired. Please log in to continue.",
-          isFromLogin: false);
+      _handleLogout(sessionExpired, isFromLogin: false);
       return false;
     }
   }
@@ -128,9 +125,7 @@ class ApiService extends BaseService {
         String code = wooData['code'].toString();
 
         if (code.contains("incorrect_password")) {
-          _handleLogout(
-              'Login Failed. Please check your password and, if needed, click "Forgot Password" below.',
-              isFromLogin: isFromLogin);
+          _handleLogout(wrongPassword, isFromLogin: isFromLogin);
           return;
         }
         if (code.contains("invalid_email")) {
@@ -140,13 +135,11 @@ class ApiService extends BaseService {
       }
 
       if (!isFromRefresh) {
-        _handleLogout("Your session has expired. Please log in to continue.",
-            isFromLogin: isFromLogin);
+        _handleLogout(sessionExpired, isFromLogin: isFromLogin);
       }
     } catch (e) {
       if (!isFromRefresh) {
-        _handleLogout("Your session has expired. Please log in to continue.",
-            isFromLogin: isFromLogin);
+        _handleLogout(sessionExpired, isFromLogin: isFromLogin);
       }
     }
   }
@@ -167,12 +160,10 @@ class ApiService extends BaseService {
       return;
     }
     if (mobileResponse.statusCode == 403) {
-      _handleLogout("Your session has expired. Please log in to continue.",
-          isFromLogin: isFromLogin);
+      _handleLogout(sessionExpired, isFromLogin: isFromLogin);
       return;
     }
-    _handleLogout("Your session has expired. Please log in to continue.",
-        isFromLogin: isFromLogin);
+    _handleLogout(sessionExpired, isFromLogin: isFromLogin);
   }
 
   Future<void> _handleLoginSuccess(http.Response response,

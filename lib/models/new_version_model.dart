@@ -70,20 +70,24 @@ class NewVersionModel {
 
 class Android {
   bool? forceUpdate;
+  bool? showPopUp;
   String? version;
 
   Android({
     this.forceUpdate,
     this.version,
+    this.showPopUp,
   });
 
   factory Android.fromJson(Map<String, dynamic> json) => Android(
         forceUpdate: json["forceUpdate"],
+        showPopUp: json["showPopUp"],
         version: json["version"],
       );
 
   Map<String, dynamic> toJson() => {
         "forceUpdate": forceUpdate,
+        "showPopUp": showPopUp,
         "version": version,
       };
 }
