@@ -1083,7 +1083,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       dateOrder: DatePickerDateOrder.mdy,
       initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
       maxDateTime: DateTime.now(),
-      minDateTime: DateTime(1950, 1, 1),
+      minDateTime: DateTime(1900, 1, 1),
       onSubmit: (dob) {
         selectedDate = dob;
         setState(() {});

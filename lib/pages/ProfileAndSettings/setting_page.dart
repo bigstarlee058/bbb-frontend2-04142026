@@ -108,7 +108,7 @@ class _SettingPageState extends State<SettingPage> {
 
   int equipments = 0;
 
-  updateEquipments(int index) async {
+  Future<void> updateEquipments(int index) async {
     equipments = index;
     setState(() {});
 
@@ -309,7 +309,8 @@ class _SettingPageState extends State<SettingPage> {
                                                     value; // Update state
                                               });
 
-                                              DateTime now = await NTP.now();
+                                              DateTime now =
+                                                  DateTime.now().toUtc();
                                               await preferences.setBool(
                                                   SharedPreference
                                                       .notificationSwitch,
@@ -1414,8 +1415,8 @@ class _SettingPageState extends State<SettingPage> {
                                                                 ),
                                                                 Spacer(),
                                                                 GestureDetector(
-                                                                  onTap: () =>
-                                                                      updateEquipments(
+                                                                  onTap: () async =>
+                                                                      await updateEquipments(
                                                                           0),
                                                                   child:
                                                                       Container(
@@ -1528,8 +1529,8 @@ class _SettingPageState extends State<SettingPage> {
                                                                 ),
                                                                 Spacer(),
                                                                 GestureDetector(
-                                                                  onTap: () =>
-                                                                      updateEquipments(
+                                                                  onTap: () async =>
+                                                                      await updateEquipments(
                                                                           1),
                                                                   child:
                                                                       Container(
@@ -1642,8 +1643,8 @@ class _SettingPageState extends State<SettingPage> {
                                                                 ),
                                                                 Spacer(),
                                                                 GestureDetector(
-                                                                  onTap: () =>
-                                                                      updateEquipments(
+                                                                  onTap: () async =>
+                                                                      await updateEquipments(
                                                                           2),
                                                                   child:
                                                                       Container(

@@ -55,7 +55,7 @@ class _SettingSectionState extends State<SettingSection> {
     super.initState();
   }
 
-  updateSplitIndex(int index) async {
+  Future<void> updateSplitIndex(int index) async {
     splitIndex = index;
     setState(() {});
     if (widget.isSetting) {
@@ -74,7 +74,7 @@ class _SettingSectionState extends State<SettingSection> {
     }
   }
 
-  updateEquipments(int index) async {
+  Future<void> updateEquipments(int index) async {
     equipments = index;
     setState(() {});
     if (widget.isSetting) {
@@ -274,7 +274,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             Spacer(),
                                             GestureDetector(
-                                              onTap: () => updateSplitIndex(0),
+                                              onTap: () async =>
+                                                  await updateSplitIndex(0),
                                               child: Container(
                                                 height:
                                                     ScreenUtil.verticalScale(4),
@@ -353,7 +354,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             Spacer(),
                                             GestureDetector(
-                                              onTap: () => updateSplitIndex(1),
+                                              onTap: () async =>
+                                                  await updateSplitIndex(1),
                                               child: Container(
                                                 height:
                                                     ScreenUtil.verticalScale(4),
@@ -432,7 +434,8 @@ class _SettingSectionState extends State<SettingSection> {
                                             ),
                                             Spacer(),
                                             GestureDetector(
-                                              onTap: () => updateSplitIndex(2),
+                                              onTap: () async =>
+                                                  await updateSplitIndex(2),
                                               child: Container(
                                                 height:
                                                     ScreenUtil.verticalScale(4),
@@ -647,7 +650,8 @@ class _SettingSectionState extends State<SettingSection> {
                                           ),
                                           Spacer(),
                                           GestureDetector(
-                                            onTap: () => updateEquipments(0),
+                                            onTap: () async =>
+                                                await updateEquipments(0),
                                             child: Container(
                                               height:
                                                   ScreenUtil.verticalScale(4),
@@ -725,7 +729,8 @@ class _SettingSectionState extends State<SettingSection> {
                                           ),
                                           Spacer(),
                                           GestureDetector(
-                                            onTap: () => updateEquipments(1),
+                                            onTap: () async =>
+                                                await updateEquipments(1),
                                             child: Container(
                                               height:
                                                   ScreenUtil.verticalScale(4),
@@ -803,7 +808,8 @@ class _SettingSectionState extends State<SettingSection> {
                                           ),
                                           Spacer(),
                                           GestureDetector(
-                                            onTap: () => updateEquipments(2),
+                                            onTap: () async =>
+                                                await updateEquipments(2),
                                             child: Container(
                                               height:
                                                   ScreenUtil.verticalScale(4),
@@ -949,7 +955,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateSplitIndex(0),
+                                onTap: () async => await updateSplitIndex(0),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
@@ -1019,7 +1025,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateSplitIndex(1),
+                                onTap: () async => await updateSplitIndex(1),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
@@ -1089,7 +1095,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateSplitIndex(2),
+                                onTap: () async => await updateSplitIndex(2),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
@@ -1229,7 +1235,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateEquipments(0),
+                                onTap: () async => await updateEquipments(0),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
@@ -1299,7 +1305,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateEquipments(1),
+                                onTap: () async => await updateEquipments(1),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),
@@ -1369,7 +1375,7 @@ class _SettingSectionState extends State<SettingSection> {
                               ),
                               Spacer(),
                               GestureDetector(
-                                onTap: () => updateEquipments(2),
+                                onTap: () async => await updateEquipments(2),
                                 child: Container(
                                   height: ScreenUtil.verticalScale(4),
                                   width: ScreenUtil.verticalScale(4),

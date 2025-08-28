@@ -12,6 +12,7 @@ import 'package:bbb/localstorage/month_database.dart';
 import 'package:bbb/localstorage/month_prefrence.dart';
 import 'package:bbb/middleware/api/api_repo.dart';
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
+import 'package:bbb/models/MonthResponseModel/month_response_model.dart';
 import 'package:bbb/models/MonthResponseModel/new_model.dart';
 import 'package:bbb/pages/IntroScreen/video_intro_page.dart';
 import 'package:bbb/pages/MonthView/MonthViewPage/sections/information_section.dart';
@@ -39,7 +40,7 @@ class MonthView extends StatefulWidget {
   State<MonthView> createState() => _MonthViewState();
 }
 
-class _MonthViewState extends State<MonthView> {
+class _MonthViewState extends State<MonthView> with WidgetsBindingObserver {
   MonthProvider? monthProvider;
   DataProvider? dataProvider;
   PageController pageController = PageController();
@@ -64,6 +65,7 @@ class _MonthViewState extends State<MonthView> {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     monthProvider = Provider.of<MonthProvider>(context, listen: false);
     scrollProvider = Provider.of<ScrollProvider>(context, listen: false);
+    WidgetsBinding.instance.addObserver(this);
 
     provider = context.read<ProgramInfoProvider>();
     provider.getProgramInfo();
@@ -146,8 +148,38 @@ class _MonthViewState extends State<MonthView> {
                 MonthSettingDialog(monthProvider: monthProvider!)));
   }
 
+  Future<void> _initializeFetchData() async {
+    log('DASHBOARD PAGE INIT');
+    if (dataProvider != null) {
+      await dataProvider?.fetchMonthWorkouts(3);
+    } else {
+      debugPrint("dataProvider is null");
+    }
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        await _initializeFetchData().then((value) async {
+          await monthProvider?.onInit(context: context, isEnabled: false);
+        });
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.detached:
+        break;
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
         WidgetsBinding.instance.addPostFrameCallback(
@@ -202,6 +234,7 @@ class _MonthViewState extends State<MonthView> {
             RefreshIndicator(
               color: AppColors.primaryColor,
               onRefresh: () async {
+                await _initializeFetchData();
                 await monthProvider?.onInit(context: context, isEnabled: false);
                 provider.getProgramInfo();
                 await dataProvider?.getChooseWorkoutData();
@@ -1012,8 +1045,7 @@ class _MonthViewState extends State<MonthView> {
 
   Future<void> _saveDayData(
       {required String status, required String type, String? title}) async {
-    DateTime now = await NTP.now();
-
+    DateTime now = DateTime.now().toUtc();
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()
@@ -1091,8 +1123,7 @@ class _MonthViewState extends State<MonthView> {
       required String type,
       String? title,
       bool endDate = false}) async {
-    DateTime now = await NTP.now();
-
+    DateTime now = DateTime.now().toUtc();
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()

@@ -157,7 +157,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       int reps = int.tryParse(data.reps.toString()) ?? 0;
       int repsInReverse = int.tryParse(data.effort.toString()) ?? 0;
       DateTime date = DateTime.parse(data.date!);
-      String formattedDate = DateFormat('dd/MM').format(date);
+      String formattedDate = DateFormat('MM/dd').format(date);
       if (!groupedData.containsKey(formattedDate)) {
         groupedData[formattedDate] = {'oneRmSession': 0.0};
       }
@@ -189,7 +189,7 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
       double oneRmSession = totals['oneRmSession']!;
       chartData.add(FlSpot(
           index.toDouble(), double.parse(oneRmSession.toStringAsFixed(2))));
-      dateLabels.add(date);
+      dateLabels.add(date[0] == "0" ? date.replaceAll(date[0], '') : date);
       index++;
     });
 

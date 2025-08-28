@@ -302,7 +302,8 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
 
   Future<void> _saveData() async {
     // HapticFeedBack.buttonClick();
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     _handleCloseTimer();
     monthProvider?.timerAddress = "";
     monthProvider?.timePassed = "";
@@ -687,8 +688,9 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                       Text(
                                         'WEIGHT (${widget.isKG ? "KG" : "LB"})',
                                         style: TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 13),
+                                          color: Colors.black54,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                       const SizedBox(height: 8),
                                       Container(
@@ -771,9 +773,10 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                     ),
                                                     onTap: () async {
                                                       if (_weightController
-                                                          .text.isEmpty) {
+                                                              .text ==
+                                                          "0") {
                                                         _weightController.text =
-                                                            "0";
+                                                            "";
                                                         setState(() {});
                                                       }
                                                     },
@@ -791,16 +794,6 @@ class _ExerciseSetCardState extends State<ExerciseSetCard>
                                                         _weightController.text =
                                                             value.replaceFirst(
                                                                 "0", "");
-                                                      }
-
-                                                      if (value.isEmpty) {
-                                                        _weightController.text =
-                                                            "0";
-                                                      }
-                                                      if (_weightController
-                                                          .text.isEmpty) {
-                                                        _weightController.text =
-                                                            "0";
                                                       }
 
                                                       _weightController.text =

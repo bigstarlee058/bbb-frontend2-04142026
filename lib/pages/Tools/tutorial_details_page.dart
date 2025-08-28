@@ -153,8 +153,12 @@ class _TutorialDetailsPageState extends State<TutorialDetailsPage>
   Future<void> initializeVideo(String url) async {
     if (hasClosedPopup) return;
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url),
-          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+        ),
+      );
 
       await _videoPlayerController.initialize();
       if (hasClosedPopup || !mounted) {

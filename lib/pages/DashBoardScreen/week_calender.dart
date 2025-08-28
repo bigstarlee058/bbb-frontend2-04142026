@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bbb/models/MonthResponseModel/day_history_model.dart';
@@ -162,11 +163,11 @@ class _WeekCalenderState extends State<WeekCalender> {
               }
             }
           }
-
           if (isCurrentDay) {
             for (var day in data) {
               final workoutDate = day.endTime!;
               DateTime localTime = Utils.formattedDate("$workoutDate");
+
               if ((localTime.day == date.day &&
                   localTime.month == date.month &&
                   localTime.year == date.year)) {

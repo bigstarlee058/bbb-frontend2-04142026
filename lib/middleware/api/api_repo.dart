@@ -114,7 +114,6 @@ class ApiRepo extends BaseService {
         url: BaseService.fetchExerciseStatus,
         body: {"monthId": monthId});
     if (response is List) {
-      log('response==========>>>>>${response}');
       return response.isEmpty
           ? []
           : response
@@ -200,16 +199,31 @@ class ApiRepo extends BaseService {
   /// ExtraSet ========================================================================
 
   static Future<List<ExtraSetDataModel>> fetchExtraSet(String monthId) async {
-    var response = await ApiService().getResponse(
-        apiType: APIType.aGet,
-        url: BaseService.fetchExtraSet,
-        body: {"monthId": monthId});
-    if (response is List) {
-      return response.isEmpty
-          ? []
-          : response.map((json) => ExtraSetDataModel.fromJson(json)).toList();
-    } else {
-      throw Exception("Unexpected response format: $response");
+    try {
+      var response = await ApiService().getResponse(
+          apiType: APIType.aGet,
+          url: BaseService.fetchExtraSet,
+          body: {"monthId": monthId});
+
+      if (response != null) {
+        if (response is List) {
+          return response.isEmpty
+              ? []
+              : response
+                  .map((json) => ExtraSetDataModel.fromJson(json))
+                  .toList();
+        } else {
+          debugPrint("Unexpected response format: $response");
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        debugPrint("Response is null: $response");
+        return [];
+      }
+    } catch (e, stack) {
+      debugPrint("Error in fetchExtraSet: $e");
+      debugPrint("Stacktrace: $stack");
+      return [];
     }
   }
 

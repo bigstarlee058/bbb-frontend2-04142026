@@ -65,8 +65,11 @@ class WorkoutCard extends StatefulWidget {
 class _WorkoutCardState extends State<WorkoutCard> {
   @override
   void initState() {
-    WidgetsBinding.instance
-        .addPostFrameCallback((timeStamp) async => await getTotalSets());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getTotalSets();
+      final provider = Provider.of<MonthProvider>(context, listen: false);
+      provider.updateSetValue(warmUpSetTotal, backOffSetTotal, workingSetTotal);
+    });
     super.initState();
   }
 

@@ -126,7 +126,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   List<Map<String, dynamic>> allImageList = [];
-  Future<void> getAppBGs() async {
+
+  Future<void> getAppBGs({bool isRetry = false}) async {
     Uri url = Uri.parse('${AppConstants.serverUrl}/api/screens/get_screens');
 
     String? userIdToken = await getAuthToken();
@@ -224,7 +225,11 @@ class DataProvider extends ChangeNotifier {
         throw Exception('Failed to get screen bg data');
       }
     } catch (e) {
-      throw Exception('Failed to get screen bg data');
+      if (!isRetry) {
+        await getAppBGs(isRetry: true);
+      } else {
+        throw Exception('Failed to get screen bg data after retry');
+      }
     } finally {
       notifyListeners();
     }
@@ -264,8 +269,7 @@ class DataProvider extends ChangeNotifier {
               if (achievementsData.isEmpty) {
                 if ((ele.achievementAchievementId?.value ?? 0) <=
                     (element.currentValue ?? 0)) {
-                  DateTime now = await NTP.now();
-
+                  DateTime now = DateTime.now().toUtc();
                   await ApiRepo.addAchievementsList(
                       body: UpdateAchievementsRequest(
                     achievementsDate: now.toString(),
@@ -282,7 +286,7 @@ class DataProvider extends ChangeNotifier {
                           z.achievementsTitle ==
                           ele.achievementAchievementId?.achievementIdId) ==
                       false)) {
-                DateTime now = await NTP.now();
+                DateTime now = DateTime.now().toUtc();
                 if ((ele.achievementAchievementId!.value)! <=
                     (element.currentValue!)) {
                   final data = UpdateAchievementsRequest(
@@ -839,8 +843,7 @@ class DataProvider extends ChangeNotifier {
     final Dio dio = Dio();
     final String url = '${AppConstants.serverUrl}/api/workouts/current';
     try {
-      DateTime now = await NTP.now();
-
+      DateTime now = DateTime.now().toUtc();
       final Map<String, String> queryParams = {
         'month': month.toString(),
         'equipment': '0',
@@ -921,83 +924,116 @@ class DataProvider extends ChangeNotifier {
 
         await preferences.putString(
             SharedPreference.monthId, "${monthDataModelSplit3.id}");
-        monthDataModelSplit3.weeks?.forEach(
-          (element) {
-            element.dayList = split3;
-            element.idList = [
-              "${element.id} split3 Day 1 Workout",
-              "${element.id} split3 Rest Day 1",
-              "${element.id} split3 Day 2 Workout",
-              "${element.id} split3 Rest Day 2",
-              "${element.id} split3 Day 3 Workout",
-              "${element.id} split3 Rest Day 3",
-              "${element.id} split3 Rest Day 4",
-            ];
-            element.restDayList = [
-              "Rest Day 1",
-              "Rest Day 2",
-              "Rest Day 3",
-              "Rest Day 4"
-            ];
-            element.days
-                ?.removeWhere((element) => !element.formats!.contains("3"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split3[i];
-            }
-          },
-        );
+
+        for (var element in monthDataModelSplit3.weeks!) {
+          element.dayList = split3;
+          element.idList = [
+            "${element.id} split3 Day 1 Workout",
+            "${element.id} split3 Rest Day 1",
+            "${element.id} split3 Day 2 Workout",
+            "${element.id} split3 Rest Day 2",
+            "${element.id} split3 Day 3 Workout",
+            "${element.id} split3 Rest Day 3",
+            "${element.id} split3 Rest Day 4",
+          ];
+          element.restDayList = [
+            "Rest Day 1",
+            "Rest Day 2",
+            "Rest Day 3",
+            "Rest Day 4"
+          ];
+          element.days?.removeWhere((d) => !d.formats!.contains("3"));
+          for (var i = 0; i < element.days!.length; i++) {
+            element.days?[i].dayType = split3[i];
+          }
+        }
 
         await preferences.putString(
             "${SplitType.split3}-${monthDataModelSplit3.id}",
             jsonEncode(monthDataModelSplit3));
-        monthDataModelSplit4.weeks?.forEach(
-          (element) {
-            element.dayList = split4;
-            element.idList = [
-              "${element.id} split4 Day 1 Workout",
-              "${element.id} split4 Day 2 Workout",
-              "${element.id} split4 Rest Day 1",
-              "${element.id} split4 Day 3 Workout",
-              "${element.id} split4 Day 4 Workout",
-              "${element.id} split4 Rest Day 2",
-              "${element.id} split4 Rest Day 3",
-            ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
-            element.days
-                ?.removeWhere((element) => !element.formats!.contains("4"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split4[i];
-            }
-          },
-        );
+        for (var element in monthDataModelSplit4.weeks!) {
+          element.dayList = split4;
+          element.idList = [
+            "${element.id} split4 Day 1 Workout",
+            "${element.id} split4 Day 2 Workout",
+            "${element.id} split4 Rest Day 1",
+            "${element.id} split4 Day 3 Workout",
+            "${element.id} split4 Day 4 Workout",
+            "${element.id} split4 Rest Day 2",
+            "${element.id} split4 Rest Day 3",
+          ];
+          element.restDayList = ["Rest Day 1", "Rest Day 2", "Rest Day 3"];
+
+          element.days?.removeWhere((day) => !day.formats!.contains("4"));
+
+          for (int i = 0; i < (element.days?.length ?? 0); i++) {
+            element.days![i].dayType = split4[i];
+          }
+        }
         await preferences.putString(
             "${SplitType.split4}-${monthDataModelSplit4.id}",
             jsonEncode(monthDataModelSplit4));
-        monthDataModelSplit5.weeks?.forEach(
-          (element) {
-            element.dayList = split5;
-            element.idList = [
-              "${element.id} split5 Day 1 Workout",
-              "${element.id} split5 Day 2 Workout",
-              "${element.id} split5 Day 3 Workout",
-              "${element.id} split5 Day 4 Workout",
-              "${element.id} split5 Day 5 Workout",
-              "${element.id} split5 Rest Day 1",
-              "${element.id} split5 Rest Day 2",
-            ];
-            element.restDayList = ["Rest Day 1", "Rest Day 2"];
-            element.days
-                ?.removeWhere((element) => !element.formats!.contains("5"));
-            for (var i = 0; i < element.days!.length; i++) {
-              element.days?[i].dayType = split5[i];
-            }
-          },
-        );
+        for (var element in monthDataModelSplit5.weeks!) {
+          element.dayList = split5;
+          element.idList = [
+            "${element.id} split5 Day 1 Workout",
+            "${element.id} split5 Day 2 Workout",
+            "${element.id} split5 Day 3 Workout",
+            "${element.id} split5 Day 4 Workout",
+            "${element.id} split5 Day 5 Workout",
+            "${element.id} split5 Rest Day 1",
+            "${element.id} split5 Rest Day 2",
+          ];
+          element.restDayList = ["Rest Day 1", "Rest Day 2"];
+
+          element.days?.removeWhere((day) => !day.formats!.contains("5"));
+
+          for (int i = 0; i < (element.days?.length ?? 0); i++) {
+            element.days![i].dayType = split5[i];
+          }
+        }
+
         await preferences.putString(
             "${SplitType.split5}-${monthDataModelSplit5.id}",
             jsonEncode(monthDataModelSplit5));
 
         final value = await DatabaseHelper().areAllTablesEmpty();
+
+        final db = DatabaseHelper();
+
+        final monthEnrollment = await ApiRepo.fetchMonthEnrollment();
+        if (monthEnrollment.isNotEmpty) {
+          for (var element in monthEnrollment) {
+            final isExist = monthProvider!.monthLocalDataModel
+                .where((e1) => e1.monthId == element.id);
+            if (isExist.isEmpty) {
+              final body = {
+                "monthId": element.id ?? "",
+                "monthStartDate": element.startDate.toString(),
+                "monthEndDate": element.endDate.toString(),
+              };
+              await db.insertData(
+                  data: body, tableName: DatabaseHelper.monthHistory);
+            }
+          }
+        } else {
+          MonthResponseModel? matchingElement =
+              monthProvider?.monthLocalDataModel.firstWhere(
+            (element) => element.monthId == monthDataModelSplit3.id,
+            orElse: () => MonthResponseModel(),
+          );
+
+          final fallbackData = {
+            "monthId": monthDataModelSplit3.id,
+            "monthStartDate": monthDataModelSplit3.startDate.toString(),
+            "monthEndDate": monthDataModelSplit3.endDate.toString()
+          };
+
+          if (matchingElement?.id == null) {
+            await db.insertData(
+                data: fallbackData, tableName: DatabaseHelper.monthHistory);
+          }
+        }
 
         if (value) {
           await fetchAndStoreDayData(monthDataModelSplit3);
@@ -1015,47 +1051,14 @@ class DataProvider extends ChangeNotifier {
     try {
       final db = DatabaseHelper();
 
-      /// Fetch month enrollment first
-      final monthEnrollment = await ApiRepo.fetchMonthEnrollment();
-      print('monthEnrollment==========>>>>>${jsonEncode(monthEnrollment)}');
-      if (monthEnrollment.isNotEmpty) {
-        for (var element in monthEnrollment) {
-          final body = {
-            "monthId": element.id ?? "",
-            "monthStartDate": element.startDate.toString(),
-            "monthEndDate": element.endDate.toString(),
-          };
-          await db.insertData(
-              data: body, tableName: DatabaseHelper.monthHistory);
-        }
-      } else {
-        MonthResponseModel? matchingElement =
-            monthProvider?.monthLocalDataModel.firstWhere(
-          (element) => element.monthId == monthDataModelSplit3.id,
-          orElse: () => MonthResponseModel(),
-        );
-
-        final fallbackData = {
-          "monthId": monthDataModelSplit3.id,
-          "monthStartDate": monthDataModelSplit3.startDate.toString(),
-          "monthEndDate": monthDataModelSplit3.endDate.toString()
-        };
-
-        if (matchingElement?.id == null) {
-          await db.insertData(
-              data: fallbackData, tableName: DatabaseHelper.monthHistory);
-        }
-      }
-
       final streakDataModelFuture = await ApiRepo.fetchStreakCount();
       final apiResults = await Future.wait([
         ApiRepo.fetchDayStatus(monthDataModelSplit3.id ?? ""),
       ]);
 
-      final streakDataModel = await streakDataModelFuture;
       await preferences.putInt(
         SharedPreference.lastStreakCount,
-        int.parse(streakDataModel?.count ?? "0"),
+        int.parse(streakDataModelFuture?.count ?? "0"),
       );
 
       final dayStatus = apiResults[0];
@@ -1594,8 +1597,6 @@ class DataProvider extends ChangeNotifier {
         // request.fields['device_version'] = appVersion ?? "";
         final version =
             "OS VERSION: ${"${osVersion ?? ""}, APP VERSION: ${(appVersion ?? "")}"}";
-
-        log('version==========>>>>>$version');
 
         request.fields['description'] = "$description\n [$version]";
       } else {

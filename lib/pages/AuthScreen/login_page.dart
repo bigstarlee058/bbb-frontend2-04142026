@@ -575,8 +575,7 @@ class _LoginPageState extends State<LoginPage> {
                                   "yearly_membership_1y_289" ||
                               subscriptionData["subscription_type"] ==
                                   "monthly_membership_1m_29") {
-                            DateTime now = await NTP.now();
-
+                            DateTime now = DateTime.now().toUtc();
                             DateTime? endDate = (subscriptionData["end_date"] ??
                                         "")
                                     .toString()
@@ -601,8 +600,7 @@ class _LoginPageState extends State<LoginPage> {
                                       "monthly_membership_1m_29" ||
                                   entitlements.values.first.productIdentifier ==
                                       "yearly_membership_1y_289") {
-                                DateTime now = await NTP.now();
-
+                                DateTime now = DateTime.now().toUtc();
                                 final String startDate =
                                     customerInfo.allPurchaseDates[
                                             subscriptionData[
@@ -648,7 +646,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ? "subscribed_user"
                                       : "free_user";
 
-                                  DateTime now = await NTP.now();
+                                  DateTime now = DateTime.now().toUtc();
                                   if ((now.isAfter(DateTime.parse(endDate)))) {
                                     await _updateSubscriptionData(
                                       isPrice: true,
@@ -667,7 +665,7 @@ class _LoginPageState extends State<LoginPage> {
                                     );
                                   }
                                 } else {
-                                  DateTime now = await NTP.now();
+                                  DateTime now = DateTime.now().toUtc();
                                   DateTime? endDate =
                                       (subscriptionData["end_date"] ?? "")
                                               .toString()
@@ -689,7 +687,7 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                               }
                             } else {
-                              DateTime now = await NTP.now();
+                              DateTime now = DateTime.now().toUtc();
                               DateTime? endDate =
                                   (subscriptionData["end_date"] ?? "")
                                           .toString()
@@ -804,7 +802,6 @@ class _LoginPageState extends State<LoginPage> {
                         //     ? null
                         //     : DateTime.parse(subscriptionData["end_date"] ?? "");
                         //
-                        // DateTime now = await NTP.now();
                         //
                         // if (subscriptionData["user_subscription_status"] == "free_user" ||
                         //     (endDate != null && now.isAfter(endDate))) {

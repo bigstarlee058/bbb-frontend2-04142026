@@ -164,7 +164,7 @@ class _ExercisePageState extends State<ExercisePage>
         if (isFinished) {
           showControlsOnTapOfPause();
         }
-        if (duration != null && position >= duration) {
+        if (position >= duration) {
           AudioManager.abandonAudioFocus();
           if (Platform.isIOS) {
             _videoPlayerController1.seekTo(Duration.zero);
@@ -304,17 +304,12 @@ class _ExercisePageState extends State<ExercisePage>
       return;
     }
     final payloadModel = PayloadModel.fromJson(jsonDecode(rawTempData));
-    log('payloadModel.weekIndex==========>>>>>${payloadModel.weekIndex}');
     monthProvider!.weekDataModel =
         monthProvider!.monthDataModel!.weeks![payloadModel.weekIndex! - 1];
 
-    log('monthProvider!.weekDataModel==========>>>>>${monthProvider!.weekDataModel}');
-    log('monthProvider?.todayTitleId==========>>>>>${jsonEncode(payloadModel)}');
     int? index = monthProvider!.weekDataModel!.idList?.indexWhere((element) {
-      log('element==========>>>>>${element}');
       return element == payloadModel.dayId;
     });
-    log('index==========>>>>>${index}');
     final dayIndex = int.parse((monthProvider!
                 .weekDataModel!.dayList?[index ?? 0]
                 .toString()
@@ -324,7 +319,6 @@ class _ExercisePageState extends State<ExercisePage>
                 .replaceAll(" ", "") ??
             "0")) -
         1;
-    log('dayIndex==========>>>>>${dayIndex}');
     DayDataModel dayData =
         "${monthProvider!.weekDataModel?.dayList![index ?? 0] ?? ""}"
                 .toString()
@@ -705,7 +699,7 @@ class _ExercisePageState extends State<ExercisePage>
 
     videoProgressValue.value = pos;
 
-    if (dur == null || _restarting) return;
+    if (_restarting) return;
 
     const epsilon = Duration(milliseconds: 120);
     if (pos >= dur - epsilon) {
@@ -866,7 +860,7 @@ class _ExercisePageState extends State<ExercisePage>
   int backOffIndex = 0;
   int workingIndex = 0;
 
-  void _showSpeedOptions() {
+  void showSpeedOptions() {
     showModalBottomSheet(
       backgroundColor: Theme.of(context).cardColor,
       context: context,
@@ -890,7 +884,7 @@ class _ExercisePageState extends State<ExercisePage>
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primaryColor
-                        : Theme.of(context).dividerColor.withOpacity(0.2),
+                        : Theme.of(context).dividerColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -917,7 +911,7 @@ class _ExercisePageState extends State<ExercisePage>
 
   double _currentSpeed = 1.0;
 
-  void _downloadVideo() {
+  void downloadVideo() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Downloading video...')),
     );
@@ -1916,7 +1910,6 @@ class _ExercisePageState extends State<ExercisePage>
                                   : extraItem.type == 2
                                       ? monthProvider!.selectedBackOffSetTotal
                                       : monthProvider!.selectedWorkingSetTotal;
-
                               int index = extraItem.type == 1
                                   ? warmUpIndex - 1
                                   : extraItem.type == 2
@@ -2655,7 +2648,8 @@ class _ExercisePageState extends State<ExercisePage>
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$exId";
     final data = {
@@ -2713,7 +2707,8 @@ class _ExercisePageState extends State<ExercisePage>
       required String type}) async {
     await monthProvider?.fetchExerciseHistoryLocalData();
     await monthProvider?.fetchCircuitModelLocalData();
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     String split = monthProvider?.monthDataModel
             ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
             .toString()

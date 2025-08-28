@@ -47,7 +47,8 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with WidgetsBindingObserver {
   final today = DateTime.now();
   List<String> title = [];
   int focusedIndexStuff = 0;
@@ -60,6 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
   ScrollController scrollController = ScrollController();
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     onInit();
     super.initState();
   }
@@ -112,7 +114,11 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void loadFeaturedChallengeData() async {
-    await dataProvider?.fetchFeaturedChalleng();
+    try {
+      await dataProvider?.fetchFeaturedChalleng();
+    } catch (e) {
+      log('e==========>>>>>${e}');
+    }
   }
 
   Future<void> loadUserInfo() async {
@@ -137,7 +143,27 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        await _initializeFetchData().then((value) async =>
+            await monthProvider.onInit(context: context, isEnabled: false));
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.detached:
+        break;
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => scrollProvider.updateOffSet(0.0));
     super.dispose();
@@ -328,6 +354,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           if ((monthData.week ?? 0) > 4) {
                             return const SizedBox();
                           }
+
                           if (monthData.todayTitleId.isNotEmpty) {
                             int? index = monthData.monthDataModel
                                 ?.weeks?[(monthData.week ?? 1) - 1].idList
@@ -923,7 +950,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         bottom: ScreenUtil.verticalScale(2),
                         top: ScreenUtil.verticalScale(2.5)),
                     child: Text(
-                      "Current Week Activity",
+                      "Your Current Streak",
                       style: TextStyle(
                         color: AppColors.primaryColor,
                         fontSize: ScreenUtil.horizontalScale(5),
@@ -1688,7 +1715,8 @@ class _DashboardPageState extends State<DashboardPage> {
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     String dataId =
         "$split-${monthProvider.monthDataModel?.id}-${monthProvider.weekDataModel?.id}-${monthProvider.weekDataModel?.idList![monthProvider.overviewCurrentDay - 1]}";
 
@@ -1759,7 +1787,7 @@ class _DashboardPageState extends State<DashboardPage> {
       required String type,
       String? title,
       bool endDate = false}) async {
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
 
     String split = monthProvider.monthDataModel
             ?.weeks?[monthProvider.overviewCurrentWeek - 1].idList?.first
