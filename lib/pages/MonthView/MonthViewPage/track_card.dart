@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bbb/components/animated_dialog.dart';
 import 'package:bbb/custom/expansion_panel.dart';
 import 'package:bbb/localstorage/month_database.dart';
@@ -64,6 +66,13 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
   // bool _isExpanded = false;
   // bool thisWeek = false;
   // List<String> moreOptions = ["None", "Recommended", "Last Visited"];
+
+  bool isNavigating = false;
+
+  updateIsNavigate(bool value) {
+    isNavigating = value;
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -697,6 +706,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         Expanded(
           child: GestureDetector(
             onTap: () async {
+              if (isNavigating) return;
+
+              updateIsNavigate(true);
+
               monthProvider.changeIsPumpDay(true);
 
               final dataList = monthProvider.dayHistoryModel
@@ -763,7 +776,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
                 if (!context.mounted) return;
                 await Navigator.pushNamed(context, '/today');
               }
-
+              updateIsNavigate(false);
               // await Navigator.pushNamed(context, '/dayOverview');
             },
             child: Padding(
@@ -1398,6 +1411,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
       BuildContext context,
       int weekIndex,
       String dayId) async {
+    if (isNavigating) return;
+
+    updateIsNavigate(true);
+
     DayHistoryModel? matchingElement = monthProvider!.allSplitDayHistoryModel
         .firstWhere(
             (element) =>
@@ -1544,7 +1561,7 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         await Navigator.pushNamed(context, '/today');
       }
     }
-
+    updateIsNavigate(false);
     // Navigator.pushNamed(context, '/dayOverview');
   }
 
@@ -1748,13 +1765,14 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
               .toString()
               .split(" ")[1] ??
           "";
-      DateTime nowUT = await NTP.now();
+      DateTime nowUT = DateTime.now().toUtc();
+
       String dataId =
           "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
       if (status == Status.completed) {
         ApiRepo.addDayStatusList(
-            body: {"date": "${nowUT}", "status": Status.completed});
+            body: {"date": "$nowUT", "status": Status.completed});
       }
 
       final data = {
@@ -1765,11 +1783,11 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "dayId": monthProvider
             ?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1],
         "split": split,
-        "date": "${nowUT}",
+        "date": "$nowUT",
         "status": status,
         "type": type,
-        "startTime": "${nowUT}",
-        "endTime": endDate ? "${nowUT}" : "",
+        "startTime": "$nowUT",
+        "endTime": endDate ? "$nowUT" : "",
       };
 
       DayHistoryModel? matchingElement = monthProvider?.dayHistoryModel
@@ -1783,11 +1801,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "startTime": status == Status.empty
             ? ""
             : matchingElement?.startTime == null
-                ? "${nowUT}"
+                ? "$nowUT"
                 : matchingElement?.startTime.toString(),
-        "endTime": (status == Status.completed)
-            ? "${nowUT}"
-            : (endDate ? "${nowUT}" : ""),
+        "endTime":
+            (status == Status.completed) ? "$nowUT" : (endDate ? "$nowUT" : ""),
       };
 
       final apiBody = {
@@ -1797,11 +1814,10 @@ class _WeeklyTrackCardState extends State<WeeklyTrackCard> {
         "startTime": status == Status.empty
             ? ""
             : matchingElement?.startTime == null
-                ? "${nowUT}"
+                ? "$nowUT"
                 : matchingElement?.startTime.toString(),
-        "endTime": (status == Status.completed)
-            ? "${nowUT}"
-            : (endDate ? "${nowUT}" : ""),
+        "endTime":
+            (status == Status.completed) ? "$nowUT" : (endDate ? "$nowUT" : ""),
         "dataId": dataId
       };
 

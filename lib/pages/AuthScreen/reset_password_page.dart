@@ -83,18 +83,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               );
 
               if (response1.statusCode == 200) {
-                // showBottomAlert(
-                //   context,
-                //   "Please check your email inbox for the password reset email.",
-                // );
-                Navigator.push(
+                final data = jsonDecode(response1.body);
+                showBottomAlert(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SetPasswordScreen(
-                      token: data["token"],
-                    ),
-                  ),
+                  "Please check your email inbox for the password reset email.",
                 );
+
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => SetPasswordScreen(
+                //       token: data["token"],
+                //     ),
+                //   ),
+                // );
               } else {
                 final data = jsonDecode(response1.body);
                 showBottomAlert(

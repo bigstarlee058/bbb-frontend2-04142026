@@ -92,13 +92,15 @@ class _SignupPageState extends State<SignupPage> {
         String message = data['message'];
 
         if (message == "User registered") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ConfirmationScreen()));
+          // Navigator.push(context,
+          //     MaterialPageRoute(builder: (context) => ConfirmationScreen()));
 
-          // Navigator.pop(context);
+          Navigator.pop(context);
+
           // await loginUser(emailAddress, password);
-          // showBottomAlert(context,
-          //     'Signup successfully with $emailAddress please login here.');
+
+          showBottomAlert(context,
+              'You have been successfully registered with $emailAddress. Please proceed to log in');
         } else {
           showBottomAlert(context, 'Failed to signup');
         }

@@ -159,7 +159,6 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
     try {
       final CustomerInfo customerInfo =
           await Purchases.purchasePackage(selectedPackage!);
-      // final DateTime now = await NTP.now();
       // final entitlementId = selectedPackage!.storeProduct.identifier;
       // final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
 
@@ -622,9 +621,6 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
       await Purchases.setEmail(userDataProvider?.userEmail ?? "");
       final CustomerInfo customerInfo =
           await Purchases.purchasePackage(selectedPackage!);
-      // final DateTime now = await NTP.now();
-      // final entitlementId = selectedPackage!.storeProduct.identifier;
-      // final expirationDate = customerInfo.allExpirationDates[entitlementId] ?? customerInfo.latestExpirationDate;
 
       final entitlements = customerInfo.entitlements.active;
       if (entitlements.isNotEmpty) {
@@ -633,8 +629,7 @@ class _SubscriptionPayWallState extends State<SubscriptionPayWall> {
 
         if (planId == "monthly_membership_1m_29" ||
             planId == "yearly_membership_1y_289") {
-          DateTime now = await NTP.now();
-
+          DateTime now = DateTime.now().toUtc();
           final String startDate = customerInfo
                   .allPurchaseDates[selectedPackage?.storeProduct.identifier] ??
               now.toString();

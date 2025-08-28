@@ -361,7 +361,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               SharedPreference.notificationSwitch,
                               isSwitchOn ?? false);
                           if (isSwitchOn == true) {
-                            DateTime now = await NTP.now();
+                            DateTime now = DateTime.now().toUtc();
                             await NotificationService.scheduleMonthlyReminder(
                                 20, monthDataModel.endTime ?? now);
                             await NotificationService.scheduleWeekReminder(

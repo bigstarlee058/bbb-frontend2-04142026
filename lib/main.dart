@@ -223,7 +223,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     c = context;
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1)),
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(1),
+        boldText: false,
+      ),
       child: MultiProvider(
         providers: [
           dataProvider,

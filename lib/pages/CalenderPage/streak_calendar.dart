@@ -705,7 +705,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
@@ -780,7 +781,8 @@ class _StreakCalendarPageState extends State<StreakCalendarPage> {
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime nowUT = await NTP.now();
+    DateTime nowUT = DateTime.now().toUtc();
+
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 

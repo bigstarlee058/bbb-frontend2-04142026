@@ -186,7 +186,13 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
     userData = Provider.of<UserDataProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
-        isKg = await preferences.getBool(SharedPreference.isKG) ?? false;
+        final raw5 = await preferences.getBool(SharedPreference.isKG);
+
+        if (raw5 != null) {
+          isKg = raw5;
+        } else {
+          await preferences.setBool(SharedPreference.isKG, isKg);
+        }
       },
     );
     WidgetsBinding.instance.addPostFrameCallback(
@@ -413,8 +419,10 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
         child: Column(
           children: [
             Padding(
-              padding:
-                  EdgeInsets.symmetric(vertical: ScreenUtil.verticalScale(5)),
+              padding: EdgeInsets.symmetric(
+                  vertical: currentPage == 2
+                      ? ScreenUtil.verticalScale(3)
+                      : ScreenUtil.verticalScale(5)),
               child: Image.asset(
                 "assets/img/logo.png",
                 scale: 1.2,
@@ -422,7 +430,8 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             ),
             SizedBox(
               // color: Colors.red,
-              height: media.height * 0.55,
+              height:
+                  currentPage == 2 ? media.height * 0.57 : media.height * 0.55,
               child: PageView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 onPageChanged: (value) {
@@ -435,7 +444,10 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
                   return Padding(
                     padding: EdgeInsets.symmetric(
                             horizontal: ScreenUtil.horizontalScale(6))
-                        .copyWith(bottom: ScreenUtil.verticalScale(6.5)),
+                        .copyWith(
+                            bottom: index == 1
+                                ? ScreenUtil.verticalScale(5)
+                                : ScreenUtil.verticalScale(6.5)),
                     child: index == 0
                         ? page1()
                         : index == 1
@@ -534,7 +546,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               color: AppColors.primaryColor,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(2.5)),
+          SizedBox(height: ScreenUtil.verticalScale(2)),
           Text(
             "Some basic info to get us started.",
             textAlign: TextAlign.center,
@@ -544,7 +556,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
               color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
-          SizedBox(height: ScreenUtil.verticalScale(3.5)),
+          SizedBox(height: ScreenUtil.verticalScale(3)),
           _buildDropdownField(
             context: context,
             label: 'Gender',
@@ -582,6 +594,35 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
             controller: selectedWeight,
             focusNode: _nodeText1,
             suffix: isKg ? "kg" : "lbs",
+          ),
+          SizedBox(height: ScreenUtil.verticalScale(2)),
+          SizedBox(
+            height: ScreenUtil.verticalScale(3),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Use metric units?",
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: ScreenUtil.verticalScale(2.2),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Switch(
+                  value: isKg, // Boolean value
+
+                  onChanged: (bool value) async {
+                    setState(() {
+                      isKg = value;
+                    });
+
+                    await preferences.setBool(SharedPreference.isKG, isKg);
+                  },
+                  activeColor: AppColors.primaryColor,
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -959,7 +1000,7 @@ class _ProfileBoardingScreenState extends State<ProfileBoardingScreen> {
       dateOrder: DatePickerDateOrder.mdy,
       initialDateTime: DateTime(2000, 1, 1),
       maxDateTime: DateTime.now(),
-      minDateTime: DateTime(1950, 1, 1),
+      minDateTime: DateTime(1900, 1, 1),
       onSubmit: (dob) {
         selectedDate = dob;
         setState(() {});

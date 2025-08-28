@@ -96,9 +96,24 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> loginStatus(bool isLoggedIn) async {
-    dataProvider?.getAppBGs();
+    try {
+      await dataProvider?.getAppBGs();
+    } catch (e) {
+      log('e==========>>>>>$e');
+    }
 
     if (isLoggedIn) {
+      // await Navigator.pushAndRemoveUntil(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => ProfileBoardingScreen(
+      //       welcomeDescription: '',
+      //       welcomeImageUrl: '',
+      //     ),
+      //   ),
+      //   (route) => false,
+      // );
+
       WidgetsBinding.instance.addPostFrameCallback(
         (timeStamp) async => await _initializeFetchData().then(
           (value) async {
@@ -112,8 +127,14 @@ class _SplashScreenState extends State<SplashScreen> {
                       _handleLogout(context, sessionExpired);
                       return;
                     }
-                    dataProvider?.getAllAchievement(true);
-                    dataProvider?.fetchFeaturedChalleng();
+
+                    try {
+                      dataProvider?.getAllAchievement(true);
+                      dataProvider?.fetchFeaturedChalleng();
+                    } catch (e) {
+                      log('e==========>>>>>$e');
+                    }
+
                     await monthProvider?.onInit(context: context);
                     bool isFirstTime = userData.user["createdAt"] ==
                             userData.user["updatedAt"] ||
@@ -137,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 "yearly_membership_1y_289" ||
                             subscriptionData["subscription_type"] ==
                                 "monthly_membership_1m_29") {
-                          DateTime now = await NTP.now();
+                          DateTime now = DateTime.now().toUtc();
 
                           DateTime? endDate = (subscriptionData["end_date"] ??
                                       "")
@@ -163,7 +184,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                     "monthly_membership_1m_29" ||
                                 entitlements.values.first.productIdentifier ==
                                     "yearly_membership_1y_289") {
-                              DateTime now = await NTP.now();
+                              DateTime now = DateTime.now().toUtc();
                               final String startDate = customerInfo
                                           .allPurchaseDates[
                                       subscriptionData["subscription_type"]] ??
@@ -207,7 +228,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 final String status = entitlement.isActive
                                     ? "subscribed_user"
                                     : "free_user";
-                                DateTime now = await NTP.now();
+                                DateTime now = DateTime.now().toUtc();
 
                                 if ((now.isAfter(DateTime.parse(endDate)))) {
                                   await _updateSubscriptionData(
@@ -227,8 +248,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   );
                                 }
                               } else {
-                                DateTime now = await NTP.now();
-
+                                DateTime now = DateTime.now().toUtc();
                                 DateTime? endDate =
                                     (subscriptionData["end_date"] ?? "")
                                             .toString()
@@ -249,7 +269,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               }
                             }
                           } else {
-                            DateTime now = await NTP.now();
+                            DateTime now = DateTime.now().toUtc();
                             DateTime? endDate = (subscriptionData["end_date"] ??
                                         "")
                                     .toString()

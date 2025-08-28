@@ -785,7 +785,8 @@ class _MonthSettingDialogState extends State<MonthSettingDialog> {
                                                   : "C";
 
                                           await value.changeDaySplit(newValue1);
-                                          value.changeEquipmentType(newValue2);
+                                          await value
+                                              .changeEquipmentType(newValue2);
                                           await value.filterWorkouts();
 
                                           await value.updateLocalData();

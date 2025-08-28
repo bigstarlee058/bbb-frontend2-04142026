@@ -101,6 +101,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
                   TextField(
                     controller: _noteController,
                     maxLines: 5,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
                       hintText: 'Enter here',
                       border: OutlineInputBorder(),
@@ -238,8 +239,7 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
             ? "${monthProvider!.exerciseDetailModel!.sId.toString()}-${monthProvider!.circuitIndex}"
             : monthProvider!.exerciseDetailModel!.sId.toString();
 
-    DateTime now = await NTP.now();
-
+    DateTime now = DateTime.now().toUtc();
     final data = {
       "exerciseId": id.toString(),
       "date": "$now",
@@ -260,11 +260,11 @@ class _AddNoteBottomSheetState extends State<AddNoteBottomSheet> {
 
     final data = await DatabaseHelper().getDataFromTable(
         tableName: DatabaseHelper.exerciseNotes, id: id, where: "exerciseId");
-    log('data==========>>>>>$data');
     if (data.isNotEmpty) {
       dataList = List<ExerciseNotesModel>.from(json
           .decode(jsonEncode(data))
           .map((x) => ExerciseNotesModel.fromJson(x)));
+      dataList.sort((b, a) => a.date!.compareTo(b.date!));
     } else {
       dataList = [];
     }

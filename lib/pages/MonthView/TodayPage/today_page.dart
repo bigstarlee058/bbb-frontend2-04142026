@@ -60,7 +60,7 @@ class _TodayPageState extends State<TodayPage>
   ScrollProvider? scrollProvider;
 
   List<ExerciseDataModel> exercises = [];
-  List<RemovedExerciseModel> removedExercise = [];
+  // List<RemovedExerciseModel> removedExercise = [];
   bool isCurrentDayCompleted = false;
   bool isCurrentDaySkipped = false;
   String currentDayTitle = '';
@@ -254,25 +254,12 @@ class _TodayPageState extends State<TodayPage>
         }
 
         try {
-          await monthProvider?.fetchAllRemovedExerciseLocalData().then(
+          await monthProvider?.fetchRemovedExerciseData().then(
             (value) {
-              if (monthProvider!.allRemovedExercise.isNotEmpty) {
-                String split = monthProvider
-                        ?.monthDataModel
-                        ?.weeks?[monthProvider!.overviewCurrentWeek - 1]
-                        .idList
-                        ?.first
-                        .toString()
-                        .split(" ")[1] ??
-                    "";
-
-                String dataId =
-                    "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
-
-                for (var element in monthProvider!.allRemovedExercise) {
-                  exercises.removeWhere((exercise) =>
-                      element.dataId == dataId &&
-                      exercise.exerciseId == element.exerciseId);
+              if (monthProvider!.removedExercise.isNotEmpty) {
+                for (var element in monthProvider!.removedExercise) {
+                  exercises.removeWhere(
+                      (exercise) => exercise.exerciseId == element.exerciseId);
                 }
               }
             },
@@ -307,27 +294,29 @@ class _TodayPageState extends State<TodayPage>
   }
 
   Future<void> fetchRemovedExerciseLocalData() async {
-    String split = monthProvider?.monthDataModel
-            ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
-            .toString()
-            .split(" ")[1] ??
-        "";
-
-    final data = await DatabaseHelper().getFilteredWithMWDData(
-        tableName: DatabaseHelper.removedExerciseHistory,
-        monthId: "${monthProvider?.monthDataModel?.id}",
-        weekId: "${monthProvider?.weekDataModel?.id}",
-        split: split,
-        dayId:
-            "${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}}");
-    if (data.isNotEmpty) {
-      removedExercise = List<RemovedExerciseModel>.from(json
-          .decode(jsonEncode(data))
-          .map((x) => RemovedExerciseModel.fromJson(x)));
-    } else {
-      removedExercise = [];
-    }
+    // String split = monthProvider?.monthDataModel
+    //         ?.weeks?[monthProvider!.overviewCurrentWeek - 1].idList?.first
+    //         .toString()
+    //         .split(" ")[1] ??
+    //     "";
+    //
+    // final data = await DatabaseHelper().getFilteredWithMWDData(
+    //     tableName: DatabaseHelper.removedExerciseHistory,
+    //     monthId: "${monthProvider?.monthDataModel?.id}",
+    //     weekId: "${monthProvider?.weekDataModel?.id}",
+    //     split: split,
+    //     dayId:
+    //         "${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}}");
+    // if (data.isNotEmpty) {
+    //   removedExercise = List<RemovedExerciseModel>.from(json
+    //       .decode(jsonEncode(data))
+    //       .map((x) => RemovedExerciseModel.fromJson(x)));
+    // } else {
+    //   removedExercise = [];
+    // }
+    await monthProvider?.fetchRemovedExerciseData();
     monthProvider?.fetchAllRemovedExerciseLocalData();
+
     if (mounted) {
       WidgetsBinding.instance
           .addPostFrameCallback((timeStamp) => setState(() {}));
@@ -776,11 +765,13 @@ class _TodayPageState extends State<TodayPage>
                                                         children: List.generate(
                                                           exercises.length,
                                                           (i) {
-                                                            if (removedExercise.any((element) =>
-                                                                    element
-                                                                        .exerciseId ==
-                                                                    exercises[i]
-                                                                        .exerciseId!) ||
+                                                            if (monthProvider!
+                                                                    .removedExercise
+                                                                    .any((element) =>
+                                                                        element
+                                                                            .exerciseId ==
+                                                                        exercises[i]
+                                                                            .exerciseId!) ||
                                                                 (!exercises[i]
                                                                         .formats!
                                                                         .contains(monthProvider
@@ -2136,7 +2127,8 @@ class _TodayPageState extends State<TodayPage>
 
                                                       RemovedExerciseModel
                                                           removedDataExit =
-                                                          removedExercise
+                                                          monthProvider!
+                                                              .removedExercise
                                                               .firstWhere(
                                                         (element) =>
                                                             element.dataId ==
@@ -3230,7 +3222,7 @@ class _TodayPageState extends State<TodayPage>
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-${exerciseId ?? ""}";
 
-    DateTime now = await NTP.now();
+    DateTime now = DateTime.now().toUtc();
     Map<String, dynamic> data = {
       "dataId": dataId,
       "split": split,
@@ -3248,7 +3240,8 @@ class _TodayPageState extends State<TodayPage>
       "insertIndex": selectedIndex.toString()
     };
 
-    RemovedExerciseModel removedDataExit = removedExercise.firstWhere(
+    RemovedExerciseModel removedDataExit =
+        monthProvider!.removedExercise.firstWhere(
       (element) => element.dataId == dataId,
       orElse: () => RemovedExerciseModel(),
     );
@@ -3308,7 +3301,7 @@ class _TodayPageState extends State<TodayPage>
 
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}-$id";
-    DateTime now = await NTP.now();
+    DateTime now = DateTime.now().toUtc();
     final data = {
       "dataId": dataId,
       "exerciseId": id,
@@ -3548,7 +3541,7 @@ class _TodayPageState extends State<TodayPage>
       {required String status,
       required String type,
       required String status1}) async {
-    DateTime now = await NTP.now();
+    DateTime now = DateTime.now().toUtc();
     await monthProvider?.fetchExerciseStatusLocalData();
     if (status1 == Status.completed) {
       ApiRepo.addDayStatusList(
@@ -3704,7 +3697,7 @@ class _TodayPageState extends State<TodayPage>
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime now = await NTP.now();
+    DateTime now = DateTime.now().toUtc();
     await unSkipped(status);
 
     String dataId =
@@ -4469,7 +4462,7 @@ class _TodayPageState extends State<TodayPage>
             .toString()
             .split(" ")[1] ??
         "";
-    DateTime now = await NTP.now();
+    DateTime now = DateTime.now().toUtc();
     double totalWeight = 0;
     int exCount = 0;
     double average = 0;
@@ -4519,7 +4512,7 @@ class _TodayPageState extends State<TodayPage>
             status: status, id: elementI.warmupId!, type: 'Warmup');
       }
     }
-    updateResetDay(false);
+
     String dataId =
         "$split-${monthProvider?.monthDataModel?.id}-${monthProvider?.weekDataModel?.id}-${monthProvider?.weekDataModel?.idList![monthProvider!.overviewCurrentDay - 1]}";
 
@@ -4554,6 +4547,7 @@ class _TodayPageState extends State<TodayPage>
     await monthProvider?.updatePumpDayStatus();
     monthProvider?.manageStreak();
     monthProvider?.getLiftedWeightGraphData();
+    updateResetDay(false);
   }
 
   Widget resetDay(

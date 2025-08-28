@@ -2,6 +2,7 @@ import 'package:bbb/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 final ThemeData lightTheme = ThemeData(
+  fontFamily: 'Roboto',
   scaffoldBackgroundColor: Colors.white,
   brightness: Brightness.light,
   primaryColor: Color(0xff9A354E),
@@ -30,6 +31,7 @@ final ThemeData lightTheme = ThemeData(
 );
 
 final ThemeData darkTheme = ThemeData(
+  fontFamily: 'Roboto',
   brightness: Brightness.dark,
   scaffoldBackgroundColor: Colors.black,
   primaryColor: Color(0xff9A354E),
